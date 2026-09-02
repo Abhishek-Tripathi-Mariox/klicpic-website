@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cousine:wght@400;700&display=swap');
+
+@import "tailwindcss";
+
+/* Design tokens taken from Figma: Klicpic mithu (1550:2022) */
+@theme {
+  --color-klicpic-gold: #f9a825;
+  --color-klicpic-amber: #fe9a00;
+  --color-klicpic-ink: #1f2937;
+  --color-klicpic-night: #1a1a2e;
+  --color-klicpic-deep: #101828;
+  --color-klicpic-muted: #6a7282;
+  --color-klicpic-subtle: #99a1af;
+  --color-klicpic-canvas: #fafafa;
+  --font-sans: 'Poppins', system-ui, sans-serif;
+  --font-script: 'Dancing Script', cursive;
+  --font-mono: 'Cousine', ui-monospace, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: #ffffff;
+  font-family: var(--font-sans);
+  color: var(--color-klicpic-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Horizontal rails (Studios, Trending) hide their scrollbar but stay swipeable. */
+.klicpic-rail {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.klicpic-rail::-webkit-scrollbar {
+  display: none;
+}
