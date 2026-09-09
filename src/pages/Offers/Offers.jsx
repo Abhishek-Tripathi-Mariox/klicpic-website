@@ -1,32 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { imageUrl } from "../../api/imageUrl";
+import { useOffers, useOfferCountdown } from "../../api/useOffers";
 import { Link } from "react-router-dom";
 import { ArrowRight, Clock } from "lucide-react";
 import SiteLayout from "../../components/SiteLayout";
-import { COUNTDOWN_SECONDS, HOW_IT_WORKS, OFFERS } from "./offersData";
+import { HOW_IT_WORKS as LOCAL_HOW_IT_WORKS, OFFERS as LOCAL_OFFERS } from "./offersData";
+import { useContent } from "../../api/useContent";
 
 /**
  * Figma: Klicpic mithu / Offers (1550:9145)
  * Hero with countdown, four offer cards, "How It Works", and the ink CTA band.
  */
 const SCRIM = "linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%)";
-const pad = (value) => String(value).padStart(2, "0");
-
-function useCountdown(initial) {
-  const [remaining, setRemaining] = useState(initial);
-  useEffect(() => {
-    const timer = setInterval(
-      () => setRemaining((current) => (current > 0 ? current - 1 : 0)),
-      1000
-    );
-    return () => clearInterval(timer);
-  }, []);
-  return `${pad(Math.floor(remaining / 3600))}:${pad(
-    Math.floor((remaining % 3600) / 60)
-  )}:${pad(remaining % 60)}`;
-}
-
 export default function Offers() {
-  const countdown = useCountdown(COUNTDOWN_SECONDS);
+  // Live copy from the backend, falling back to what this build shipped.
+  const { content } = useContent("offers", { HOW_IT_WORKS: LOCAL_HOW_IT_WORKS });
+  const { HOW_IT_WORKS } = content;
+  // Offers are records now, not page copy.
+  const { offers: OFFERS, endsAt } = useOffers(LOCAL_OFFERS);
+
+  // Counts to the soonest expiry among the live offers; null when none is set.
+  const countdown = useOfferCountdown(endsAt);
 
   return (
     <SiteLayout active="Offers">
@@ -42,15 +36,17 @@ export default function Offers() {
           Don't miss out — grab these deals before they expire. Real value, zero
           compromise on quality.
         </p>
-        <div className="flex items-center gap-3 rounded-full border-[0.701px] border-solid border-[rgba(249,168,37,0.3)] bg-[rgba(249,168,37,0.12)] px-6 py-3">
-          <Clock className="size-[19.997px] shrink-0 text-[#f9a825]" strokeWidth={1.666} />
-          <span className="text-center text-[14px] leading-[20px] whitespace-nowrap text-[rgba(15,17,23,0.6)]">
-            Offers end in:
-          </span>
-          <span className="font-mono text-center text-[24px] leading-8 font-bold whitespace-nowrap text-[#f9a825]">
-            {countdown}
-          </span>
-        </div>
+        {countdown && (
+          <div className="flex items-center gap-3 rounded-full border-[0.701px] border-solid border-[rgba(249,168,37,0.3)] bg-[rgba(249,168,37,0.12)] px-6 py-3">
+            <Clock className="size-[19.997px] shrink-0 text-[#f9a825]" strokeWidth={1.666} />
+            <span className="text-center text-[14px] leading-[20px] whitespace-nowrap text-[rgba(15,17,23,0.6)]">
+              Offers end in:
+            </span>
+            <span className="font-mono text-center text-[24px] leading-8 font-bold whitespace-nowrap text-[#f9a825]">
+              {countdown}
+            </span>
+          </div>
+        )}
       </section>
 
       {/* offer cards */}
@@ -64,7 +60,7 @@ export default function Offers() {
               >
                 <div className="relative h-[175.997px] w-full shrink-0 overflow-hidden">
                   <img
-                    src={offer.image}
+                    src={imageUrl(offer.image, 640)}
                     alt={offer.title}
                     className="pointer-events-none absolute inset-0 size-full object-cover"
                   />
@@ -93,7 +89,7 @@ export default function Offers() {
 
                   <div className="h-4 w-full shrink-0" />
                   <Link
-          to="/book"
+          to={`/book?offer=${encodeURIComponent(offer.code || offer.id || "")}`}
                     className="mt-auto flex h-[41.385px] w-full cursor-pointer items-center justify-center rounded-[20px] border-[0.701px] border-solid border-[rgba(249,168,37,0.2)] bg-[rgba(249,168,37,0.12)] text-center text-[14px] leading-[20px] font-bold text-[#f9a825] transition-colors hover:bg-[rgba(249,168,37,0.22)]"
                   >
                     Claim Offer →

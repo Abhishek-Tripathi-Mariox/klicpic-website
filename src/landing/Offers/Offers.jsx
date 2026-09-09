@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useOffers, useOfferCountdown } from "../../api/useOffers";
 import { Link } from "react-router-dom";
 import { Clock } from "lucide-react";
 import freeInstagramReel from "./assets/free-instagram-reel.jpg";
@@ -10,7 +11,7 @@ import weekendSpecial from "./assets/weekend-special.jpg";
  * Figma: Klicpic mithu / Home — Exclusive Offers (1550:3078)
  * Four offer cards on the dark band with a countdown to the offer deadline.
  */
-const OFFERS = [
+const LOCAL_OFFERS = [
   {
     title: "Free Instagram Reel",
     image: freeInstagramReel,
@@ -50,28 +51,13 @@ const OFFERS = [
 ];
 
 /** Design shows 02:13:44 remaining; it ticks down from there. */
-const INITIAL_SECONDS = 2 * 3600 + 13 * 60 + 44;
-
-const pad = (value) => String(value).padStart(2, "0");
-
-function useCountdown(initialSeconds) {
-  const [remaining, setRemaining] = useState(initialSeconds);
-
-  useEffect(() => {
-    const timer = setInterval(
-      () => setRemaining((current) => (current > 0 ? current - 1 : 0)),
-      1000
-    );
-    return () => clearInterval(timer);
-  }, []);
-
-  return `${pad(Math.floor(remaining / 3600))}:${pad(
-    Math.floor((remaining % 3600) / 60)
-  )}:${pad(remaining % 60)}`;
-}
 
 export default function Offers() {
-  const countdown = useCountdown(INITIAL_SECONDS);
+  // Offer records, live from the CRM.
+  const { offers: OFFERS, endsAt } = useOffers(LOCAL_OFFERS);
+
+  // Counts to the soonest expiry among the live offers; null when none is set.
+  const countdown = useOfferCountdown(endsAt);
 
   return (
     <section className="flex w-full flex-col items-center bg-[#1f2937] px-6 py-24">
@@ -83,15 +69,17 @@ export default function Offers() {
           <h2 className="pt-1 text-center text-[36px] leading-10 font-bold text-white">
             Exclusive Offers
           </h2>
-          <div className="mt-6 flex items-center gap-3 rounded-full border-[0.701px] border-solid border-[rgba(249,168,37,0.25)] bg-[rgba(249,168,37,0.12)] px-6 py-3">
-            <Clock className="size-4 shrink-0 text-[#f9a825]" strokeWidth={1.333} />
-            <span className="text-center text-[14px] leading-[20px] whitespace-nowrap text-[rgba(255,255,255,0.6)]">
-              Offer ends in:
-            </span>
-            <span className="font-mono text-center text-[20px] leading-7 font-bold whitespace-nowrap text-[#f9a825]">
-              {countdown}
-            </span>
-          </div>
+          {countdown && (
+            <div className="mt-6 flex items-center gap-3 rounded-full border-[0.701px] border-solid border-[rgba(249,168,37,0.25)] bg-[rgba(249,168,37,0.12)] px-6 py-3">
+              <Clock className="size-4 shrink-0 text-[#f9a825]" strokeWidth={1.333} />
+              <span className="text-center text-[14px] leading-[20px] whitespace-nowrap text-[rgba(255,255,255,0.6)]">
+                Offer ends in:
+              </span>
+              <span className="font-mono text-center text-[20px] leading-7 font-bold whitespace-nowrap text-[#f9a825]">
+                {countdown}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="grid w-full grid-cols-1 gap-5 pt-12 sm:grid-cols-2 xl:grid-cols-4">
@@ -129,7 +117,7 @@ export default function Offers() {
               <div className="h-4 w-full shrink-0" />
 
               <Link
-          to="/book"
+          to={`/book?offer=${encodeURIComponent(offer.code || offer.id || "")}`}
                 className="mt-auto flex h-[41.385px] w-full cursor-pointer items-center justify-center rounded-[20px] border-[0.701px] border-solid border-[rgba(249,168,37,0.2)] bg-[rgba(249,168,37,0.12)] text-center text-[14px] leading-[20px] font-bold text-[#f9a825] transition-colors hover:bg-[rgba(249,168,37,0.2)]"
               >
                 Claim Offer →

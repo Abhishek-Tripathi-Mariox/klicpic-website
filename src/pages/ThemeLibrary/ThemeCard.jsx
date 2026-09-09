@@ -1,10 +1,15 @@
 import React from "react";
+import { imageUrl } from "../../api/imageUrl";
 import { Link } from "react-router-dom";
 import { CalendarCheck, Clock, Flame, Images, MapPin, Star } from "lucide-react";
 
 /**
  * Figma: Theme card (1550:3645) — photo with live-viewing / trending / price
  * badges, then props + gowns chips and the FOMO bar.
+ *
+ * A theme coming from the CRM carries the facts but none of the marketing
+ * dressing — `gowns`, and often `props`, have no column there. Both lists are
+ * read defensively so a live record still renders, just without those chips.
  */
 export default function ThemeCard({ theme, image }) {
   return (
@@ -12,7 +17,8 @@ export default function ThemeCard({ theme, image }) {
       {/* photo */}
       <div className="relative h-[339.992px] w-full shrink-0 overflow-hidden">
         <img
-          src={image}
+          src={imageUrl(image, 640)}
+          loading="lazy"
           alt={theme.name}
           className="pointer-events-none absolute inset-0 size-full object-cover"
         />
@@ -95,7 +101,7 @@ export default function ThemeCard({ theme, image }) {
         <div className="flex w-full flex-col items-start pt-2">
           <p className="text-[12px] leading-4 font-medium text-[#6a7282]">Props Used</p>
           <div className="flex flex-wrap items-start gap-1 pt-1">
-            {theme.props.map((prop) => (
+            {(theme.props ?? []).map((prop) => (
               <span
                 key={prop}
                 className="rounded-full bg-[#f3f4f6] px-2 py-[2px] text-[11px] leading-[16.5px] whitespace-nowrap text-[#4a5565]"
@@ -109,7 +115,7 @@ export default function ThemeCard({ theme, image }) {
         <div className="flex w-full flex-col items-start pt-3">
           <p className="text-[12px] leading-4 font-medium text-[#6a7282]">Gowns Used</p>
           <div className="flex flex-wrap items-start gap-1 pt-1">
-            {theme.gowns.map((gown) => (
+            {(theme.gowns ?? []).map((gown) => (
               <span
                 key={gown}
                 className="rounded-full bg-[#faf5ff] px-2 py-[2px] text-[11px] leading-[16.5px] whitespace-nowrap text-[#9810fa]"

@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useMemo } from "react";
+import { useShootTypes } from "../../api/useCatalog";
 import SectionHeading from "../../components/SectionHeading";
 import maternity from "./assets/maternity.jpg";
 import newborn from "./assets/newborn.jpg";
@@ -13,30 +14,41 @@ import corporate from "./assets/corporate.jpg";
 /**
  * Figma: Klicpic mithu / Home — Choose Your Perfect Photoshoot (1550:2077)
  * 3x3 grid of category cards, image + bottom-up scrim + title/meta.
+ *
+ * The frame's "From ₹…" price, theme count and "Booked" tally are gone: all
+ * The frame's "From ₹…" price is gone — those figures undercut what the CRM's
+ * packages actually cost — and the theme count now comes from the CRM, which
+ * holds 2 Maternity themes where the frame claimed 48.
  */
 const CATEGORIES = [
-  { name: "Maternity", image: maternity, price: "From ₹4,999", themes: "48 Themes", booked: "1,240+ Booked" },
-  { name: "Newborn", image: newborn, price: "From ₹5,999", themes: "35 Themes", booked: "890+ Booked" },
-  { name: "Baby", image: baby, price: "From ₹3,999", themes: "52 Themes", booked: "1,580+ Booked" },
-  { name: "Birthday", image: birthday, price: "From ₹6,999", themes: "67 Themes", booked: "2,100+ Booked" },
-  { name: "Family", image: family, price: "From ₹7,999", themes: "44 Themes", booked: "1,340+ Booked" },
-  { name: "Wedding", image: wedding, price: "From ₹24,999", themes: "38 Themes", booked: "760+ Booked" },
-  { name: "Pre-Wedding", image: preWedding, price: "From ₹14,999", themes: "29 Themes", booked: "540+ Booked" },
-  { name: "Couple", image: couple, price: "From ₹8,999", themes: "33 Themes", booked: "870+ Booked" },
-  { name: "Corporate", image: corporate, price: "From ₹9,999", themes: "18 Themes", booked: "320+ Booked" },
+  { name: "Maternity", image: maternity, booked: "1,240+ Booked" },
+  { name: "Newborn", image: newborn, booked: "890+ Booked" },
+  { name: "Baby", image: baby, booked: "1,580+ Booked" },
+  { name: "Birthday", image: birthday, booked: "2,100+ Booked" },
+  { name: "Family", image: family, booked: "1,340+ Booked" },
+  { name: "Wedding", image: wedding, booked: "760+ Booked" },
+  { name: "Pre-Wedding", image: preWedding, booked: "540+ Booked" },
+  { name: "Couple", image: couple, booked: "870+ Booked" },
+  { name: "Corporate", image: corporate, booked: "320+ Booked" },
 ];
 
 const CARD_SCRIM =
   "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0) 100%)";
 
 export default function Categories() {
+  const liveTypes = useShootTypes([]);
+  const themeCounts = useMemo(
+    () => new Map(liveTypes.map((type) => [type.label.toLowerCase(), type.themeCount])),
+    [liveTypes]
+  );
+
   return (
     <section className="flex w-full flex-col items-center bg-[#fafafa] px-6 py-24">
       <div className="flex w-full max-w-[1440px] flex-col items-start">
         <SectionHeading
           eyebrow="Choose Your"
           title="Perfect Photoshoot"
-          subtitle="10 categories · 500+ themes · infinite memories"
+          subtitle={`${CATEGORIES.length} categories · infinite memories`}
         />
 
         <div className="grid w-full grid-cols-1 gap-5 pt-16 sm:grid-cols-2 lg:grid-cols-3">
@@ -59,14 +71,16 @@ export default function Categories() {
                   {category.name}
                 </h3>
                 <div className="flex items-center gap-2 pt-1">
-                  <span className="text-[14px] leading-[20px] whitespace-nowrap text-[rgba(255,255,255,0.65)]">
-                    {category.price}
-                  </span>
-                  <span className="text-[14px] leading-[20px] text-[rgba(255,255,255,0.65)]">·</span>
-                  <span className="text-[14px] leading-[20px] whitespace-nowrap text-[rgba(255,255,255,0.65)]">
-                    {category.themes}
-                  </span>
-                  <span className="text-[14px] leading-[20px] text-[rgba(255,255,255,0.65)]">·</span>
+                  {/* Only a category the CRM actually holds themes for gets a
+                      count; the rest simply do not show one. */}
+                  {themeCounts.get(category.name.toLowerCase()) > 0 && (
+                    <>
+                      <span className="text-[14px] leading-[20px] whitespace-nowrap text-[rgba(255,255,255,0.65)]">
+                        {themeCounts.get(category.name.toLowerCase())} Themes
+                      </span>
+                      <span className="text-[14px] leading-[20px] text-[rgba(255,255,255,0.65)]">·</span>
+                    </>
+                  )}
                   <span className="text-[14px] leading-[20px] whitespace-nowrap text-[rgba(255,255,255,0.65)]">
                     {category.booked}
                   </span>

@@ -11,7 +11,6 @@ export const NAV_LINKS = [
   { label: "Photoshoots", to: "/photoshoots" },
   { label: "Themes", to: "/themes" },
   { label: "Props", to: "/props" },
-  { label: "Gowns", to: "/gowns" },
   { label: "Packages", to: "/packages" },
   { label: "Gallery", to: "/gallery" },
   { label: "Offers", to: "/offers" },

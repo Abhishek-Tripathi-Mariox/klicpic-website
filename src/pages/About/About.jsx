@@ -1,8 +1,11 @@
 import React from "react";
+import { useApi } from "../../api/useApi";
+import { fetchAbout } from "../../api/endpoints";
 import { Link } from "react-router-dom";
 import { Gem, Heart, MapPin, Smile, Users } from "lucide-react";
 import SiteLayout from "../../components/SiteLayout";
-import { STATS, STORY, STUDIO, TEAM, VALUES } from "./aboutData";
+import { STATS as LOCAL_STATS, STORY as LOCAL_STORY, STUDIO as LOCAL_STUDIO, TEAM as LOCAL_TEAM, VALUES as LOCAL_VALUES } from "./aboutData";
+import { useContent } from "../../api/useContent";
 import studioHero from "./assets/studio-hero.jpg";
 
 /**
@@ -15,6 +18,16 @@ const HERO_SCRIM =
   "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0) 100%)";
 
 export default function About() {
+  // Live copy from the backend, falling back to what this build shipped.
+  // About is its own record now; the block stays as the offline fallback.
+  const { data: live } = useApi(fetchAbout, null, []);
+  const { content } = useContent("about", { STORY: LOCAL_STORY, STATS: LOCAL_STATS, VALUES: LOCAL_VALUES, TEAM: LOCAL_TEAM, STUDIO: LOCAL_STUDIO });
+  const STORY = live?.story?.length ? live.story : content.STORY;
+  const STATS = live?.stats?.length ? live.stats : content.STATS;
+  const VALUES = live?.values?.length ? live.values : content.VALUES;
+  const TEAM = live?.team?.length ? live.team : content.TEAM;
+  const STUDIO = live?.studio?.address ? live.studio : content.STUDIO;
+
   return (
     <SiteLayout
       announcement={{

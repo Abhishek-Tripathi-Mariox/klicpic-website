@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useReviews } from "../../api/useReviews";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import priyaSharma from "./assets/priya-sharma.jpg";
 
@@ -9,7 +10,7 @@ import priyaSharma from "./assets/priya-sharma.jpg";
  * first slide, so TESTIMONIALS holds that one; SLIDE_COUNT keeps the designed
  * four dots until the remaining quotes are supplied.
  */
-const TESTIMONIALS = [
+const LOCAL_TESTIMONIALS = [
   {
     quote:
       "“Absolutely magical experience! The team at Klicpic captured our maternity shoot so beautifully. Every photo tells a story. We will treasure these memories forever.”",
@@ -29,6 +30,9 @@ const PLATFORMS = [
 ];
 
 export default function Testimonials() {
+  // Real customer reviews, left through the portal.
+  const { testimonials: TESTIMONIALS } = useReviews(LOCAL_TESTIMONIALS);
+
   const [index, setIndex] = useState(0);
   const testimonial = TESTIMONIALS[index];
 

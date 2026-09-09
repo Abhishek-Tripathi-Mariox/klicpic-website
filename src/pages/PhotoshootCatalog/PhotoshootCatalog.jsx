@@ -1,19 +1,61 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Star } from "lucide-react";
 import SiteLayout from "../../components/SiteLayout";
 import PageHeading from "../../components/PageHeading";
-import { CATALOG } from "./catalogData";
+import Pagination from "../../components/Pagination";
+import { CATALOG as LOCAL_CATALOG } from "./catalogData";
+import { useContent } from "../../api/useContent";
+import { useShootTypes } from "../../api/useCatalog";
 
 /**
  * Figma: Klicpic mithu / Photoshoots — Photoshoot Catalog (1616:18859)
- * 3x3 grid of category cards: photo with rating + price badge, then copy,
- * theme/gallery counts and the two CTAs.
+ * 3x3 grid of category cards: photo with a rating badge, then copy,
+ *
+ * The frame also put a "From ₹…" pill on each card. Those figures were design
+ * copy, not the studio's: the CRM's cheapest Maternity package is ₹6,999, not
+ * the ₹4,999 the card promised, and six of the nine categories have no package
+ * at all. Quoting a price nobody can honour is worse than quoting none.
+ * the CRM's theme count and the two CTAs.
  */
+/** Cards per page — twelve fills the three-column grid four rows deep. */
+const PAGE_SIZE = 12;
+
 const SCRIM =
   "linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%)";
 
 export default function PhotoshootCatalog() {
+  // Live copy from the backend, falling back to what this build shipped.
+  const { content } = useContent("photoshoot-catalog", { CATALOG: LOCAL_CATALOG });
+  const { CATALOG } = content;
+
+  /**
+   * Theme counts come from the CRM, matched to a card by name. The frame's
+   * numbers were invented — it credited Maternity with 48 themes where the CRM
+   * holds 2. A category the CRM has never heard of gets no count at all rather
+   * than a made-up one.
+   */
+  /**
+   * These cards live in the CMS block, not a collection, so there is nothing
+   * for the backend to slice — the page holds them all and pages through them
+   * here. With nine cards the control does not render at all; add a tenth and
+   * it appears.
+   */
+  const [page, setPage] = useState(1);
+  const pages = Math.max(1, Math.ceil(CATALOG.length / PAGE_SIZE));
+  const shown = CATALOG.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const changePage = (next) => {
+    setPage(next);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const liveTypes = useShootTypes([]);
+  const themeCounts = useMemo(
+    () => new Map(liveTypes.map((type) => [type.label.toLowerCase(), type.themeCount])),
+    [liveTypes]
+  );
+
   return (
     <SiteLayout active="Photoshoots">
       <section className="flex w-full flex-col items-center bg-white px-6 pb-24">
@@ -21,11 +63,13 @@ export default function PhotoshootCatalog() {
           <PageHeading
             eyebrow="Explore Our"
             title="Photoshoot Catalog"
-            subtitle="9 categories · 500+ themes · crafted for every milestone"
+            /* The category count is whatever is on the page; the "500+ themes"
+               claim is gone — the CRM holds 187. */
+            subtitle={`${CATALOG.length} categories · crafted for every milestone`}
           />
 
           <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {CATALOG.map((item) => (
+            {shown.map((item) => (
               <article
                 key={item.name}
                 className="group flex flex-col items-start overflow-hidden rounded-3xl bg-white shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)]"
@@ -37,10 +81,6 @@ export default function PhotoshootCatalog() {
                     className="pointer-events-none absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   <div className="absolute inset-0" style={{ background: SCRIM }} />
-
-                  <span className="absolute top-4 right-4 rounded-full bg-[#f9a825] px-3 py-1 text-[12px] leading-4 font-bold whitespace-nowrap text-white">
-                    {item.price}
-                  </span>
 
                   <div className="absolute bottom-4 left-4 flex items-center gap-1">
                     <Star
@@ -64,22 +104,17 @@ export default function PhotoshootCatalog() {
                     {item.description}
                   </p>
 
-                  <div className="flex items-center gap-4 pt-4">
-                    <span className="flex items-center gap-1 text-[14px] leading-[20px] text-[#6a7282]">
-                      🎨
-                      <strong className="font-bold text-[#1f2937]">
-                        {item.themes}
-                      </strong>
-                      Themes
-                    </span>
-                    <span className="flex items-center gap-1 text-[14px] leading-[20px] text-[#6a7282]">
-                      📸
-                      <strong className="font-bold text-[#1f2937]">
-                        {item.gallery}
-                      </strong>
-                      Gallery
-                    </span>
-                  </div>
+                  {themeCounts.get(item.name.toLowerCase()) > 0 && (
+                    <div className="flex items-center gap-4 pt-4">
+                      <span className="flex items-center gap-1 text-[14px] leading-[20px] text-[#6a7282]">
+                        🎨
+                        <strong className="font-bold text-[#1f2937]">
+                          {themeCounts.get(item.name.toLowerCase())}
+                        </strong>
+                        Themes
+                      </span>
+                    </div>
+                  )}
 
                   <div className="mt-auto flex w-full items-stretch gap-3 pt-5">
                     <Link
@@ -100,6 +135,14 @@ export default function PhotoshootCatalog() {
               </article>
             ))}
           </div>
+
+          <Pagination
+            page={page}
+            pages={pages}
+            total={CATALOG.length}
+            noun="categories"
+            onChange={changePage}
+          />
         </div>
       </section>
     </SiteLayout>

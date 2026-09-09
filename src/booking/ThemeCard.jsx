@@ -1,4 +1,5 @@
 import React from "react";
+import { imageUrl } from "../api/imageUrl";
 import { Check, Flame } from "lucide-react";
 
 /**
@@ -12,7 +13,7 @@ const SCRIM =
 export default function ThemeCard({ theme, selected, onSelect, onOpen }) {
   return (
     <div
-      className={`group relative h-[199.99px] w-full overflow-hidden rounded-2xl ${
+      className={`group relative h-[199.99px] w-full overflow-hidden rounded-2xl bg-gradient-to-br from-[#3f4550] to-[#1f2937] ${
         selected ? "ring-2 ring-[#f9a825] ring-offset-2" : ""
       }`}
     >
@@ -23,11 +24,14 @@ export default function ThemeCard({ theme, selected, onSelect, onOpen }) {
         className="absolute inset-0 cursor-pointer text-left"
         aria-pressed={selected}
       >
-        <img
-          src={theme.image}
-          alt={theme.name}
-          className="pointer-events-none absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
+        {theme.image && (
+          <img
+            loading="lazy"
+            src={imageUrl(theme.image, 480)}
+            alt={theme.name}
+            className="pointer-events-none absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        )}
         <span className="absolute inset-0" style={{ background: SCRIM }} />
 
         <span className="absolute top-2 left-2 flex flex-col items-start gap-1">

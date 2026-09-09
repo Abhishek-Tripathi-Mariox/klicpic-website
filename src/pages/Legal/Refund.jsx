@@ -4,16 +4,17 @@ import { AlertCircle, CalendarClock, CheckCircle2, Clock } from "lucide-react";
 import SiteLayout from "../../components/SiteLayout";
 import PolicyHero from "../../components/PolicyHero";
 import {
-  BALANCE_POINTS,
-  CANCELLATION_TIERS,
-  HOW_TO_STEPS,
-  REFUND_CALLOUT,
-  REFUND_LINKS,
-  REFUND_META,
-  RESCHEDULE_FOOTNOTE,
-  RESCHEDULE_ROWS,
-  SPECIAL_CIRCUMSTANCES,
+  BALANCE_POINTS as LOCAL_BALANCE_POINTS,
+  CANCELLATION_TIERS as LOCAL_CANCELLATION_TIERS,
+  HOW_TO_STEPS as LOCAL_HOW_TO_STEPS,
+  REFUND_CALLOUT as LOCAL_REFUND_CALLOUT,
+  REFUND_LINKS as LOCAL_REFUND_LINKS,
+  REFUND_META as LOCAL_REFUND_META,
+  RESCHEDULE_FOOTNOTE as LOCAL_RESCHEDULE_FOOTNOTE,
+  RESCHEDULE_ROWS as LOCAL_RESCHEDULE_ROWS,
+  SPECIAL_CIRCUMSTANCES as LOCAL_SPECIAL_CIRCUMSTANCES,
 } from "./refundData";
+import { useContent } from "../../api/useContent";
 
 /**
  * Figma: Klicpic mithu / Refund (1616:22448)
@@ -49,6 +50,30 @@ function SectionHeading({ title, note }) {
 }
 
 export default function Refund() {
+  // Live copy from the backend, falling back to what this build shipped.
+  const { content } = useContent("legal-refund", {
+    BALANCE_POINTS: LOCAL_BALANCE_POINTS,
+    CANCELLATION_TIERS: LOCAL_CANCELLATION_TIERS,
+    HOW_TO_STEPS: LOCAL_HOW_TO_STEPS,
+    REFUND_CALLOUT: LOCAL_REFUND_CALLOUT,
+    REFUND_LINKS: LOCAL_REFUND_LINKS,
+    REFUND_META: LOCAL_REFUND_META,
+    RESCHEDULE_FOOTNOTE: LOCAL_RESCHEDULE_FOOTNOTE,
+    RESCHEDULE_ROWS: LOCAL_RESCHEDULE_ROWS,
+    SPECIAL_CIRCUMSTANCES: LOCAL_SPECIAL_CIRCUMSTANCES,
+  });
+  const {
+    BALANCE_POINTS,
+    CANCELLATION_TIERS,
+    HOW_TO_STEPS,
+    REFUND_CALLOUT,
+    REFUND_LINKS,
+    REFUND_META,
+    RESCHEDULE_FOOTNOTE,
+    RESCHEDULE_ROWS,
+    SPECIAL_CIRCUMSTANCES,
+  } = content;
+
   return (
     <SiteLayout
       announcement={{

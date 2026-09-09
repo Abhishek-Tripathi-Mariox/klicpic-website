@@ -1,14 +1,25 @@
 import React, { useMemo, useState } from "react";
+import { useApi } from "../../api/useApi";
+import { fetchFaqs } from "../../api/endpoints";
 import { ChevronDown, MessageCircle, Phone } from "lucide-react";
 import SiteLayout from "../../components/SiteLayout";
 import PolicyHero from "../../components/PolicyHero";
-import { FAQS, FAQ_CATEGORIES } from "./faqData";
+import { FAQS as LOCAL_FAQS, FAQ_CATEGORIES as LOCAL_FAQ_CATEGORIES } from "./faqData";
 
 /**
  * Figma: Klicpic mithu / FAQ (1616:20695)
  * Dark hero with search, category pills, accordion list, and a contact card.
  */
 export default function FAQPage() {
+  // Live copy from the backend, falling back to what this build shipped.
+  // FAQs are records now; the block stays as the offline fallback.
+  const { data: live } = useApi(fetchFaqs, null, []);
+  const content = {
+    FAQS: live?.faqs?.length ? live.faqs : LOCAL_FAQS,
+    FAQ_CATEGORIES: live?.categories?.length ? live.categories : LOCAL_FAQ_CATEGORIES,
+  };
+  const { FAQS, FAQ_CATEGORIES } = content;
+
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [openQuestion, setOpenQuestion] = useState(FAQS[0].question);
@@ -23,7 +34,7 @@ export default function FAQPage() {
         faq.answer.toLowerCase().includes(needle);
       return inCategory && matches;
     });
-  }, [query, category]);
+  }, [query, category, FAQS]);
 
   return (
     <SiteLayout

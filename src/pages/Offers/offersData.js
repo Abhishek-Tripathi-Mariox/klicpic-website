@@ -72,5 +72,3 @@ export const HOW_IT_WORKS = [
   },
 ];
 
-/** Design shows 13:49:02 remaining; it ticks down from there. */
-export const COUNTDOWN_SECONDS = 13 * 3600 + 49 * 60 + 2;

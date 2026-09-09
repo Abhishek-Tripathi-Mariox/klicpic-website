@@ -1,6 +1,8 @@
 import React from "react";
+import { useApi } from "../../api/useApi";
+import { fetchContact } from "../../api/endpoints";
 import { Link } from "react-router-dom";
-import { Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Clock, Instagram, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import SiteLayout from "../../components/SiteLayout";
 import PolicyHero from "../../components/PolicyHero";
 
@@ -10,7 +12,10 @@ import PolicyHero from "../../components/PolicyHero";
  * is reused from designed frames (Footer 1550:3328, About 1550:9732) rather
  * than invented. Replace it when a Contact design lands.
  */
-const CHANNELS = [
+/** Icon names the CMS can choose from. */
+const ICONS = { Phone, MessageCircle, Mail, MapPin, Clock, Instagram };
+
+const LOCAL_CHANNELS = [
   {
     Icon: Phone,
     label: "Call us",
@@ -32,6 +37,14 @@ const CHANNELS = [
 ];
 
 export default function Contact() {
+  // Channels come from the CMS; the block stores an icon name, which maps to
+  // the component here because a component cannot be stored as JSON.
+  const { data: live } = useApi(fetchContact, null, []);
+  const CHANNELS = (live?.channels?.length ? live.channels : LOCAL_CHANNELS).map((channel) => ({
+    ...channel,
+    Icon: ICONS[channel.icon] || channel.Icon || Phone,
+  }));
+
   return (
     <SiteLayout>
       <PolicyHero

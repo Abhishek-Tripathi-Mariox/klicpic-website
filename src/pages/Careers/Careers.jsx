@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useCareers } from "../../api/useCareers";
 import {
   Camera,
   CheckCircle2,
@@ -11,13 +12,8 @@ import {
 } from "lucide-react";
 import SiteLayout from "../../components/SiteLayout";
 import JobCard from "./JobCard";
-import {
-  ANNOUNCEMENT,
-  BENEFITS,
-  HERO,
-  JOBS,
-  OPEN_APPLICATION,
-} from "./careersData";
+import { ANNOUNCEMENT as LOCAL_ANNOUNCEMENT, BENEFITS as LOCAL_BENEFITS, HERO as LOCAL_HERO, JOBS as LOCAL_JOBS, OPEN_APPLICATION as LOCAL_OPEN_APPLICATION } from "./careersData";
+import { useContent } from "../../api/useContent";
 
 /**
  * Figma: Careers — 1550:9954 (positions list), 1550:10438 (a role expanded
@@ -28,6 +24,12 @@ import {
 const ICONS = { Sparkles, TrendingUp, Clock, Wallet, Camera, Heart };
 
 export default function Careers() {
+  // Live copy from the backend, falling back to what this build shipped.
+  const { content } = useContent("careers", { ANNOUNCEMENT: LOCAL_ANNOUNCEMENT, BENEFITS: LOCAL_BENEFITS, HERO: LOCAL_HERO, OPEN_APPLICATION: LOCAL_OPEN_APPLICATION });
+  const { ANNOUNCEMENT, BENEFITS, HERO, OPEN_APPLICATION } = content;
+  // Postings are records now, managed in the CRM; the rest is page copy.
+  const { jobs: JOBS } = useCareers(LOCAL_JOBS);
+
   const [openJob, setOpenJob] = useState(null);
   const [submittedJob, setSubmittedJob] = useState(null);
 
@@ -36,9 +38,10 @@ export default function Careers() {
     setOpenJob((current) => (current === id ? null : id));
   };
 
-  const handleSubmitted = (id) => {
+  // Keep the reference the backend assigns, so the confirmation can quote it.
+  const handleSubmitted = (id, applicationNumber) => {
     setOpenJob(null);
-    setSubmittedJob(id);
+    setSubmittedJob({ id, applicationNumber });
   };
 
   return (
@@ -111,7 +114,7 @@ export default function Careers() {
 
           <div className="flex w-full flex-col items-start gap-4 pt-8">
             {JOBS.map((job) =>
-              submittedJob === job.id ? (
+              submittedJob?.id === job.id ? (
                 <div
                   key={job.id}
                   className="flex w-full flex-col items-center rounded-2xl border-[0.701px] border-solid border-[#f3f4f6] bg-white px-6 py-10 text-center shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)]"
@@ -127,6 +130,15 @@ export default function Careers() {
                     Thanks for applying to {job.title}. Our team will get back to
                     you within 3 working days.
                   </p>
+                  {submittedJob.applicationNumber && (
+                    <p className="pt-3 text-[13px] leading-[18px] text-[#6a7282]">
+                      Your reference is{" "}
+                      <strong className="font-bold text-[#1f2937]">
+                        {submittedJob.applicationNumber}
+                      </strong>
+                      . We've emailed you a copy.
+                    </p>
+                  )}
                   <button
                     type="button"
                     onClick={() => setSubmittedJob(null)}

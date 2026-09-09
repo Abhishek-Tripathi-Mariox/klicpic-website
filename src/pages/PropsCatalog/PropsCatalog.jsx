@@ -1,8 +1,10 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { imageUrl } from "../../api/imageUrl";
 import SiteLayout from "../../components/SiteLayout";
+import Pagination from "../../components/Pagination";
 import CatalogFilters from "../../components/CatalogFilters";
 import PageHeading from "../../components/PageHeading";
-import { PROPS, PROP_FILTERS } from "./propsData";
+import { usePagedProps } from "../../api/useCatalog";
 
 /**
  * Figma: Props Catalog (1550:6558) — 4-column grid of prop cards.
@@ -14,7 +16,8 @@ function PropCard({ prop }) {
       <div className="relative h-[239.997px] w-full shrink-0 overflow-hidden bg-gradient-to-b from-[#eceef0] to-[#dfe2e4]">
         {prop.image && (
           <img
-            src={prop.image}
+            src={imageUrl(prop.image, 480)}
+            loading="lazy"
             alt={prop.name}
             className="pointer-events-none absolute inset-0 size-full object-cover"
           />
@@ -51,14 +54,16 @@ function PropCard({ prop }) {
         <h3 className="pt-1 text-[18px] leading-[27px] font-bold text-[#1f2937]">
           {prop.name}
         </h3>
-        <p className="pt-2 text-[14px] leading-[22.75px] text-[#6a7282]">
+        {/* CRM descriptions run to full spec paragraphs; the card was drawn for
+            a sentence, so clamp rather than let rows go ragged. */}
+        <p className="line-clamp-3 pt-2 text-[14px] leading-[22.75px] text-[#6a7282]">
           {prop.description}
         </p>
 
         <div className="flex w-full flex-col items-start py-3">
           <p className="text-[12px] leading-4 text-[#99a1af]">Works with</p>
           <div className="flex flex-wrap items-start gap-1 pt-1">
-            {prop.worksWith.map((theme) => (
+            {(prop.worksWith ?? []).map((theme) => (
               <span
                 key={theme}
                 className="rounded-full bg-[#fff7ed] px-2 py-[2px] text-[11px] leading-[16.5px] font-medium whitespace-nowrap text-[#f9a825]"
@@ -73,15 +78,30 @@ function PropCard({ prop }) {
   );
 }
 
+/**
+ * Cards per page. Twelve fills the four-column grid exactly three rows deep,
+ * so no page ends on a half-empty row. The backend counts and slices; the
+ * browser only ever holds one page.
+ */
+const PAGE_SIZE = 12;
+
 export default function PropsCatalog() {
   const [activeFilter, setActiveFilter] = useState("All");
-  const visible = useMemo(
-    () =>
-      activeFilter === "All"
-        ? PROPS
-        : PROPS.filter((prop) => prop.category === activeFilter),
-    [activeFilter]
-  );
+  const [page, setPage] = useState(1);
+
+  // A new filter is a new list — page 3 of the old one means nothing in it.
+  useEffect(() => setPage(1), [activeFilter]);
+
+  const { items, filters, total, pages, loading } = usePagedProps({
+    category: activeFilter,
+    page,
+    limit: PAGE_SIZE,
+  });
+
+  const changePage = (next) => {
+    setPage(next);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <SiteLayout active="Props">
@@ -90,18 +110,37 @@ export default function PropsCatalog() {
           <PageHeading
             eyebrow="Our Stunning"
             title="Props Catalog"
-            subtitle="1,500+ premium props curated for every theme"
+            subtitle={
+              total
+                ? `${total.toLocaleString("en-IN")} premium props curated for every theme`
+                : "Premium props curated for every theme"
+            }
           />
           <CatalogFilters
-            filters={PROP_FILTERS}
+            filters={filters}
             active={activeFilter}
             onChange={setActiveFilter}
           />
-          <div className="grid w-full grid-cols-1 gap-5 pt-14 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {visible.map((prop) => (
-              <PropCard key={prop.name} prop={prop} />
-            ))}
-          </div>
+
+          {!loading && items.length === 0 ? (
+            <p className="w-full pt-14 text-center text-[14px] leading-[20px] text-[#6a7282]">
+              Nothing in this category yet.
+            </p>
+          ) : (
+            <div className="grid w-full grid-cols-1 gap-5 pt-14 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {items.map((prop) => (
+                <PropCard key={prop.id || prop.name} prop={prop} />
+              ))}
+            </div>
+          )}
+
+          <Pagination
+            page={page}
+            pages={pages}
+            total={total}
+            noun="props"
+            onChange={changePage}
+          />
         </div>
       </section>
     </SiteLayout>

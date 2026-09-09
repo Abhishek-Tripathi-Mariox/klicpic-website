@@ -1,8 +1,10 @@
 import React, { useMemo, useState } from "react";
+import { imageUrl } from "../../api/imageUrl";
 import { Check, Search } from "lucide-react";
 import { useBooking } from "../BookingContext";
 import DetailsShell from "../DetailsShell";
-import { PROPS, PROP_FILTERS } from "../propsData";
+import { PROPS as LOCAL_PROPS, PROP_FILTERS as LOCAL_PROP_FILTERS } from "../propsData";
+import { usePropsCatalog } from "../../api/useCatalog";
 
 /**
  * Figma: booking wizard — Props sub-step (1552:16994).
@@ -11,7 +13,13 @@ import { PROPS, PROP_FILTERS } from "../propsData";
 const SCRIM =
   "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.15) 55%, rgba(0,0,0,0) 100%)";
 
+/** What this build shipped — the fallback when the API is unreachable. */
+const LOCAL_CATALOG = { items: LOCAL_PROPS, filters: LOCAL_PROP_FILTERS };
+
 export default function StepProps({ onBack, onNext, onSkipAll }) {
+  // The wizard must offer what the studio actually has on the shelf.
+  const { items: PROPS, filters: PROP_FILTERS } = usePropsCatalog(LOCAL_CATALOG);
+
   const { booking, set } = useBooking();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("All");
@@ -32,7 +40,7 @@ export default function StepProps({ onBack, onNext, onSkipAll }) {
         (filter === "All" || item.category === filter) &&
         (!needle || item.name.toLowerCase().includes(needle))
     );
-  }, [query, filter]);
+  }, [query, filter, PROPS]);
 
   return (
     <DetailsShell
@@ -40,7 +48,7 @@ export default function StepProps({ onBack, onNext, onSkipAll }) {
       hint="Props are optional"
       onSkipStep={onNext}
       backLabel="Theme"
-      nextLabel="Next: Gowns"
+      nextLabel="Next: Location"
       canContinue
       onBack={onBack}
       onNext={onNext}
@@ -101,15 +109,18 @@ export default function StepProps({ onBack, onNext, onSkipAll }) {
               type="button"
               onClick={() => toggle(item.name)}
               aria-pressed={selected}
-              className={`group relative aspect-square w-full cursor-pointer overflow-hidden rounded-2xl text-left ${
+              className={`group relative aspect-square w-full cursor-pointer overflow-hidden rounded-2xl bg-gradient-to-br from-[#3f4550] to-[#1f2937] text-left ${
                 selected ? "ring-2 ring-[#f9a825] ring-offset-2" : ""
               }`}
             >
-              <img
-                src={item.image}
-                alt={item.name}
-                className="pointer-events-none absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
+              {item.image && (
+                <img
+                  loading="lazy"
+                  src={imageUrl(item.image, 480)}
+                  alt={item.name}
+                  className="pointer-events-none absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              )}
               <span className="absolute inset-0" style={{ background: SCRIM }} />
 
               {item.viewing && (

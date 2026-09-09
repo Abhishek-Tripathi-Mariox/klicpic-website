@@ -3,14 +3,21 @@ import SaveProgressButton from "../SaveProgressButton";
 import { ArrowLeft, ArrowRight, Search } from "lucide-react";
 import { useBooking } from "../BookingContext";
 import { DETAIL_SUBSTEPS } from "../bookingData";
-import { THEMES, THEME_FILTERS } from "../themeData";
+import { THEMES as LOCAL_THEMES, THEME_FILTERS as LOCAL_THEME_FILTERS } from "../themeData";
+import { useThemes } from "../../api/useCatalog";
 import ThemeCard from "../ThemeCard";
 
 /**
  * Figma: Step3Details — Theme sub-step (1550:14898 empty, 1550:15939 selected).
  * Sub-stepper, search + category pills, the theme grid, and a sticky action bar.
  */
+/** What this build shipped — the fallback when the API is unreachable. */
+const LOCAL_CATALOG = { items: LOCAL_THEMES, filters: LOCAL_THEME_FILTERS };
+
 export default function StepThemes({ onNext, onBack, onOpenTheme }) {
+  // The wizard must offer what the studio actually has on the shelf.
+  const { items: THEMES, filters: THEME_FILTERS } = useThemes(LOCAL_CATALOG);
+
   const { booking, set } = useBooking();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("All");
@@ -22,7 +29,7 @@ export default function StepThemes({ onNext, onBack, onOpenTheme }) {
         (filter === "All" || theme.category === filter) &&
         (!needle || theme.name.toLowerCase().includes(needle))
     );
-  }, [query, filter]);
+  }, [query, filter, THEMES]);
 
   const vibeLabel = booking.vibe ?? "your";
 
@@ -35,7 +42,7 @@ export default function StepThemes({ onNext, onBack, onOpenTheme }) {
             Customise Your Session
           </h2>
           <p className="pt-1 text-[12px] leading-4 text-[#99a1af]">
-            Step 1 of 4 — Theme{" "}
+            Step 1 of {DETAIL_SUBSTEPS.length} — {DETAIL_SUBSTEPS[0]}{" "}
             {booking.date && (
               <span className="font-semibold text-[#f9a825]">
                 📅 {booking.date}

@@ -1,6 +1,7 @@
 import React from "react";
 import { Gift, MessageCircle, Phone } from "lucide-react";
 import { useBooking } from "./BookingContext";
+import { useOffers } from "../api/useOffers";
 
 /**
  * Figma: Booking Summary sidebar (1550:11659).
@@ -11,12 +12,18 @@ const inr = (value) => `₹${value.toLocaleString("en-IN")}`;
 export default function BookingSummary() {
   const { booking } = useBooking();
 
+  // The promo strip echoes whatever the studio is actually running. An offer
+  // already claimed for this booking wins; otherwise the first live offer
+  // stands in. With none running the strip does not render at all — a promise
+  // nobody is honouring is worse than a quieter card.
+  const { offers } = useOffers([]);
+  const promo = booking.coupon || offers[0] || null;
+
   const rows = [
     { label: "Shoot Type", value: booking.shootType },
     { label: "Vibe", value: booking.vibe },
     { label: "Theme", value: booking.theme },
     { label: "Props", value: booking.props?.length ? booking.props.join(", ") : null },
-    { label: "Gown", value: booking.gown },
     { label: "Location", value: booking.location },
     { label: "Date", value: booking.date, accent: true },
     { label: "Time Slot", value: booking.timeSlot, accent: true },
@@ -69,12 +76,16 @@ export default function BookingSummary() {
           <span className="text-[14px] leading-[20px] font-bold text-[#1f2937]">
             Estimated Total
           </span>
+          {/* Before a package is picked there is no price to quote, so the
+              summary says so rather than showing a number nobody chose. */}
           <span className="text-[20px] leading-7 font-bold whitespace-nowrap text-[#f9a825]">
-            {inr(booking.total)}
+            {booking.total > 0 ? inr(booking.total) : "—"}
           </span>
         </div>
         <p className="pt-1 text-[11px] leading-[16.5px] text-[#99a1af]">
-          30% advance to confirm booking
+          {booking.total > 0
+            ? "30% advance to confirm booking"
+            : "Pick a package to see your total"}
         </p>
 
         <div className="flex w-full items-stretch gap-2 pt-3">
@@ -95,11 +106,19 @@ export default function BookingSummary() {
         </div>
       </div>
 
-      <div className="mt-4 w-full rounded-[20px] bg-[#fff7ed] p-3">
-        <p className="text-[12px] leading-4 font-medium text-[#1f2937]">
-          🔥 Free Instagram Reel with every booking this month!
-        </p>
-      </div>
+      {promo && (
+        <div className="mt-4 w-full rounded-[20px] bg-[#fff7ed] p-3">
+          <p className="text-[12px] leading-4 font-medium text-[#1f2937]">
+            🔥 {promo.title}
+            {promo.code ? ` · ${promo.code}` : ""}
+          </p>
+          {promo.description && (
+            <p className="mt-1 text-[11px] leading-4 text-[#6a7282]">
+              {promo.description}
+            </p>
+          )}
+        </div>
+      )}
     </aside>
   );
 }

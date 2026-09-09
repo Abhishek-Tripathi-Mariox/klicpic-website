@@ -7,15 +7,18 @@ import { usePortal } from "./PortalContext";
  * Figma: Customer Portal — phone step 1615:9755, OTP step 1615:10008.
  * Two-tab card; the demo OTP is 1234 exactly as the frame states.
  */
-const DEMO_OTP = "1234";
 const RESEND_SECONDS = 29;
 
 export default function PortalLogin({ onSuccess }) {
-  const { phone, setPhone, login } = usePortal();
+  const { phone, setPhone, requestOtp, verifyOtp } = usePortal();
   const [step, setStep] = useState("phone");
   const [digits, setDigits] = useState(["", "", "", ""]);
   const [countdown, setCountdown] = useState(RESEND_SECONDS);
   const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  // Non-production backends hand the code back so the flow is testable; a
+  // production one never does, and this hint disappears on its own.
+  const [devCode, setDevCode] = useState("");
   const boxes = useRef([]);
 
   useEffect(() => {
@@ -41,13 +44,35 @@ export default function PortalLogin({ onSuccess }) {
     if (clean && index < 3) boxes.current[index + 1]?.focus();
   };
 
-  const verify = () => {
-    if (otp !== DEMO_OTP) {
-      setError("That code doesn't match. Try 1234.");
-      return;
+  /** Asks the backend to text a code, then moves to the four-box step. */
+  const requestCode = async () => {
+    setBusy(true);
+    setError("");
+
+    try {
+      const result = await requestOtp(phone);
+      setDevCode(result?.devCode || "");
+      setDigits(["", "", "", ""]);
+      setStep("otp");
+    } catch (cause) {
+      setError(cause.message || "We couldn't send the code. Please try again.");
+    } finally {
+      setBusy(false);
     }
-    login("mithu");
-    onSuccess?.();
+  };
+
+  const verify = async () => {
+    setBusy(true);
+    setError("");
+
+    try {
+      await verifyOtp(phone, otp);
+      onSuccess?.();
+    } catch (cause) {
+      setError(cause.message || "That code doesn't match.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -121,22 +146,23 @@ export default function PortalLogin({ onSuccess }) {
 
                 <button
                   type="button"
-                  disabled={!phoneValid}
-                  onClick={() => setStep("otp")}
+                  disabled={!phoneValid || busy}
+                  onClick={requestCode}
                   className={`mt-4 h-[51.992px] w-full rounded-2xl text-center text-[14px] leading-[20px] font-bold text-white transition-opacity ${
-                    phoneValid ? "cursor-pointer hover:opacity-95" : "cursor-not-allowed opacity-50"
+                    phoneValid && !busy
+                      ? "cursor-pointer hover:opacity-95"
+                      : "cursor-not-allowed opacity-50"
                   }`}
                   style={{
                     backgroundImage:
                       "linear-gradient(172.27deg, rgb(249,168,37) 0%, rgb(245,124,0) 100%)",
                   }}
                 >
-                  Send OTP →
+                  {busy ? "Sending…" : "Send OTP →"}
                 </button>
 
                 <div className="mt-5 w-full rounded-[20px] border-[0.57px] border-solid border-[#dbeafe] bg-[#eff6ff] p-3 text-center text-[12px] leading-4 text-[#155dfc]">
-                  Demo: enter any 10-digit number · OTP will be{" "}
-                  <strong className="font-bold">{DEMO_OTP}</strong>
+                  We&apos;ll text you a 4-digit code to sign in.
                 </div>
               </>
             ) : (
@@ -188,7 +214,7 @@ export default function PortalLogin({ onSuccess }) {
 
                 <button
                   type="button"
-                  disabled={otp.length < 4}
+                  disabled={otp.length < 4 || busy}
                   onClick={verify}
                   className={`mt-6 h-[51.992px] w-full rounded-2xl text-center text-[14px] leading-[20px] font-bold text-white transition-opacity ${
                     otp.length === 4
@@ -200,8 +226,15 @@ export default function PortalLogin({ onSuccess }) {
                       "linear-gradient(172.27deg, rgb(249,168,37) 0%, rgb(245,124,0) 100%)",
                   }}
                 >
-                  Verify &amp; Login →
+                  {busy ? "Verifying…" : "Verify & Login →"}
                 </button>
+
+                {devCode && (
+                  <p className="mt-4 w-full rounded-[20px] border-[0.57px] border-solid border-[#dbeafe] bg-[#eff6ff] p-3 text-center text-[12px] leading-4 text-[#155dfc]">
+                    Test build — your code is{" "}
+                    <strong className="font-bold">{devCode}</strong>
+                  </p>
+                )}
 
                 <p className="w-full pt-4 text-center text-[12px] leading-4 text-[#99a1af]">
                   {countdown > 0 ? (
@@ -209,7 +242,7 @@ export default function PortalLogin({ onSuccess }) {
                   ) : (
                     <button
                       type="button"
-                      onClick={() => setCountdown(RESEND_SECONDS)}
+                      onClick={requestCode}
                       className="cursor-pointer font-semibold text-[#f9a825]"
                     >
                       Resend OTP

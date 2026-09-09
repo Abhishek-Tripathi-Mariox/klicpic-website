@@ -9,9 +9,9 @@ import BookingFlow from "./booking/BookingFlow";
 import Portal from "./portal/Portal";
 import Contact from "./pages/Contact/Contact";
 import Blog from "./pages/Blog/Blog";
+import BlogPost from "./pages/Blog/BlogPost";
 import NotFound from "./pages/NotFound";
 import PropsCatalog from "./pages/PropsCatalog/PropsCatalog";
-import GownCollection from "./pages/GownCollection/GownCollection";
 import Packages from "./pages/Packages/Packages";
 import StudioGallery from "./pages/StudioGallery/StudioGallery";
 import StudioLocations from "./pages/StudioLocations/StudioLocations";
@@ -31,7 +31,6 @@ import Refund from "./pages/Legal/Refund";
  *   /photoshoots/themes  Theme Library 1550:5078 (Photoshoots active)
  *   /themes       Theme Library   1550:3598  (Themes active)
  *   /props        Props Catalog   1550:6558
- *   /gowns        Gown Collection 1550:7268
  *   /packages     Packages        1550:7831
  *   /gallery      Studio Gallery  1550:8378
  *   /careers      Careers         1550:9954 / 10438 / 10988 (3 states)
@@ -71,7 +70,6 @@ export default function App() {
           element={<ThemeLibrary variant="themes" activeNav="Themes" />}
         />
         <Route path="/props" element={<PropsCatalog />} />
-        <Route path="/gowns" element={<GownCollection />} />
         <Route path="/packages" element={<Packages />} />
         <Route path="/gallery" element={<StudioGallery />} />
         <Route path="/studios" element={<StudioLocations />} />
@@ -82,6 +80,7 @@ export default function App() {
         <Route path="/portal" element={<Portal />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
         <Route path="/faq" element={<FAQPage />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />

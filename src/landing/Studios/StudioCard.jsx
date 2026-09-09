@@ -1,4 +1,5 @@
 import React from "react";
+import { imageUrl } from "../../api/imageUrl";
 import { Link } from "react-router-dom";
 import { Flame, MapPin, Star } from "lucide-react";
 
@@ -6,12 +7,15 @@ import { Flame, MapPin, Star } from "lucide-react";
 export default function StudioCard({ studio }) {
   return (
     <article className="flex w-[287.996px] shrink-0 flex-col items-start self-start overflow-hidden rounded-2xl border-[0.701px] border-solid border-[#f3f4f6] bg-white shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)]">
-      <div className="relative h-[175.997px] w-full shrink-0 overflow-hidden">
-        <img
-          src={studio.image}
-          alt={studio.name}
-          className="pointer-events-none absolute inset-0 size-full object-cover"
-        />
+      <div className="relative h-[175.997px] w-full shrink-0 overflow-hidden bg-gradient-to-br from-[#3f4550] to-[#1f2937]">
+        {studio.image && (
+          <img
+            loading="lazy"
+            src={imageUrl(studio.image, 480)}
+            alt={studio.name}
+            className="pointer-events-none absolute inset-0 size-full object-cover"
+          />
+        )}
         <div
           className="absolute inset-0"
           style={{

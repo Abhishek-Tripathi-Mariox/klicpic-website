@@ -10,13 +10,19 @@ import family from "./assets/types/family.jpg";
 import wedding from "./assets/types/wedding.jpg";
 import couple from "./assets/types/couple.jpg";
 
+/**
+ * Emoji, tagline and a stand-in photo per shoot type. The names, prices and
+ * cover photos the wizard actually shows come from the CRM; this only fills
+ * the gaps the CRM has no column for. No prices here — a figure the studio
+ * never set is a promise it never made.
+ */
 export const SHOOT_TYPES = [
-  { name: "Maternity", emoji: "🤰", tagline: "Celebrate your glow", price: "From ₹4,999", image: maternity },
-  { name: "Baby", emoji: "👶", tagline: "Precious early milestones", price: "From ₹3,999", image: baby },
-  { name: "Birthday", emoji: "🎂", tagline: "Royally styled celebrations", price: "From ₹6,999", image: birthday },
-  { name: "Family", emoji: "👨‍👩‍👧‍👦", tagline: "Timeless togetherness", price: "From ₹7,999", image: family },
-  { name: "Wedding", emoji: "💍", tagline: "Cinematic love stories", price: "From ₹24,999", image: wedding },
-  { name: "Couple", emoji: "💑", tagline: "Celebrate your chemistry", price: "From ₹8,999", image: couple },
+  { name: "Maternity", emoji: "🤰", tagline: "Celebrate your glow", image: maternity },
+  { name: "Baby", emoji: "👶", tagline: "Precious early milestones", image: baby },
+  { name: "Birthday", emoji: "🎂", tagline: "Royally styled celebrations", image: birthday },
+  { name: "Family", emoji: "👨‍👩‍👧‍👦", tagline: "Timeless togetherness", image: family },
+  { name: "Wedding", emoji: "💍", tagline: "Cinematic love stories", image: wedding },
+  { name: "Couple", emoji: "💑", tagline: "Celebrate your chemistry", image: couple },
 ];
 
 import boho from "./assets/vibes/boho.jpg";
@@ -52,4 +58,11 @@ export const TIME_SLOTS = [
 ];
 
 /** Details sub-stepper (Figma 1550:14898). */
-export const DETAIL_SUBSTEPS = ["Theme", "Props", "Gowns", "Location"];
+/**
+ * The Details sub-steps.
+ *
+ * The frames had a fourth, "Gowns", between Props and Location. The CRM files
+ * gowns as props under the "gown" category, so the Props step already lists
+ * every one of them — the extra step only asked the same question twice.
+ */
+export const DETAIL_SUBSTEPS = ["Theme", "Props", "Location"];

@@ -1,20 +1,41 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Camera, Package, Palette, Shirt, Star, Zap } from "lucide-react";
+import { useThemes } from "../../api/useCatalog";
+import { usePagedProps } from "../../api/useCatalog";
 
 /**
  * Figma: Klicpic mithu / Home — Why Families Choose Klicpic (1550:2719)
  * Six stat tiles on the dark ink band.
+ *
+ * The frame's catalogue figures were roughly triple what the studio holds —
+ * 500+ themes against 178, 1,500+ props against 551, 300+ gowns against 182.
+ * Those three now count the CRM. Sessions, rating and turnaround stay as the
+ * frame had them: no record here can back them either way.
  */
-const STATS = [
-  { Icon: Palette, value: "500+", label: "Themes" },
-  { Icon: Package, value: "1,500+", label: "Props" },
-  { Icon: Shirt, value: "300+", label: "Gowns" },
+const STATIC_STATS = [
   { Icon: Camera, value: "12,500+", label: "Sessions" },
   { Icon: Star, value: "4.9", label: "Rating" },
   { Icon: Zap, value: "48hr", label: "Delivery" },
 ];
 
+const count = (n, fallback) => (n > 0 ? n.toLocaleString("en-IN") : fallback);
+
 export default function WhyChooseUs() {
+  const { items: themes } = useThemes({ items: [], filters: [] });
+  // limit 1 — the page needs the count, not the records.
+  const { total: props } = usePagedProps({ limit: 1 });
+  const { total: gowns } = usePagedProps({ category: "gown", limit: 1 });
+
+  const STATS = useMemo(
+    () => [
+      { Icon: Palette, value: count(themes.length, "—"), label: "Themes" },
+      { Icon: Package, value: count(props, "—"), label: "Props" },
+      { Icon: Shirt, value: count(gowns, "—"), label: "Gowns" },
+      ...STATIC_STATS,
+    ],
+    [themes.length, props, gowns]
+  );
+
   return (
     <section className="flex w-full flex-col items-center bg-[#1f2937] px-6 py-20">
       <div className="flex w-full max-w-[1440px] flex-col items-start">

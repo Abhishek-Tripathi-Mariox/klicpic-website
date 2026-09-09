@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { ArrowRight, Clock, MapPin, Send, X } from "lucide-react";
+import React, { useRef, useState } from "react";
+import { applyForJob } from "../../api/endpoints";
+import { ArrowRight, Clock, MapPin, Paperclip, Send, X } from "lucide-react";
 
 /**
  * Figma: JobCard collapsed 1550:10098, expanded 1550:10582 with the
@@ -9,6 +10,10 @@ const EMPTY = { name: "", phone: "", email: "", about: "" };
 
 export default function JobCard({ job, isOpen, onToggle, onSubmitted }) {
   const [values, setValues] = useState(EMPTY);
+  const [resume, setResume] = useState(null);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
+  const resumeInput = useRef(null);
 
   const handleChange = (event) =>
     setValues((current) => ({
@@ -20,12 +25,34 @@ export default function JobCard({ job, isOpen, onToggle, onSubmitted }) {
   const canSubmit =
     values.name.trim() && values.phone.trim() && values.email.trim();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!canSubmit) return;
-    // Wire to the careers endpoint; the Figma frames specify no destination.
-    setValues(EMPTY);
-    onSubmitted(job.id);
+    if (!canSubmit || sending) return;
+
+    setSending(true);
+    setError("");
+
+    try {
+      const result = await applyForJob(
+        job.id,
+        {
+          name: values.name,
+          email: values.email,
+          phone: values.phone,
+          coverLetter: values.about,
+        },
+        resume
+      );
+
+      setValues(EMPTY);
+      setResume(null);
+      // The reference comes back so the candidate has something to quote.
+      onSubmitted(job.id, result.applicationNumber);
+    } catch (cause) {
+      setError(cause.message);
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -33,7 +60,7 @@ export default function JobCard({ job, isOpen, onToggle, onSubmitted }) {
       <div className="flex items-start justify-between gap-6 p-6">
         <div className="flex min-w-px flex-col items-start">
           <div className="flex flex-wrap items-center gap-2">
-            {job.tags.map((tag) => (
+            {(job.tags ?? []).map((tag) => (
               <span
                 key={tag}
                 className="rounded-full bg-[#fff7ed] px-[10px] py-1 text-[11px] leading-[15px] font-semibold whitespace-nowrap text-[#f9a825]"
@@ -87,7 +114,7 @@ export default function JobCard({ job, isOpen, onToggle, onSubmitted }) {
                 What We're Looking For
               </p>
               <ul className="flex flex-col items-start gap-[6px] pt-2">
-                {job.requirements.map((requirement) => (
+                {(job.requirements ?? []).map((requirement) => (
                   <li key={requirement} className="flex items-start gap-2">
                     <span className="text-[14px] leading-[20px] text-[#f9a825]">
                       ✦
@@ -143,15 +170,37 @@ export default function JobCard({ job, isOpen, onToggle, onSubmitted }) {
               className="mt-3 h-[85.343px] w-full resize-none rounded-[20px] border-[0.701px] border-solid border-[#e5e7eb] px-4 py-3 text-[14px] leading-[20px] text-[#1f2937] outline-none transition-colors placeholder:text-[rgba(31,41,55,0.5)] focus:border-[#f9a825]"
             />
 
+            {/* The frame has no CV field, but a careers form without one sends
+                the team a name and nothing to read. */}
+            <input
+              ref={resumeInput}
+              type="file"
+              accept=".pdf,.doc,.docx"
+              hidden
+              onChange={(event) => setResume(event.target.files?.[0] || null)}
+            />
+            <button
+              type="button"
+              onClick={() => resumeInput.current?.click()}
+              className="mt-3 flex cursor-pointer items-center gap-2 rounded-[20px] border-[0.701px] border-dashed border-[#e5e7eb] px-4 py-3 text-[13px] leading-[18px] font-semibold text-[#6a7282] transition-colors hover:border-[#f9a825] hover:text-[#f9a825]"
+            >
+              <Paperclip className="size-4 shrink-0" strokeWidth={1.666} />
+              {resume ? resume.name : "Attach your CV (PDF or Word)"}
+            </button>
+
+            {error && (
+              <p className="pt-3 text-[12px] leading-4 font-semibold text-[#e7000b]">{error}</p>
+            )}
+
             <button
               type="submit"
-              disabled={!canSubmit}
+              disabled={!canSubmit || sending}
               className={`mt-4 flex items-center gap-2 rounded-[20px] bg-[#f9a825] px-6 py-3 text-center text-[14px] leading-[20px] font-bold text-[#1f2937] transition-opacity ${
-                canSubmit ? "cursor-pointer hover:opacity-90" : "cursor-not-allowed opacity-50"
+                canSubmit && !sending ? "cursor-pointer hover:opacity-90" : "cursor-not-allowed opacity-50"
               }`}
             >
               <Send className="size-4 shrink-0" strokeWidth={1.666} />
-              Submit Application
+              {sending ? "Sending…" : "Submit Application"}
             </button>
           </form>
         </div>

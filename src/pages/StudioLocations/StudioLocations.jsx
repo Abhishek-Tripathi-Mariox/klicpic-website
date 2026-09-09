@@ -4,7 +4,8 @@ import SiteLayout from "../../components/SiteLayout";
 import CatalogFilters from "../../components/CatalogFilters";
 import PageHeading from "../../components/PageHeading";
 import StudioCard from "../../landing/Studios/StudioCard";
-import { STUDIOS, STUDIO_CITIES } from "../../landing/Studios/studioData";
+import { STUDIOS as LOCAL_STUDIOS, STUDIO_CITIES as LOCAL_STUDIO_CITIES } from "../../landing/Studios/studioData";
+import { useStudios } from "../../api/useCatalog";
 
 /**
  * The listing behind the home rail's "View All" (1550:2241). The frame set has
@@ -14,7 +15,14 @@ import { STUDIOS, STUDIO_CITIES } from "../../landing/Studios/studioData";
  */
 const AVAILABILITY = ["All", "Open now", "Flagship"];
 
+/** What this build shipped — the fallback when the API is unreachable. */
+const LOCAL_CATALOG = { items: LOCAL_STUDIOS, filters: LOCAL_STUDIO_CITIES };
+
 export default function StudioLocations() {
+  // Live from the CRM, overlaid on the bundled copy for the fields
+  // the CRM has no column for.
+  const { items: STUDIOS, filters: STUDIO_CITIES } = useStudios(LOCAL_CATALOG);
+
   const [city, setCity] = useState("All");
   const [availability, setAvailability] = useState("All");
 
@@ -28,7 +36,7 @@ export default function StudioLocations() {
           (availability === "Flagship" && studio.flagship);
         return inCity && matches;
       }),
-    [city, availability]
+    [city, availability, STUDIOS]
   );
 
   const openCount = studios.filter((studio) => studio.open).length;

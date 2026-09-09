@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { ArrowLeft, ArrowRight, Check, Info, Maximize2 } from "lucide-react";
-import { useBooking } from "../BookingContext";
-import { EXTRAS, SLOT_TONES } from "../extrasData";
+import { priceBooking, useBooking } from "../BookingContext";
+import { EXTRAS as LOCAL_EXTRAS, SLOT_TONES as LOCAL_SLOT_TONES } from "../extrasData";
+import { useContent } from "../../api/useContent";
 import ExtraModal from "../ExtraModal";
 
 /**
@@ -10,16 +11,28 @@ import ExtraModal from "../ExtraModal";
  * add-on detail modal (1615:6539 / 7254).
  */
 export default function StepExtras({ onBack, onNext, onSkip }) {
+  // Live copy from the backend, falling back to what this build shipped.
+  const { content } = useContent("booking-extras", { EXTRAS: LOCAL_EXTRAS, SLOT_TONES: LOCAL_SLOT_TONES });
+  const { EXTRAS, SLOT_TONES } = content;
+
   const { booking, set } = useBooking();
   const [preview, setPreview] = useState(null);
   const chosen = booking.extrasList ?? [];
 
-  const toggle = (name) =>
+  const toggle = (name) => {
+    const next = chosen.includes(name)
+      ? chosen.filter((item) => item !== name)
+      : [...chosen, name];
+
+    // Re-price as they go, so the summary tracks what they have chosen rather
+    // than waiting for the package step.
+    const picked = EXTRAS.filter((extra) => next.includes(extra.name));
     set({
-      extrasList: chosen.includes(name)
-        ? chosen.filter((item) => item !== name)
-        : [...chosen, name],
+      extrasList: next,
+      extras: next[0] || null,
+      total: priceBooking({ packagePrice: booking.packagePrice, extras: picked }),
     });
+  };
 
   return (
     <div className="flex w-full flex-col items-start pb-24">

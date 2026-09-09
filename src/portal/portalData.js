@@ -2,18 +2,12 @@
  * Figma: Customer Portal dashboard (1615:10258 / 10956) and its tabs.
  * All copy and values are taken from the frames.
  */
-export const ACCOUNT = {
-  name: "mithu",
-  bookingId: "KLP-527669",
-  status: "Quotation Pending",
-};
-
 export const TABS = [
   { id: "overview", label: "Overview" },
   { id: "payments", label: "Payments" },
   { id: "selections", label: "Selections" },
   { id: "deliverables", label: "Deliverables" },
-  { id: "messages", label: "Messages", badge: 1 },
+  { id: "messages", label: "Messages" },
   { id: "profile", label: "Profile" },
 ];
 
@@ -22,14 +16,6 @@ export const MY_BOOKINGS = [
   { title: "Birthday Shoot", meta: "KP-2026-0007 · 14 Mar 2026", status: "Completed" },
   { title: "Family Shoot", meta: "KP-2025-0091 · 05 Dec 2025", status: "Completed" },
 ];
-
-export const SAVED_JOURNEY = {
-  title: "My Saved Journey",
-  progressId: "Progress ID: KP-2026-1180",
-  label: "Booking journey",
-  progress: "7/7 steps done",
-  steps: ["Shoot Type", "Vibe", "Theme", "Gown", "Extras", "Package", "Date & Time"],
-};
 
 export const BOOKING_DETAILS = {
   reference: "KP-2026-0012",

@@ -2,14 +2,27 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, MapPin } from "lucide-react";
 import StudioCard from "./StudioCard";
-import { STUDIOS } from "./studioData";
+import { STUDIOS as LOCAL_STUDIOS, STUDIO_CITIES as LOCAL_STUDIO_CITIES } from "./studioData";
+import { useStudios } from "../../api/useCatalog";
 
 /**
  * Figma: Klicpic mithu / Home — Klicpic Studios Near You (1550:2241)
  * Horizontal rail of StudioCards ending in a dashed "see all" card.
  */
 
+/** What this build shipped — the fallback when the API is unreachable. */
+const LOCAL_CATALOG = { items: LOCAL_STUDIOS, filters: LOCAL_STUDIO_CITIES };
+
 export default function Studios() {
+  // The real branches, live from the CRM.
+  const { items: STUDIOS } = useStudios(LOCAL_CATALOG);
+  // The frame hardcodes "7 studios · 6 cities" and "See All 9". Those numbers
+  // have to follow the live list, or the rail promises branches we don't have.
+  const openCount = STUDIOS.filter((studio) => studio.open).length;
+  const cityCount = new Set(
+    STUDIOS.map((studio) => String(studio.area || "").split(", ").pop()).filter(Boolean)
+  ).size;
+
   return (
     <section className="flex w-full flex-col items-start bg-white py-16">
       <div className="flex w-full flex-col items-center">
@@ -22,7 +35,8 @@ export default function Studios() {
               Klicpic Studios Near You
             </h2>
             <p className="pt-2 text-[14px] leading-[20px] text-[#99a1af]">
-              7 studios open now · Across 6 cities
+              {openCount} studios open now · Across {cityCount}{" "}
+              {cityCount === 1 ? "city" : "cities"}
             </p>
           </div>
           <Link
@@ -48,7 +62,7 @@ export default function Studios() {
               <MapPin className="size-[23.994px] text-[#f9a825]" strokeWidth={1.666} />
             </div>
             <p className="text-center text-[14px] leading-[20px] font-bold whitespace-nowrap text-[#1f2937]">
-              See All 9 Studios
+              See All {STUDIOS.length} Studios
             </p>
             <p className="w-[174px] text-center text-[12px] leading-4 text-[#99a1af]">
               Filter by city, availability &amp; more

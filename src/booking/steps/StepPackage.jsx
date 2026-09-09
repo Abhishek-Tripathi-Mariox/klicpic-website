@@ -1,12 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, X } from "lucide-react";
-import { useBooking } from "../BookingContext";
-import {
-  BASE_SESSION,
-  BUNDLE_SAVINGS_RATE,
-  CUSTOM_ADDONS,
-  PLANS,
-} from "../packageData";
+import { priceBooking, useBooking } from "../BookingContext";
+import { BASE_SESSION as LOCAL_BASE_SESSION, BUNDLE_SAVINGS_RATE as LOCAL_BUNDLE_SAVINGS_RATE, CUSTOM_ADDONS as LOCAL_CUSTOM_ADDONS, PLANS as LOCAL_PLANS } from "../packageData";
+import { useContent } from "../../api/useContent";
 
 /**
  * Figma: Step 5 Package — Choose a Plan (1615:7929) and Build Your Own
@@ -15,6 +11,10 @@ import {
 const inr = (value) => `₹${value.toLocaleString("en-IN")}`;
 
 export default function StepPackage({ onBack, onNext }) {
+  // Live copy from the backend, falling back to what this build shipped.
+  const { content } = useContent("booking-packages", { BASE_SESSION: LOCAL_BASE_SESSION, BUNDLE_SAVINGS_RATE: LOCAL_BUNDLE_SAVINGS_RATE, CUSTOM_ADDONS: LOCAL_CUSTOM_ADDONS, PLANS: LOCAL_PLANS });
+  const { BASE_SESSION, BUNDLE_SAVINGS_RATE, CUSTOM_ADDONS, PLANS } = content;
+
   const { booking, set } = useBooking();
   const [tab, setTab] = useState("plan");
   const [addons, setAddons] = useState([]);
@@ -34,7 +34,7 @@ export default function StepPackage({ onBack, onNext }) {
     const gross = BASE_SESSION.price + sum;
     const save = sum > 0 ? Math.round(gross * BUNDLE_SAVINGS_RATE) : 0;
     return { addonTotal: sum, savings: save, total: gross - save };
-  }, [addons]);
+  }, [addons, BASE_SESSION, BUNDLE_SAVINGS_RATE, CUSTOM_ADDONS]);
 
   return (
     <div className="flex w-full flex-col items-start pb-16">
@@ -126,7 +126,16 @@ export default function StepPackage({ onBack, onNext }) {
                 <button
                   type="button"
                   onClick={() => {
-                    set({ package: plan.name });
+                    // The plan carries the price; without this the summary
+                    // kept whatever total was there before.
+                    set({
+                      package: plan.name,
+                      packagePrice: plan.price,
+                      total: priceBooking({
+                        packagePrice: plan.price,
+                        extras: booking.extrasList || [],
+                      }),
+                    });
                     onNext?.();
                   }}
                   className={`mt-auto w-full cursor-pointer rounded-2xl py-[10px] text-center text-[14px] leading-[20px] font-bold transition-colors ${
@@ -217,7 +226,7 @@ export default function StepPackage({ onBack, onNext }) {
             <button
               type="button"
               onClick={() => {
-                set({ package: "Custom", total });
+                set({ package: "Custom", packagePrice: total, total });
                 onNext?.();
               }}
               className="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#f9a825] py-3 text-center text-[16px] leading-6 font-bold text-white transition-colors hover:bg-[#e69a1f]"

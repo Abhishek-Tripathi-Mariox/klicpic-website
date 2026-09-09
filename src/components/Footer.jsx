@@ -36,7 +36,6 @@ const LINK_COLUMNS = [
       { label: "Photoshoots", to: "/photoshoots" },
       { label: "Themes", to: "/themes" },
       { label: "Props", to: "/props" },
-      { label: "Gowns", to: "/gowns" },
       { label: "Packages", to: "/packages" },
     ],
   },

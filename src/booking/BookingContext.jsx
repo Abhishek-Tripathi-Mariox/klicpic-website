@@ -19,22 +19,53 @@ function readSaved() {
   }
 }
 
-/** Defaults shown in the Figma frames before the user picks anything. */
+/**
+ * Nothing is chosen yet.
+ *
+ * The frames show a filled-in summary (Studio · Premium Album · ₹11,499) to
+ * illustrate the design, but presenting those as the customer's choices — and
+ * quoting a price for a booking with no package — is a promise we cannot keep.
+ * The summary stays empty until they pick.
+ */
 const INITIAL = {
   shootType: null,
   vibe: null,
   theme: null,
   props: [],
-  gown: null,
-  location: "Studio",
+  location: null,
+  /** Where the shoot happens: a CRM studio branch, or an address we travel to. */
+  locationType: null,
+  studioId: null,
+  studioName: "",
+  customStudioAddress: "",
+  customStudioMapLink: "",
   date: null,
   timeSlot: null,
-  extras: "Premium Album",
+  extras: null,
   extrasList: [],
   package: null,
+  /** Kept so add-ons can re-price without re-reading the catalogue. */
+  packagePrice: 0,
   coupon: null,
-  total: 11499,
+  total: 0,
 };
+
+/** "₹7,999" or 7999 → 7999. The catalogue mixes both. */
+const asAmount = (value) =>
+  typeof value === "number" ? value : Number(String(value || "").replace(/[^\d]/g, "")) || 0;
+
+/**
+ * What the booking costs, from what has actually been chosen.
+ *
+ * One place decides this, so the summary, the confirmation screen and the
+ * request that reaches the CRM can never disagree.
+ */
+export function priceBooking({ packagePrice = 0, extras = [] } = {}) {
+  const base = asAmount(packagePrice);
+  const addOns = extras.reduce((sum, item) => sum + asAmount(item?.price ?? item), 0);
+  // Nothing picked yet is 0, not a guess.
+  return base + addOns;
+}
 
 export function BookingProvider({ children }) {
   const [booking, setBooking] = useState(() => ({ ...INITIAL, ...readSaved() }));
@@ -54,7 +85,10 @@ export function BookingProvider({ children }) {
       /** Returns false when storage is unavailable so the UI can say so. */
       save: () => {
         try {
-          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(booking));
+          window.localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify({ ...booking, savedAt: Date.now() })
+          );
           return true;
         } catch {
           return false;
@@ -73,4 +107,33 @@ export function useBooking() {
   const context = useContext(BookingContext);
   if (!context) throw new Error("useBooking must be used inside BookingProvider");
   return context;
+}
+
+/** The wizard steps, in the order the portal lists them. */
+const JOURNEY_STEPS = [
+  { label: "Shoot Type", done: (b) => Boolean(b.shootType) },
+  { label: "Vibe", done: (b) => Boolean(b.vibe) },
+  { label: "Theme", done: (b) => Boolean(b.theme) },
+  { label: "Extras", done: (b) => Boolean(b.extrasList?.length || b.extras) },
+  { label: "Package", done: (b) => Boolean(b.package) },
+  { label: "Date & Time", done: (b) => Boolean(b.date && b.timeSlot) },
+];
+
+/**
+ * What "Save Progress" actually parked, for the portal's Saved Journey card.
+ * Returns null when there is nothing saved — the card should not claim a
+ * journey the customer never started.
+ */
+export function readSavedJourney() {
+  const saved = readSaved();
+  if (!saved) return null;
+
+  const steps = JOURNEY_STEPS.map((step) => ({
+    label: step.label,
+    done: step.done(saved),
+  }));
+  const done = steps.filter((step) => step.done).length;
+  if (!done) return null;
+
+  return { steps, done, total: steps.length, savedAt: saved.savedAt || null };
 }

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Bookmark, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useBooking } from "../BookingContext";
-import { TIME_SLOTS } from "../bookingData";
+import { TIME_SLOTS as LOCAL_TIME_SLOTS } from "../bookingData";
+import { useTimeSlots } from "../../api/useCatalog";
 
 /**
  * Figma: Step3Details — date sub-step (1550:13247 / 13271).
@@ -35,6 +36,9 @@ const LEGEND = [
 const isWeekend = (index) => index % 7 === 0 || index % 7 === 6;
 
 export default function StepDate({ onNext, onRestart }) {
+  // Only offer slots the studio actually runs.
+  const TIME_SLOTS = useTimeSlots(LOCAL_TIME_SLOTS);
+
   const { booking, set } = useBooking();
   const [monthOffset, setMonthOffset] = useState(0);
   const [day, setDay] = useState(5);

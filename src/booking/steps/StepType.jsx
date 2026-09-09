@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Play, Sparkles, Tag } from "lucide-react";
 import { useBooking } from "../BookingContext";
-import { REEL_COUPON, SHOOT_TYPES } from "../bookingData";
+import { SHOOT_TYPES as LOCAL_SHOOT_TYPES } from "../bookingData";
+import { useShootTypes } from "../../api/useCatalog";
+import { imageUrl } from "../../api/imageUrl";
 
 /**
  * Figma: Step1Type (1550:11465) — offer banner, heading, 2x3 shoot-type grid.
@@ -12,10 +14,36 @@ const CARD_SCRIM =
   "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%)";
 
 export default function StepType({ onNext }) {
+  // The CRM decides which shoot types exist, what they cost and what they look
+  // like — offering one the studio does not run would strand the booking, and
+  // a "From ₹…" it cannot honour is worse than none. Only the emoji and
+  // tagline come from the bundled card, and only where the name matches.
+  const liveTypes = useShootTypes([]);
+  const SHOOT_TYPES = useMemo(() => {
+    if (!liveTypes.length) return LOCAL_SHOOT_TYPES;
+
+    const dressing = new Map(
+      LOCAL_SHOOT_TYPES.map((type) => [type.name.toLowerCase(), type])
+    );
+    return liveTypes.map((type) => {
+      const bundled = dressing.get(type.label.toLowerCase()) || {};
+      return {
+        emoji: bundled.emoji || "📸",
+        tagline: bundled.tagline || "",
+        name: type.label,
+        shootType: type.name,
+        // A CRM cover photo is the studio's own current work; the bundled
+        // stock shot only stands in while none has been set.
+        image: type.image ? imageUrl(type.image, 640) : bundled.image || "",
+        price: type.fromPriceLabel || "",
+      };
+    });
+  }, [liveTypes]);
+
   const { booking, set } = useBooking();
 
   const choose = (type) => {
-    set({ shootType: type.name, coupon: REEL_COUPON });
+    set({ shootType: type.name });
     onNext?.();
   };
 
@@ -37,9 +65,31 @@ export default function StepType({ onNext }) {
             </span>
           </span>
           <span className="text-[10px] leading-[15px] font-medium whitespace-nowrap text-[#99a1af]">
-            Refreshes daily · 1 per user
+            {booking.coupon ? "Applied to this booking" : "Refreshes daily · 1 per user"}
           </span>
         </div>
+        {/* Once an offer is claimed the banner states it rather than sending
+            the customer back out to pick another. */}
+        {booking.coupon ? (
+          <div className="mt-3 flex w-full flex-col items-center gap-1 rounded-[20px] bg-[rgba(249,168,37,0.12)] py-3">
+            <span className="flex items-center gap-2">
+              <Sparkles className="size-4 shrink-0 text-[#f9a825]" strokeWidth={1.666} />
+              <span className="text-[14px] leading-[20px] font-black text-[#1f2937]">
+                {booking.coupon.title}
+              </span>
+            </span>
+            {booking.coupon.subtitle && (
+              <span className="text-[11px] leading-4 text-[#6a7282]">
+                {booking.coupon.subtitle}
+              </span>
+            )}
+            {booking.coupon.code && (
+              <span className="rounded-full bg-white px-3 py-[2px] text-[11px] leading-4 font-bold tracking-[0.5px] text-[#f9a825]">
+                {booking.coupon.code}
+              </span>
+            )}
+          </div>
+        ) : (
         <Link
           to="/offers"
           className="mt-3 flex w-full cursor-pointer items-center justify-center gap-[10px] rounded-[20px] py-[14px] transition-opacity hover:opacity-95"
@@ -53,6 +103,7 @@ export default function StepType({ onNext }) {
             Check Your Offer Today
           </span>
         </Link>
+        )}
       </div>
 
       {/* heading */}
@@ -85,17 +136,22 @@ export default function StepType({ onNext }) {
               key={type.name}
               type="button"
               onClick={() => choose(type)}
-              className={`group relative h-[199.992px] w-full cursor-pointer overflow-hidden rounded-2xl text-left transition-shadow ${
+              className={`group relative h-[199.992px] w-full cursor-pointer overflow-hidden rounded-2xl bg-gradient-to-br from-[#3f4550] to-[#1f2937] text-left transition-shadow ${
                 isSelected
                   ? "ring-2 ring-[#f9a825] ring-offset-2"
                   : "hover:shadow-[0px_10px_7.5px_rgba(0,0,0,0.1)]"
               }`}
             >
-              <img
-                src={type.image}
-                alt={`${type.name} shoot`}
-                className="pointer-events-none absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
+              {/* A shoot type the CRM added has no bundled photo, so the card
+                  falls back to its own gradient rather than a broken image. */}
+              {type.image && (
+                <img
+                  src={type.image}
+                  alt={`${type.name} shoot`}
+                  loading="lazy"
+                  className="pointer-events-none absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              )}
               <span
                 className="absolute inset-0"
                 style={{ background: CARD_SCRIM }}

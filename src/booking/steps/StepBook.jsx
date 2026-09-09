@@ -14,7 +14,7 @@ const FIELDS = [
 
 const EMPTY = { fullName: "", phone: "", email: "", whatsapp: "", city: "", notes: "" };
 
-export default function StepBook({ onBack, onSubmit }) {
+export default function StepBook({ onBack, onSubmit, submitting = false, error = "" }) {
   const [values, setValues] = useState(EMPTY);
 
   const change = (event) =>
@@ -81,12 +81,19 @@ export default function StepBook({ onBack, onSubmit }) {
           />
         </label>
 
+        {error && (
+          <p className="mt-4 w-full rounded-2xl bg-[#fef2f2] px-4 py-3 text-center text-[13px] leading-5 font-semibold text-[#e7000b]">
+            {error}
+          </p>
+        )}
+
         <button
           type="submit"
-          className="mt-4 flex h-[55.992px] w-full cursor-pointer items-center justify-center gap-2 rounded-[20px] bg-[#f9a825] text-center text-[16px] leading-6 font-bold text-white transition-colors hover:bg-[#e69a1f]"
+          disabled={submitting}
+          className="mt-4 flex h-[55.992px] w-full items-center justify-center gap-2 rounded-[20px] bg-[#f9a825] text-center text-[16px] leading-6 font-bold text-white transition-colors enabled:cursor-pointer enabled:hover:bg-[#e69a1f] disabled:cursor-not-allowed disabled:bg-[#d1d5dc]"
         >
           <Send className="size-5 shrink-0" strokeWidth={1.666} />
-          Request Booking
+          {submitting ? "Sending your request…" : "Request Booking"}
         </button>
 
         <p className="w-full pt-4 text-center text-[12px] leading-4 text-[#99a1af]">

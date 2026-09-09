@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useAvailability } from "../../api/useAvailability";
 import { Link } from "react-router-dom";
 import {
   CalendarDays,
@@ -15,13 +16,22 @@ import {
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const SHOOT_FILTERS = ["All", "Maternity", "Family", "Wedding", "Baby", "Birthday", "Couple"];
 
-/** The frame opens on July 2026; the arrows page forward from there. */
-const FIRST_MONTH = { year: 2026, month: 6 };
+/**
+ * The calendar opens on the current month. The frame was drawn against July
+ * 2026, but a live availability grid has to start where the customer is.
+ */
+const FIRST_MONTH = (() => {
+  const now = new Date();
+  return { year: now.getFullYear(), month: now.getMonth() };
+})();
 
 /** Real month maths, so paging never drifts out of sync with the weekday grid. */
 function monthView(offset) {
   const first = new Date(FIRST_MONTH.year, FIRST_MONTH.month + offset, 1);
   return {
+    year: first.getFullYear(),
+    // The API takes a 1-based month.
+    month: first.getMonth() + 1,
     label: first.toLocaleDateString("en-GB", { month: "long", year: "numeric" }),
     days: new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate(),
     leadingBlanks: first.getDay(),
@@ -29,7 +39,7 @@ function monthView(offset) {
 }
 
 /** day → state; days not listed render as the muted default. */
-const DAY_STATES = {
+const LOCAL_DAY_STATES = {
   4: { state: "available", note: "4 slots" },
   5: { state: "limited", note: "2 slots" },
   6: { state: "full", note: "Full" },
@@ -64,10 +74,25 @@ export default function AvailabilityCalendar() {
   const [activeFilter, setActiveFilter] = useState("All");
   const [monthOffset, setMonthOffset] = useState(0);
 
-  const view = monthView(monthOffset);
-  // Slot data is only published for the opening month; later months page in
-  // muted until the studio releases them.
-  const isPublished = monthOffset === 0;
+  const frame = monthView(monthOffset);
+
+  // Real availability, worked out by the backend from bookings already taken.
+  // Until it lands, the frame's own month maths and day states keep the
+  // calendar drawn rather than blank.
+  const { availability, live } = useAvailability(
+    { year: frame.year, month: frame.month },
+    null
+  );
+
+  const view = availability
+    ? {
+        label: availability.label,
+        days: availability.daysInMonth,
+        leadingBlanks: availability.leadingBlanks,
+      }
+    : frame;
+
+  const dayStates = availability?.days || (monthOffset === 0 ? LOCAL_DAY_STATES : {});
   const days = Array.from({ length: view.days }, (_, index) => index + 1);
 
   return (
@@ -174,7 +199,7 @@ export default function AvailabilityCalendar() {
                   <div key={`blank-${index}`} />
                 ))}
                 {days.map((day) => {
-                  const entry = isPublished ? DAY_STATES[day] : undefined;
+                  const entry = dayStates[day];
                   const state = entry?.state ?? "muted";
                   const isBookable = state === "available" || state === "limited";
                   const cell = (
@@ -208,10 +233,9 @@ export default function AvailabilityCalendar() {
                 })}
               </div>
 
-              {!isPublished && (
+              {!live && (
                 <p className="w-full pt-4 text-center text-[12px] leading-4 text-[#99a1af]">
-                  Slots for {view.label} open closer to the date — call us to
-                  hold one early.
+                  Showing indicative availability — call us to confirm a slot.
                 </p>
               )}
 
