@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { imageUrl } from "../../api/imageUrl";
 import SiteLayout from "../../components/SiteLayout";
+import FitImage from "../../components/FitImage";
 import Pagination from "../../components/Pagination";
 import CatalogFilters from "../../components/CatalogFilters";
 import PageHeading from "../../components/PageHeading";
@@ -13,15 +14,14 @@ function PropCard({ prop }) {
   const isBooked = prop.status === "Booked Out";
   return (
     <article className="flex flex-col items-start overflow-hidden rounded-2xl bg-white shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)]">
-      <div className="relative h-[239.997px] w-full shrink-0 overflow-hidden bg-gradient-to-b from-[#eceef0] to-[#dfe2e4]">
-        {prop.image && (
-          <img
-            src={imageUrl(prop.image, 480)}
-            loading="lazy"
-            alt={prop.name}
-            className="pointer-events-none absolute inset-0 size-full object-cover"
-          />
-        )}
+      {/* Most props are gowns — tall, with trains — and a cover crop cut them
+          at the knee. Shown whole over a blurred copy, in a box tall enough
+          that a full-length gown still reads. */}
+      <FitImage
+        src={prop.image ? imageUrl(prop.image, 480) : ""}
+        alt={prop.name}
+        className="h-[260px] w-full shrink-0 bg-gradient-to-b from-[#eceef0] to-[#dfe2e4] sm:h-[320px]"
+      >
         <div
           className="absolute inset-0"
           style={{
@@ -45,7 +45,7 @@ function PropCard({ prop }) {
         >
           {prop.status}
         </span>
-      </div>
+      </FitImage>
 
       <div className="flex w-full flex-col items-start p-4">
         <p className="text-[11px] leading-[16.5px] font-semibold tracking-[0.275px] uppercase text-[#f9a825]">

@@ -4,6 +4,7 @@ import { useOffers, useOfferCountdown } from "../../api/useOffers";
 import { Link } from "react-router-dom";
 import { ArrowRight, Clock } from "lucide-react";
 import SiteLayout from "../../components/SiteLayout";
+import FitImage from "../../components/FitImage";
 import { HOW_IT_WORKS as LOCAL_HOW_IT_WORKS, OFFERS as LOCAL_OFFERS } from "./offersData";
 import { useContent } from "../../api/useContent";
 
@@ -37,7 +38,7 @@ export default function Offers() {
           compromise on quality.
         </p>
         {countdown && (
-          <div className="flex items-center gap-3 rounded-full border-[0.701px] border-solid border-[rgba(249,168,37,0.3)] bg-[rgba(249,168,37,0.12)] px-6 py-3">
+          <div className="flex max-w-full flex-wrap items-center justify-center gap-x-3 gap-y-1 rounded-3xl border-[0.701px] border-solid border-[rgba(249,168,37,0.3)] bg-[rgba(249,168,37,0.12)] px-5 py-3 sm:rounded-full sm:px-6">
             <Clock className="size-[19.997px] shrink-0 text-[#f9a825]" strokeWidth={1.666} />
             <span className="text-center text-[14px] leading-[20px] whitespace-nowrap text-[rgba(15,17,23,0.6)]">
               Offers end in:
@@ -58,20 +59,23 @@ export default function Offers() {
                 key={offer.title}
                 className="flex flex-col items-start overflow-hidden rounded-3xl border-[0.701px] border-solid border-[rgba(249,168,37,0.18)] bg-[rgba(15,17,23,0.04)]"
               >
-                <div className="relative h-[175.997px] w-full shrink-0 overflow-hidden">
-                  <img
-                    src={imageUrl(offer.image, 640)}
-                    alt={offer.title}
-                    className="pointer-events-none absolute inset-0 size-full object-cover"
-                  />
+                {/* Shown whole over a blurred copy of itself, never cropped. */}
+                <FitImage
+                  src={offer.image ? imageUrl(offer.image, 640) : ""}
+                  alt={offer.title}
+                  loading="eager"
+                  className="h-[176px] w-full shrink-0"
+                >
                   <div className="absolute inset-0" style={{ background: SCRIM }} />
                   <span
                     className="absolute top-3 right-3 rounded-full px-[10px] py-1 text-[10px] leading-[15px] font-bold whitespace-nowrap text-[#0f1117]"
-                    style={{ backgroundColor: offer.ribbonBg }}
+                    // CRM offers carry no ribbon colour; without one the dark
+                    // label sat straight on the photo and vanished into it.
+                    style={{ backgroundColor: offer.ribbonBg || "#f9a825" }}
                   >
                     {offer.ribbon}
                   </span>
-                </div>
+                </FitImage>
 
                 <div className="flex w-full flex-1 flex-col items-start p-5">
                   <h3 className="text-[18px] leading-7 font-bold text-[#0f1117]">

@@ -5,37 +5,35 @@ import { useBooking } from "../BookingContext";
 import { SHOOT_TYPES as LOCAL_SHOOT_TYPES } from "../bookingData";
 import { useShootTypes } from "../../api/useCatalog";
 import { imageUrl } from "../../api/imageUrl";
+import FitImage from "../../components/FitImage";
 
 /**
- * Figma: Step1Type (1550:11465) — offer banner, heading, 2x3 shoot-type grid.
+ * Figma: Step1Type (1550:11465) — offer banner, heading, shoot-type grid.
  * Picking a type applies the reel coupon, matching frame 1550:11817.
  */
 const CARD_SCRIM =
   "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%)";
 
 export default function StepType({ onNext }) {
-  // The CRM decides which shoot types exist, what they cost and what they look
-  // like — offering one the studio does not run would strand the booking, and
-  // a "From ₹…" it cannot honour is worse than none. Only the emoji and
-  // tagline come from the bundled card, and only where the name matches.
+  // The same list as the admin's Add New Lead form. The CRM adds what it knows
+  // about each — the cheapest package, a photo of the studio's own work — and
+  // a type it has no photo for shows a related bundled picture instead.
   const liveTypes = useShootTypes([]);
   const SHOOT_TYPES = useMemo(() => {
-    if (!liveTypes.length) return LOCAL_SHOOT_TYPES;
+    const dressing = new Map(LOCAL_SHOOT_TYPES.map((type) => [type.value.toLowerCase(), type]));
+    const source = liveTypes.length
+      ? liveTypes
+      : LOCAL_SHOOT_TYPES.map((type) => ({ name: type.value, label: type.name }));
 
-    const dressing = new Map(
-      LOCAL_SHOOT_TYPES.map((type) => [type.name.toLowerCase(), type])
-    );
-    return liveTypes.map((type) => {
-      const bundled = dressing.get(type.label.toLowerCase()) || {};
+    return source.map((type) => {
+      const bundled = dressing.get(String(type.name).toLowerCase()) || {};
       return {
         emoji: bundled.emoji || "📸",
         tagline: bundled.tagline || "",
         name: type.label,
-        shootType: type.name,
-        // A CRM cover photo is the studio's own current work; the bundled
-        // stock shot only stands in while none has been set.
+        value: type.name,
+        // The studio's own photo first; the related bundled picture otherwise.
         image: type.image ? imageUrl(type.image, 640) : bundled.image || "",
-        price: type.fromPriceLabel || "",
       };
     });
   }, [liveTypes]);
@@ -43,7 +41,8 @@ export default function StepType({ onNext }) {
   const { booking, set } = useBooking();
 
   const choose = (type) => {
-    set({ shootType: type.name });
+    // The card's short name for the summary; the admin's exact value for the Lead.
+    set({ shootType: type.name, shootTypeValue: type.value });
     onNext?.();
   };
 
@@ -136,7 +135,7 @@ export default function StepType({ onNext }) {
               key={type.name}
               type="button"
               onClick={() => choose(type)}
-              className={`group relative h-[199.992px] w-full cursor-pointer overflow-hidden rounded-2xl bg-gradient-to-br from-[#3f4550] to-[#1f2937] text-left transition-shadow ${
+              className={`group block w-full cursor-pointer rounded-2xl text-left transition-shadow ${
                 isSelected
                   ? "ring-2 ring-[#f9a825] ring-offset-2"
                   : "hover:shadow-[0px_10px_7.5px_rgba(0,0,0,0.1)]"
@@ -144,40 +143,37 @@ export default function StepType({ onNext }) {
             >
               {/* A shoot type the CRM added has no bundled photo, so the card
                   falls back to its own gradient rather than a broken image. */}
-              {type.image && (
-                <img
-                  src={type.image}
-                  alt={`${type.name} shoot`}
-                  loading="lazy"
-                  className="pointer-events-none absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
+              <FitImage
+                src={type.image}
+                alt={`${type.name} shoot`}
+                tone="dark"
+                className="h-[199.992px] w-full rounded-2xl bg-gradient-to-br from-[#3f4550] to-[#1f2937]"
+                imgClassName="transition-transform duration-500 group-hover:scale-[1.03]"
+              >
+                <span
+                  className="absolute inset-0"
+                  style={{ background: CARD_SCRIM }}
                 />
-              )}
-              <span
-                className="absolute inset-0"
-                style={{ background: CARD_SCRIM }}
-              />
-              <span className="absolute inset-x-0 bottom-0 flex items-center justify-between p-4">
-                <span className="flex flex-col items-start">
-                  <span className="flex items-baseline gap-2">
-                    <span className="text-[20px] leading-7">{type.emoji}</span>
-                    <span className="text-[18px] leading-7 font-bold text-white">
-                      {type.name}
+                <span className="absolute inset-x-0 bottom-0 flex items-center justify-between p-4">
+                  <span className="flex flex-col items-start">
+                    <span className="flex items-baseline gap-2">
+                      <span className="text-[20px] leading-7">{type.emoji}</span>
+                      <span className="text-[18px] leading-7 font-bold text-white">
+                        {type.name}
+                      </span>
+                    </span>
+                    <span className="pt-[2px] text-[12px] leading-4 text-[rgba(255,255,255,0.7)]">
+                      {type.tagline}
                     </span>
                   </span>
-                  <span className="pt-[2px] text-[12px] leading-4 text-[rgba(255,255,255,0.7)]">
-                    {type.tagline}
-                  </span>
-                </span>
 
-                <span className="flex flex-col items-end">
-                  <span className="text-right text-[12px] leading-4 font-semibold whitespace-nowrap text-[#f9a825]">
-                    {type.price}
-                  </span>
-                  <span className="mt-1 flex size-8 items-center justify-center rounded-full bg-[rgba(249,168,37,0.2)]">
+                  {/* No price here — what a shoot costs is settled on the Package
+                      step, against the packages that actually fit it. */}
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[rgba(249,168,37,0.2)]">
                     <ArrowRight className="size-4 text-[#f9a825]" strokeWidth={1.666} />
                   </span>
                 </span>
-              </span>
+              </FitImage>
             </button>
           );
         })}

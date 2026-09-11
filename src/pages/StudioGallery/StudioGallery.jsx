@@ -1,67 +1,19 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { ImageIcon } from "lucide-react";
 import SiteLayout from "../../components/SiteLayout";
-import priyaArjun from "../../landing/Gallery/assets/priya-arjun.jpg";
-import snehaMehta from "../../landing/Gallery/assets/sneha-mehta.jpg";
-import sharmaFamily from "../../landing/Gallery/assets/sharma-family.jpg";
-import babyAnika from "../../landing/Gallery/assets/baby-anika.jpg";
-import kavithaRajan from "../../landing/Gallery/assets/kavitha-rajan.jpg";
-import divyaNair from "../../landing/Gallery/assets/divya-nair.jpg";
-import kapoorFamily from "../../landing/Gallery/assets/kapoor-family.jpg";
-import babyKrish from "../../landing/Gallery/assets/baby-krish.jpg";
-import meeraVikram from "../../landing/Gallery/assets/meera-vikram.jpg";
-import littleSia from "../../landing/Gallery/assets/little-sia.jpg";
-import rahulPooja from "../../landing/Gallery/assets/rahul-pooja.jpg";
-import ananyaDev from "../../landing/Gallery/assets/ananya-dev.jpg";
+import PhotoWall from "../../components/PhotoWall";
+import Pagination from "../../components/Pagination";
+import { useGallery } from "../../api/useGallery";
 
 /**
  * Figma: Studio Gallery (1550:8378).
- * Same twelve shoots and column heights as the home Gallery section
- * (1550:2576), so the photography is shared with that section's assets.
  *
- * NOTE: the frame's pills carry counts totalling 20 while it lays out 12 photos,
- * and tags none of them with a category. So both the counts and the pill list
- * are derived from the photos here, and each `category` below was read off the
- * photograph itself. Nothing in the set is a non-wedding couple shoot, so the
- * frame's "Couple" pill does not render.
+ * The full portfolio from the admin's Media Library, twelve to a page. The
+ * pills are the types that actually hold live photos, each with its real count;
+ * the backend pages and filters. The frame's twelve stock shoots are gone.
  */
-/** The frame's pill order. FILTERS below drops any category with no photos. */
-const FILTER_ORDER = ["Wedding", "Family", "Maternity", "Newborn", "Couple"];
-
-const COLUMNS = [
-  {
-    offsetTop: 16,
-    items: [
-      { name: "Priya & Arjun", image: priyaArjun, height: 420, category: "Wedding" },
-      { name: "Sneha Mehta", image: snehaMehta, height: 462.34, category: "Maternity" },
-      { name: "The Sharma Family", image: sharmaFamily, height: 403.488, category: "Family" },
-    ],
-  },
-  {
-    offsetTop: 0,
-    items: [
-      { name: "Baby Anika", image: babyAnika, height: 437.119, category: "Newborn" },
-      { name: "Kavitha & Rajan", image: kavithaRajan, height: 504.371, category: "Wedding" },
-      { name: "Divya Nair", image: divyaNair, height: 386.678, category: "Maternity" },
-    ],
-  },
-  {
-    offsetTop: 0,
-    items: [
-      { name: "The Kapoor Family", image: kapoorFamily, height: 453.929, category: "Family" },
-      { name: "Baby Krish", image: babyKrish, height: 420.309, category: "Newborn" },
-      { name: "Meera & Vikram", image: meeraVikram, height: 403.488, category: "Wedding" },
-    ],
-  },
-  {
-    offsetTop: 0,
-    items: [
-      { name: "Little Sia", image: littleSia, height: 437.119, category: "Maternity" },
-      { name: "Rahul & Pooja", image: rahulPooja, height: 487.55, category: "Wedding" },
-      { name: "Ananya & Dev", image: ananyaDev, height: 428.708, category: "Wedding" },
-    ],
-  },
-];
+const PAGE_SIZE = 12;
 
 const ANNOUNCEMENT = {
   emoji: "🔥",
@@ -70,61 +22,31 @@ const ANNOUNCEMENT = {
   activeDot: 0,
 };
 
-/** Every photo, flattened row-major so a filtered view can re-flow freely. */
-const PHOTOS = COLUMNS[0].items.flatMap((_, row) =>
-  COLUMNS.map((column) => column.items[row]).filter(Boolean)
-);
-
-const COUNTS = PHOTOS.reduce(
-  (acc, photo) => ({ ...acc, [photo.category]: (acc[photo.category] ?? 0) + 1 }),
-  { All: PHOTOS.length }
-);
-
-// Counts and pills both come from the photos, so a filter can never promise
-// more than exists — or show up at all with nothing behind it.
-const FILTERS = ["All", ...FILTER_ORDER.filter((label) => COUNTS[label])];
-
-/**
- * The frame gives every photo its own height (386px–504px) plus a 16px offset on
- * the first column. That stagger reads as noise rather than design here, so every
- * card is levelled to one height — object-cover crops, it never distorts.
- */
-const UNIFORM_HEIGHT = 440;
-
-/** Greedy shortest-column packing — keeps a filtered grid gap-free. */
-function packColumns(photos, columnCount) {
-  const columns = Array.from({ length: columnCount }, () => ({
-    offsetTop: 0,
-    height: 0,
-    items: [],
-  }));
-  photos.forEach((photo) => {
-    const target = columns.reduce(
-      (shortest, column) => (column.height < shortest.height ? column : shortest),
-      columns[0]
-    );
-    target.items.push({ ...photo, height: UNIFORM_HEIGHT });
-    target.height += UNIFORM_HEIGHT + 16;
-  });
-  return columns.filter((column) => column.items.length > 0);
-}
-
 export default function StudioGallery() {
   const [active, setActive] = useState("All");
+  const [page, setPage] = useState(1);
 
-  // Every view re-flows through the packer, so a filter never leaves empty
-  // columns behind and the grid stays even however many photos match.
-  const columns = useMemo(() => {
-    const matching =
-      active === "All"
-        ? PHOTOS
-        : PHOTOS.filter((photo) => photo.category === active);
-    return packColumns(matching, Math.min(COLUMNS.length, matching.length) || 1);
-  }, [active]);
+  const { photos, categories, total, matching, pages, loading } = useGallery({
+    category: active,
+    page,
+    limit: PAGE_SIZE,
+  });
+
+  const FILTERS = [{ name: "All", count: total }, ...categories];
+
+  const pick = (name) => {
+    setActive(name);
+    setPage(1);
+  };
+
+  const changePage = (next) => {
+    setPage(next);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <SiteLayout active="Gallery" announcement={ANNOUNCEMENT}>
-      <section className="flex w-full flex-col items-center bg-white px-6 pt-36 pb-16">
+      <section className="flex w-full flex-col items-center bg-white px-6 pt-16 pb-16 md:pt-36">
         <div className="flex w-full max-w-[1440px] flex-col items-center">
           <p className="font-script text-center text-[30px] leading-9 font-normal whitespace-nowrap text-[#f9a825]">
             Our Work
@@ -137,65 +59,75 @@ export default function StudioGallery() {
             shoots from Klicpic Studio.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-8">
-            {FILTERS.map((label) => {
-              const isActive = label === active;
-              const count = COUNTS[label] ?? 0;
-              return (
-                <button
-                  key={label}
-                  type="button"
-                  onClick={() => setActive(label)}
-                  className={`flex cursor-pointer items-center gap-2 rounded-full px-5 py-2 transition-colors ${
-                    isActive
-                      ? "bg-[#f9a825]"
-                      : "border-[0.701px] border-solid border-[rgba(31,41,55,0.1)] hover:border-[#f9a825]"
-                  }`}
-                >
-                  <span
-                    className={`text-center text-[14px] leading-[20px] font-semibold whitespace-nowrap ${
-                      isActive ? "text-[#0f1117]" : "text-[rgba(31,41,55,0.6)]"
+          {total > 0 && FILTERS.length > 2 && (
+            // One sideways-scrolling row on a phone, as CatalogFilters does.
+            <div className="klicpic-rail mt-8 flex w-full items-center gap-3 overflow-x-auto py-1 sm:flex-wrap sm:justify-center sm:overflow-visible">
+              {FILTERS.map(({ name, count }) => {
+                const isActive = name === active;
+                return (
+                  <button
+                    key={name}
+                    type="button"
+                    onClick={() => pick(name)}
+                    className={`flex min-h-10 shrink-0 cursor-pointer items-center gap-2 rounded-full px-5 py-2 transition-colors first:ml-auto last:mr-auto sm:first:ml-0 sm:last:mr-0 ${
+                      isActive
+                        ? "bg-[#f9a825]"
+                        : "border-[0.701px] border-solid border-[rgba(31,41,55,0.1)] hover:border-[#f9a825]"
                     }`}
                   >
-                    {label}
-                  </span>
-                  <span
-                    className={`text-center text-[12px] leading-4 font-semibold opacity-60 ${
-                      isActive ? "text-[#0f1117]" : "text-[rgba(31,41,55,0.6)]"
-                    }`}
-                  >
-                    ({count})
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                    <span
+                      className={`text-center text-[14px] leading-[20px] font-semibold whitespace-nowrap ${
+                        isActive ? "text-[#0f1117]" : "text-[rgba(31,41,55,0.6)]"
+                      }`}
+                    >
+                      {name}
+                    </span>
+                    <span
+                      className={`text-center text-[12px] leading-4 font-semibold opacity-60 ${
+                        isActive ? "text-[#0f1117]" : "text-[rgba(31,41,55,0.6)]"
+                      }`}
+                    >
+                      ({count})
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 
       <section className="flex w-full flex-col items-center bg-white px-6 pb-16">
-        <div className="flex w-full max-w-[1440px] items-start justify-center gap-[17px]">
-          {columns.map((column, columnIndex) => (
-            <div
-              key={columnIndex}
-              className="flex w-[336px] max-w-full flex-col items-start gap-4"
-              style={{ marginTop: `${column.offsetTop}px` }}
-            >
-              {column.items.map((item) => (
-                <figure
-                  key={item.name}
-                  className="group w-full cursor-pointer overflow-hidden rounded-[20px] bg-[#f3f4f6]"
-                  style={{ height: `${item.height}px` }}
-                >
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="pointer-events-none size-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                </figure>
-              ))}
+        <div className="flex w-full max-w-[1440px] flex-col items-center">
+          {!loading && total === 0 ? (
+            <div className="flex w-full max-w-[640px] flex-col items-center rounded-3xl border-[1.4px] border-dashed border-[#e5e7eb] px-6 py-16 text-center">
+              <ImageIcon className="size-10 text-[#f9a825]" strokeWidth={1.4} />
+              <p className="pt-4 text-[18px] leading-7 font-bold text-[#1f2937]">
+                Our portfolio is on its way
+              </p>
+              <p className="max-w-[420px] pt-2 text-[14px] leading-[22px] text-[#6a7282]">
+                We're adding photos from recent shoots. Meanwhile, browse our
+                themes to see the sets families book.
+              </p>
+              <Link
+                to="/themes"
+                className="mt-6 rounded-full border-[1.4px] border-solid border-[#f9a825] px-6 py-2.5 text-[14px] font-bold text-[#f9a825] hover:bg-[#f9a825]/10"
+              >
+                Browse Themes →
+              </Link>
             </div>
-          ))}
+          ) : (
+            <>
+              <PhotoWall photos={photos} />
+              <Pagination
+                page={page}
+                pages={pages}
+                total={matching}
+                noun="photos"
+                onChange={changePage}
+              />
+            </>
+          )}
         </div>
       </section>
 

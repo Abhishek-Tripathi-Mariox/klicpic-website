@@ -1,5 +1,6 @@
 import React from "react";
 import { imageUrl } from "../../api/imageUrl";
+import FitImage from "../../components/FitImage";
 import { useThemes } from "../../api/useCatalog";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
@@ -31,13 +32,13 @@ export default function Trending() {
   const THEMES = items.slice(0, LOCAL_THEMES.length);
 
   return (
-    <section className="flex w-full flex-col items-center bg-white px-6 py-24">
+    <section className="flex w-full flex-col items-center bg-white px-4 py-16 sm:px-6 md:py-24">
       <div className="flex w-full max-w-[1440px] flex-col items-start">
         <div className="flex w-full flex-col items-center">
-          <p className="font-script text-center text-[30px] leading-9 font-normal whitespace-nowrap text-[#f9a825]">
+          <p className="font-script text-center text-[26px] leading-8 font-normal whitespace-nowrap text-[#f9a825] sm:text-[30px] sm:leading-9">
             Most Popular
           </p>
-          <h2 className="pt-1 text-center text-[36px] leading-10 font-bold text-[#1f2937]">
+          <h2 className="pt-1 text-center text-[28px] leading-[34px] font-bold text-[#1f2937] sm:text-[36px] sm:leading-10">
             Trending This Month
           </h2>
           <Link to="/themes" className="mt-4 flex items-center gap-[6px]">
@@ -48,34 +49,37 @@ export default function Trending() {
           </Link>
         </div>
 
-        <div className="grid w-full grid-cols-1 gap-5 pt-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        <div className="grid w-full grid-cols-1 gap-5 pt-8 sm:grid-cols-2 md:pt-12 lg:grid-cols-3 xl:grid-cols-5">
           {THEMES.map((theme) => (
             <article
               key={theme.name}
               className="flex flex-col items-start overflow-hidden rounded-2xl border-[0.701px] border-solid border-[#f3f4f6] bg-white shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)]"
             >
-              <div className="relative h-[279.991px] w-full shrink-0 overflow-hidden bg-gradient-to-br from-[#3f4550] to-[#1f2937]">
-                {theme.image && (
-                  <img
-                    src={imageUrl(theme.image, 480)}
-                    loading="lazy"
-                    alt={theme.name}
-                    className="pointer-events-none absolute inset-0 size-full object-cover"
-                  />
+              <FitImage
+                src={theme.image ? imageUrl(theme.image, 480) : null}
+                alt={theme.name}
+                tone="dark"
+                className="h-[279.991px] w-full shrink-0 bg-gradient-to-br from-[#3f4550] to-[#1f2937]"
+              >
+                {/* CRM themes carry no booking or stock figures; an empty
+                    badge read as a rendering glitch. */}
+                {theme.bookings && (
+                  <span className="absolute top-3 left-3 rounded-full bg-[#f9a825] px-[10px] py-[3px] text-[11px] leading-[16.5px] font-bold whitespace-nowrap text-white">
+                    {theme.bookings}
+                  </span>
                 )}
-                <span className="absolute top-3 left-3 rounded-full bg-[#f9a825] px-[10px] py-[3px] text-[11px] leading-[16.5px] font-bold whitespace-nowrap text-white">
-                  {theme.bookings}
-                </span>
-                <span className="absolute top-3 right-3 rounded-full bg-[#fb2c36] px-[10px] py-[3px] text-[11px] leading-[16.5px] font-bold whitespace-nowrap text-white">
-                  {theme.left}
-                </span>
-              </div>
+                {theme.left && (
+                  <span className="absolute top-3 right-3 rounded-full bg-[#fb2c36] px-[10px] py-[3px] text-[11px] leading-[16.5px] font-bold whitespace-nowrap text-white">
+                    {theme.left}
+                  </span>
+                )}
+              </FitImage>
 
               <div className="flex w-full flex-col items-start p-4">
-                <h3 className="text-[14px] leading-[20px] font-semibold whitespace-nowrap text-[#1f2937]">
+                <h3 className="w-full text-[14px] leading-[20px] font-semibold text-[#1f2937]">
                   {theme.name}
                 </h3>
-                <div className="flex w-full items-center justify-between pt-1 pb-3">
+                <div className="flex w-full items-center justify-between gap-2 pt-1 pb-3">
                   <span className="text-[12px] leading-4 whitespace-nowrap text-[#6a7282]">
                     {theme.rating}
                   </span>

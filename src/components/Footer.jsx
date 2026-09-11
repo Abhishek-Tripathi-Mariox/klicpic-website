@@ -27,6 +27,7 @@ const LINK_COLUMNS = [
       { label: "About Us", to: "/about" },
       { label: "Careers", to: "/careers" },
       { label: "Blog", to: "/blog" },
+      { label: "Reviews", to: "/reviews" },
       { label: "Contact", to: "/contact" },
     ],
   },
@@ -60,9 +61,9 @@ const SOCIALS = [
 export default function Footer() {
   return (
     <footer className="flex w-full flex-col items-center bg-[#111827]">
-      <div className="flex w-full max-w-[1440px] flex-col items-start px-6 py-16">
-        <div className="grid w-full grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="flex flex-col items-start">
+      <div className="flex w-full max-w-[1440px] flex-col items-start px-4 py-12 sm:px-6 md:py-16">
+        <div className="grid w-full grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="col-span-2 flex flex-col items-start sm:col-span-3 lg:col-span-1">
             <img
               src={logo}
               alt="Klicpic"
@@ -124,7 +125,7 @@ export default function Footer() {
 
         <div className="flex w-full flex-col items-center pt-12">
           <div className="flex w-full flex-col items-center justify-between gap-6 border-t-[0.701px] border-solid border-[rgba(255,255,255,0.08)] pt-8 md:flex-row">
-            <p className="font-script text-[24px] leading-8 font-normal whitespace-nowrap text-[rgba(255,255,255,0.3)]">
+            <p className="font-script text-center text-[24px] leading-8 font-normal text-[rgba(255,255,255,0.3)] md:whitespace-nowrap">
               Crafting Memories Since 2015
             </p>
 
@@ -134,14 +135,14 @@ export default function Footer() {
                   key={label}
                   href="#top"
                   aria-label={label}
-                  className="flex size-[35.997px] items-center justify-center rounded-full border-[0.701px] border-solid border-[rgba(249,168,37,0.2)] bg-[rgba(249,168,37,0.12)] transition-colors hover:bg-[rgba(249,168,37,0.25)]"
+                  className="flex size-10 items-center justify-center rounded-full border-[0.701px] border-solid border-[rgba(249,168,37,0.2)] bg-[rgba(249,168,37,0.12)] transition-colors hover:bg-[rgba(249,168,37,0.25)]"
                 >
                   <Icon className="size-4 text-[#f9a825]" strokeWidth={1.333} />
                 </a>
               ))}
             </div>
 
-            <p className="text-[12px] leading-4 whitespace-nowrap text-[rgba(255,255,255,0.25)]">
+            <p className="text-center text-[12px] leading-4 text-[rgba(255,255,255,0.25)] md:whitespace-nowrap">
               © 2026 Klicpic. All rights reserved.
             </p>
           </div>

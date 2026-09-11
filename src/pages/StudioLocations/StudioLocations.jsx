@@ -61,7 +61,7 @@ export default function StudioLocations() {
                   key={option}
                   type="button"
                   onClick={() => setAvailability(option)}
-                  className={`cursor-pointer rounded-full px-4 py-[6px] text-center text-[12px] leading-4 font-semibold whitespace-nowrap transition-colors ${
+                  className={`flex min-h-10 cursor-pointer items-center rounded-full px-4 py-[6px] text-center text-[12px] leading-4 font-semibold whitespace-nowrap transition-colors lg:min-h-0 ${
                     isActive
                       ? "bg-[#1f2937] text-white"
                       : "border-[0.701px] border-solid border-[rgba(31,41,55,0.12)] bg-white text-[#6a7282] hover:border-[#f9a825] hover:text-[#f9a825]"
@@ -79,10 +79,12 @@ export default function StudioLocations() {
               : `Showing ${studios.length} studio${studios.length === 1 ? "" : "s"} · ${openCount} open now`}
           </p>
 
+          {/* Cards are fluid now; a handful of branches stay a readable width
+              and centre under the filters instead of stretching. */}
           {studios.length > 0 && (
-            <div className="grid w-full grid-cols-1 justify-items-center gap-6 pt-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid w-full grid-cols-1 justify-center gap-6 pt-8 sm:grid-cols-[repeat(auto-fit,minmax(280px,340px))]">
               {studios.map((studio) => (
-                <StudioCard key={studio.name} studio={studio} />
+                <StudioCard key={studio.id || studio.name} studio={studio} />
               ))}
             </div>
           )}
@@ -95,8 +97,8 @@ export default function StudioLocations() {
               We Come to You
             </h2>
             <p className="max-w-[520px] pt-3 text-center text-[16px] leading-6 text-[#6a7282]">
-              Outdoor and on-location shoots are available in every city we
-              operate in. Tell us where, and we will bring the studio.
+              We shoot at your home or venue in every city we operate in.
+              Tell us where, and we will bring the studio.
             </p>
             <Link
               to="/contact"

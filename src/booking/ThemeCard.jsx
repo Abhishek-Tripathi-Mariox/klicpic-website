@@ -1,4 +1,5 @@
 import React from "react";
+import FitImage from "../components/FitImage";
 import { imageUrl } from "../api/imageUrl";
 import { Check, Flame } from "lucide-react";
 
@@ -12,11 +13,18 @@ const SCRIM =
 
 export default function ThemeCard({ theme, selected, onSelect, onOpen }) {
   return (
-    <div
-      className={`group relative h-[199.99px] w-full overflow-hidden rounded-2xl bg-gradient-to-br from-[#3f4550] to-[#1f2937] ${
+    // The card is the photo, shown whole over a blurred copy of itself (see
+    // FitImage); the gradient shows only for a theme with no photo.
+    <FitImage
+      src={theme.image ? imageUrl(theme.image, 480) : ""}
+      alt={theme.name}
+      tone="dark"
+      className={`group h-[199.99px] w-full rounded-2xl bg-gradient-to-br from-[#3f4550] to-[#1f2937] ${
         selected ? "ring-2 ring-[#f9a825] ring-offset-2" : ""
       }`}
+      imgClassName="transition-transform duration-500 group-hover:scale-[1.03]"
     >
+      <span className="absolute inset-0" style={{ background: SCRIM }} />
       <button
         type="button"
         onClick={() => onSelect?.(theme)}
@@ -24,16 +32,6 @@ export default function ThemeCard({ theme, selected, onSelect, onOpen }) {
         className="absolute inset-0 cursor-pointer text-left"
         aria-pressed={selected}
       >
-        {theme.image && (
-          <img
-            loading="lazy"
-            src={imageUrl(theme.image, 480)}
-            alt={theme.name}
-            className="pointer-events-none absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        )}
-        <span className="absolute inset-0" style={{ background: SCRIM }} />
-
         <span className="absolute top-2 left-2 flex flex-col items-start gap-1">
           {theme.viewing && (
             <span className="flex items-center gap-[5px] rounded-full bg-[rgba(0,0,0,0.65)] px-2 py-1">
@@ -86,6 +84,6 @@ export default function ThemeCard({ theme, selected, onSelect, onOpen }) {
           <Check className="size-[14px] text-white" strokeWidth={3} />
         </span>
       )}
-    </div>
+    </FitImage>
   );
 }

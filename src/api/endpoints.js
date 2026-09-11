@@ -68,7 +68,39 @@ export const fetchPortalBookings = (options) =>
 export const fetchPortalBooking = (id, options) =>
   api.get(`/website/portal/bookings/${id}`, { ...options, auth: true });
 
+/** Photos the team shared from the shoot for the customer to pick. */
+export const fetchPortalSelections = (bookingId, options) =>
+  api.get(`/website/portal/bookings/${bookingId}/selections`, { ...options, auth: true });
+
+/** { status: "approved" | "rejected" | "pending", photoIds } or { status, all: true }. */
+export const savePortalSelections = (bookingId, payload) =>
+  api.put(`/website/portal/bookings/${bookingId}/selections`, payload, { auth: true });
+
+/** What the customer receives for a booking, and where each item stands. */
+export const fetchPortalDeliverables = (bookingId, options) =>
+  api.get(`/website/portal/bookings/${bookingId}/deliverables`, { ...options, auth: true });
+
 export const fetchShootTypes = (options) => api.get("/website/shoot-types", options);
+
+/** Portfolio photos, managed in the admin's Media Library. */
+export const fetchGallery = (params, options) =>
+  api.get(`/website/gallery${query(params)}`, options);
+
+/** The studio's packages ranked against the customer's choices so far. */
+export const matchPackages = (criteria) => api.post("/website/packages/match", criteria);
+
+// The booking wizard's journey — progress per step, Save Progress, resume link.
+export const startJourney = (payload) => api.post("/website/journeys", payload);
+export const updateJourney = (id, payload) =>
+  api.put(`/website/journeys/${encodeURIComponent(id)}`, payload);
+export const resumeJourney = (token) =>
+  api.get(`/website/journeys/resume/${encodeURIComponent(token)}`);
+
+/** Booking add-ons — the CRM's active Products, priced as on a quotation. */
+export const fetchExtras = (options) => api.get("/website/extras", options);
+
+/** Vibes for the booking wizard, managed in Settings → Website CMS → Vibes. */
+export const fetchVibes = (options) => api.get("/website/vibes", options);
 
 /** Gowns live in the CRM as props filed under the "gown" category. */
 // ── Availability ────────────────────────────────────────────────────────────

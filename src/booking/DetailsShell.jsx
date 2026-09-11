@@ -26,9 +26,11 @@ export default function DetailsShell({
 
   return (
     <div className="flex w-full flex-col items-start pb-24">
-      <div className="flex w-full items-start justify-between gap-4">
+      {/* Wraps rather than squeezes: on a phone the pill drops under the
+          heading instead of crushing it into a three-line column. */}
+      <div className="flex w-full flex-wrap items-start justify-between gap-x-4 gap-y-3">
         <div className="flex flex-col items-start">
-          <h2 className="text-[30px] leading-9 font-bold text-[#1f2937]">
+          <h2 className="text-[26px] leading-8 font-bold text-[#1f2937] sm:text-[30px] sm:leading-9">
             Customise Your Session
           </h2>
           <p className="pt-1 text-[12px] leading-4 text-[#99a1af]">
@@ -84,13 +86,13 @@ export default function DetailsShell({
         })}
       </div>
 
-      <div className="flex w-full items-center justify-between pt-2">
+      <div className="flex w-full items-center justify-between gap-3 pt-2">
         <p className="text-[12px] leading-4 text-[#99a1af]">{hint}</p>
         {onSkipStep && (
           <button
             type="button"
             onClick={onSkipStep}
-            className="cursor-pointer text-[12px] leading-4 font-semibold text-[#6a7282] transition-colors hover:text-[#f9a825]"
+            className="shrink-0 cursor-pointer text-[12px] leading-4 font-semibold whitespace-nowrap text-[#6a7282] transition-colors hover:text-[#f9a825]"
           >
             Skip this step →
           </button>
@@ -99,20 +101,23 @@ export default function DetailsShell({
 
       {children}
 
-      <div className="sticky bottom-4 z-10 mt-6 flex w-full items-center gap-3 rounded-2xl border-[0.701px] border-solid border-[#f3f4f6] bg-white/95 p-3 shadow-[0px_10px_7.5px_rgba(0,0,0,0.1)] backdrop-blur">
+      {/* On a phone the back button keeps only its arrow, so the main action
+          reads on one line between it and "Skip all". */}
+      <div className="sticky bottom-4 z-10 mt-6 flex w-full items-center gap-2 rounded-2xl border-[0.701px] border-solid border-[#f3f4f6] bg-white/95 p-2 shadow-[0px_10px_7.5px_rgba(0,0,0,0.1)] backdrop-blur sm:gap-3 sm:p-3">
         <button
           type="button"
           onClick={onBack}
-          className="flex shrink-0 cursor-pointer items-center gap-2 rounded-2xl border-[0.701px] border-solid border-[#e5e7eb] px-4 py-3 text-[14px] leading-[20px] font-semibold text-[#1f2937] transition-colors hover:bg-[#f9fafb]"
+          aria-label={`Back to ${backLabel}`}
+          className="flex shrink-0 cursor-pointer items-center gap-2 rounded-2xl border-[0.701px] border-solid border-[#e5e7eb] px-3 py-3 text-[14px] leading-[20px] font-semibold text-[#1f2937] transition-colors hover:bg-[#f9fafb] sm:px-4"
         >
           <ArrowLeft className="size-4 shrink-0" strokeWidth={1.666} />
-          {backLabel}
+          <span className="hidden sm:inline">{backLabel}</span>
         </button>
         <button
           type="button"
           onClick={onNext}
           disabled={!canContinue}
-          className={`flex flex-1 items-center justify-center gap-2 rounded-2xl py-3 text-center text-[14px] leading-[20px] font-bold transition-colors ${
+          className={`flex min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl px-2 py-3 text-center text-[14px] leading-[20px] font-bold transition-colors ${
             canContinue
               ? "cursor-pointer bg-[#f9a825] text-white hover:bg-[#e69a1f]"
               : "cursor-not-allowed bg-[#f3f4f6] text-[#99a1af]"
@@ -124,7 +129,7 @@ export default function DetailsShell({
         <button
           type="button"
           onClick={onSkipAll}
-          className="shrink-0 cursor-pointer px-3 text-[12px] leading-4 font-semibold text-[#6a7282] transition-colors hover:text-[#f9a825]"
+          className="shrink-0 cursor-pointer px-2 text-[12px] leading-4 font-semibold whitespace-nowrap text-[#6a7282] transition-colors hover:text-[#f9a825] sm:px-3"
         >
           Skip all
         </button>

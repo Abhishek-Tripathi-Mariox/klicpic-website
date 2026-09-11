@@ -36,7 +36,7 @@ export default function StepSuccess({ requestId, name, onHome }) {
   ].filter((row) => row.value);
 
   return (
-    <div className="relative flex w-full flex-col items-center px-6 py-16">
+    <div className="relative flex w-full flex-col items-center py-8 sm:px-6 sm:py-16">
       {/* emoji burst — trails off to the upper right, as in Figma 1615:9530 */}
       <div aria-hidden className="pointer-events-none absolute inset-0 hidden overflow-hidden lg:block">
         {BURST.map((emoji, index) => (
@@ -82,7 +82,7 @@ export default function StepSuccess({ requestId, name, onHome }) {
         </div>
 
         {/* summary */}
-        <div className="mt-8 w-full rounded-2xl border-[0.701px] border-solid border-[#f3f4f6] bg-white p-7 shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1)]">
+        <div className="mt-8 w-full rounded-2xl border-[0.701px] border-solid border-[#f3f4f6] bg-white p-5 shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1)] sm:p-7">
           <h3 className="text-[16px] leading-6 font-bold text-[#1f2937]">
             📋 Booking Summary
           </h3>

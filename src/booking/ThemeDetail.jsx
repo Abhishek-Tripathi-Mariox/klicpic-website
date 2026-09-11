@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { ArrowLeft, ChevronRight, Images, Video } from "lucide-react";
+import FitImage from "../components/FitImage";
+import { imageUrl } from "../api/imageUrl";
 import { useBooking } from "./BookingContext";
 import { THEMES } from "./themeData";
 import ThemeCard from "./ThemeCard";
@@ -60,13 +62,12 @@ export default function ThemeDetail({ theme, onBack, onSelect }) {
 
       {/* hero + strip */}
       <div className="w-full pt-6">
-        <div className="w-full overflow-hidden rounded-2xl bg-[#f3f4f6]">
-          <img
-            src={strip[active].image}
-            alt={strip[active].name}
-            className="aspect-[4/3] w-full object-cover"
-          />
-        </div>
+        <FitImage
+          src={imageUrl(strip[active].image, 960)}
+          alt={strip[active].name}
+          loading="eager"
+          className="aspect-[4/3] w-full rounded-2xl"
+        />
 
         <div className="klicpic-rail flex w-full items-center gap-2 overflow-x-auto pt-3">
           {strip.map((item, index) => (
@@ -80,11 +81,7 @@ export default function ThemeDetail({ theme, onBack, onSelect }) {
                   : "opacity-80 hover:opacity-100"
               }`}
             >
-              <img
-                src={item.image}
-                alt=""
-                className="size-full object-cover"
-              />
+              <FitImage src={imageUrl(item.image, 160)} className="size-full" />
             </button>
           ))}
           <span className="flex size-[52px] shrink-0 items-center justify-center rounded-full border-[0.701px] border-solid border-[#e5e7eb] text-[#6a7282]">

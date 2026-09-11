@@ -5,6 +5,7 @@ import { TABS } from "./portalData";
 import DashboardOverview from "./DashboardOverview";
 import PaymentsTab from "./tabs/PaymentsTab";
 import DeliverablesTab from "./tabs/DeliverablesTab";
+import SelectionsTab from "./tabs/SelectionsTab";
 import MessagesTab from "./tabs/MessagesTab";
 import ProfileTab from "./tabs/ProfileTab";
 import { usePortalBookings } from "../api/usePortalBookings";
@@ -54,7 +55,7 @@ export default function PortalDashboard() {
       {/* greeting — the frame puts this on a dark band, with the tab bar
           sitting in it and the active tab reading as a page behind it. */}
       <div className="w-full bg-[#1f2937]">
-        <div className="mx-auto flex w-full max-w-[1200px] flex-col items-start px-6 pt-10">
+        <div className="mx-auto flex w-full max-w-[1200px] flex-col items-start px-4 pt-8 sm:px-6 sm:pt-10">
           <div className="flex w-full flex-wrap items-start justify-between gap-4">
             <div className="flex flex-col items-start">
               {/* The frame shows a booking id and a status pill. A customer
@@ -65,7 +66,7 @@ export default function PortalDashboard() {
                   Booking ID: {booking.bookingCode}
                 </p>
               )}
-              <h1 className="pt-1 text-[30px] leading-9 font-bold text-white">
+              <h1 className="pt-1 text-[24px] leading-8 font-bold text-white sm:text-[30px] sm:leading-9">
                 {/* A customer whose lead carries no name yet still gets a greeting. */}
                 Hi{user?.name ? `, ${user.name}` : " there"}! 👋
               </h1>
@@ -74,7 +75,7 @@ export default function PortalDashboard() {
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               {booking?.status && (
                 <span className="flex items-center gap-2 rounded-full border-[0.57px] border-solid border-[rgba(249,168,37,0.3)] bg-[rgba(249,168,37,0.15)] px-4 py-2">
                   <span
@@ -89,7 +90,7 @@ export default function PortalDashboard() {
               <button
                 type="button"
                 onClick={logout}
-                className="flex cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-[14px] leading-[20px] font-medium text-[rgba(255,255,255,0.6)] transition-colors hover:text-white"
+                className="flex h-10 cursor-pointer items-center gap-2 rounded-full px-4 text-[14px] leading-[20px] font-medium text-[rgba(255,255,255,0.6)] transition-colors hover:text-white"
               >
                 <LogOut className="size-4 shrink-0" strokeWidth={1.666} />
                 Logout
@@ -98,7 +99,7 @@ export default function PortalDashboard() {
           </div>
 
           {/* tabs */}
-          <div className="klicpic-rail mt-8 flex w-full items-end gap-1 overflow-x-auto">
+          <div className="klicpic-rail -mx-4 mt-6 flex w-[calc(100%+2rem)] items-end gap-1 overflow-x-auto px-4 sm:mx-0 sm:mt-8 sm:w-full sm:px-0">
             {TABS.map((item) => {
               const active = tab === item.id;
               return (
@@ -106,7 +107,7 @@ export default function PortalDashboard() {
                   key={item.id}
                   type="button"
                   onClick={() => openTab(item.id)}
-                  className={`flex shrink-0 cursor-pointer items-center gap-2 rounded-t-[20px] px-5 py-3 text-[14px] leading-[20px] font-semibold transition-colors ${
+                  className={`flex shrink-0 cursor-pointer items-center gap-2 rounded-t-[20px] px-4 py-3 text-[14px] whitespace-nowrap sm:px-5 leading-[20px] font-semibold transition-colors ${
                     active
                       ? "bg-[#fafafa] text-[#f9a825]"
                       : "text-[rgba(255,255,255,0.6)] hover:text-white"
@@ -125,13 +126,13 @@ export default function PortalDashboard() {
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-[1200px] px-6 pt-8">
+      <div className="mx-auto w-full max-w-[1200px] px-4 pt-6 sm:px-6 sm:pt-8">
         {tab === "overview" && <DashboardOverview onOpenTab={openTab} />}
         {tab === "payments" && <PaymentsTab booking={booking} />}
-        {/* Selections and Deliverables are the same frame (1615:12026). */}
-        {(tab === "selections" || tab === "deliverables") && (
-          <DeliverablesTab booking={booking} />
-        )}
+        {/* The frame drew Selections and Deliverables alike (1615:12026); they
+            are different things — photos to pick, and what is delivered. */}
+        {tab === "selections" && <SelectionsTab bookings={bookings} booking={booking} />}
+        {tab === "deliverables" && <DeliverablesTab bookings={bookings} booking={booking} />}
         {tab === "messages" && <MessagesTab />}
         {tab === "profile" && (
           <ProfileTab customer={user} bookings={bookings} onLogout={logout} />

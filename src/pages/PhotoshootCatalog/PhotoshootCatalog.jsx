@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Star } from "lucide-react";
 import SiteLayout from "../../components/SiteLayout";
+import FitImage from "../../components/FitImage";
 import PageHeading from "../../components/PageHeading";
 import Pagination from "../../components/Pagination";
 import { CATALOG as LOCAL_CATALOG } from "./catalogData";
@@ -74,12 +75,14 @@ export default function PhotoshootCatalog() {
                 key={item.name}
                 className="group flex flex-col items-start overflow-hidden rounded-3xl bg-white shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)]"
               >
-                <div className="relative h-[319.997px] w-full shrink-0 overflow-hidden">
-                  <img
-                    src={item.image}
-                    alt={`${item.name} photoshoot`}
-                    className="pointer-events-none absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
+                {/* Shown whole — a cover crop cut heads and bumps off the
+                    portrait shots — over a blurred copy that fills the box. */}
+                <FitImage
+                  src={item.image}
+                  alt={`${item.name} photoshoot`}
+                  className="h-[320px] w-full shrink-0"
+                  imgClassName="transition-transform duration-500 group-hover:scale-105"
+                >
                   <div className="absolute inset-0" style={{ background: SCRIM }} />
 
                   <div className="absolute bottom-4 left-4 flex items-center gap-1">
@@ -94,9 +97,9 @@ export default function PhotoshootCatalog() {
                       {item.booked}
                     </span>
                   </div>
-                </div>
+                </FitImage>
 
-                <div className="flex w-full flex-1 flex-col items-start p-6">
+                <div className="flex w-full flex-1 flex-col items-start p-5 sm:p-6">
                   <h3 className="text-[24px] leading-8 font-bold text-[#1f2937]">
                     {item.name}
                   </h3>

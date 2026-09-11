@@ -28,19 +28,19 @@ export default function SaveShoot() {
   };
 
   return (
-    <section className="flex w-full flex-col items-center bg-[#fafafa] px-6 py-24">
+    <section className="flex w-full flex-col items-center bg-[#fafafa] px-4 py-16 sm:px-6 md:py-24">
       <form
         onSubmit={handleSubmit}
-        className="flex w-full max-w-[576px] flex-col items-start rounded-3xl border-[0.701px] border-solid border-[rgba(249,168,37,0.2)] p-14 shadow-[0px_20px_30px_rgba(249,168,37,0.08)]"
+        className="flex w-full max-w-[576px] flex-col items-start rounded-3xl border-[0.701px] border-solid border-[rgba(249,168,37,0.2)] px-5 py-10 shadow-[0px_20px_30px_rgba(249,168,37,0.08)] sm:p-14"
         style={{
           backgroundImage:
             "linear-gradient(133.98deg, rgb(255, 247, 237) 0%, rgb(255, 255, 255) 100%)",
         }}
       >
-        <p className="w-full text-center font-script text-[36px] leading-10 font-normal text-[#f9a825]">
+        <p className="w-full text-center font-script text-[30px] leading-9 font-normal text-[#f9a825] sm:text-[36px] sm:leading-10">
           Not Ready Yet?
         </p>
-        <h2 className="w-full pt-1 text-center text-[30px] leading-9 font-bold text-[#1f2937]">
+        <h2 className="w-full pt-1 text-center text-[26px] leading-8 font-bold text-[#1f2937] sm:text-[30px] sm:leading-9">
           Save Your Dream Shoot
         </h2>
         <p className="w-full pt-3 text-center text-[14px] leading-[20px] text-[#6a7282]">

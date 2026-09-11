@@ -47,7 +47,7 @@ export default function Careers() {
   return (
     <SiteLayout active="Careers" announcement={ANNOUNCEMENT}>
       {/* Hero */}
-      <section className="flex w-full flex-col items-center bg-[#1f2937] px-6 pt-36 pb-16">
+      <section className="flex w-full flex-col items-center bg-[#1f2937] px-6 pt-20 pb-16 md:pt-36">
         <div className="flex w-full max-w-[1440px] flex-col items-center">
           <p className="font-script text-center text-[30px] leading-9 font-normal whitespace-nowrap text-[#f9a825]">
             {HERO.eyebrow}
@@ -55,11 +55,11 @@ export default function Careers() {
           <h1 className="pt-1 text-center text-[40px] leading-[44px] font-bold text-white md:text-[48px] md:leading-[48px]">
             {HERO.title}
           </h1>
-          <p className="w-[576px] max-w-full pt-4 text-center text-[18px] leading-7 text-[rgba(255,255,255,0.5)]">
+          <p className="w-[576px] max-w-full pt-4 text-center text-[16px] leading-6 text-[rgba(255,255,255,0.5)] sm:text-[18px] sm:leading-7">
             {HERO.subtitle}
           </p>
 
-          <div className="flex flex-wrap items-start justify-center gap-10 pt-8">
+          <div className="flex flex-wrap items-start justify-center gap-x-10 gap-y-6 pt-8">
             {HERO.stats.map(({ value, label }) => (
               <div key={label} className="flex flex-col items-center">
                 <p className="text-center text-[24px] leading-8 font-bold whitespace-nowrap text-[#f9a825]">
@@ -169,7 +169,7 @@ export default function Careers() {
             </p>
             <a
               href={`mailto:${OPEN_APPLICATION.email}`}
-              className="mt-4 flex cursor-pointer items-center gap-2 rounded-[20px] bg-[#f9a825] px-6 py-3 text-[14px] leading-[20px] font-bold text-[#1f2937] transition-colors hover:bg-[#e69a1f]"
+              className="mt-4 flex max-w-full cursor-pointer items-center gap-2 rounded-[20px] bg-[#f9a825] px-6 py-3 text-[14px] leading-[20px] font-bold break-all text-[#1f2937] transition-colors hover:bg-[#e69a1f]"
             >
               <Mail className="size-4 shrink-0" strokeWidth={1.666} />
               Email {OPEN_APPLICATION.email}

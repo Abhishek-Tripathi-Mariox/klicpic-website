@@ -16,6 +16,7 @@ import Packages from "./pages/Packages/Packages";
 import StudioGallery from "./pages/StudioGallery/StudioGallery";
 import StudioLocations from "./pages/StudioLocations/StudioLocations";
 import Careers from "./pages/Careers/Careers";
+import Reviews from "./pages/Reviews/Reviews";
 import FAQPage from "./pages/FAQ/FAQ";
 import Privacy from "./pages/Legal/Privacy";
 import Terms from "./pages/Legal/Terms";
@@ -81,6 +82,7 @@ export default function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogPost />} />
+        <Route path="/reviews" element={<Reviews />} />
         <Route path="/faq" element={<FAQPage />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />

@@ -5,6 +5,8 @@ import {
   fetchPackages,
   fetchStudios,
   fetchShootTypes,
+  fetchVibes,
+  fetchExtras,
   fetchTimeSlots,
 } from "./endpoints";
 import { useApi } from "./useApi";
@@ -82,6 +84,28 @@ export const usePackages = (local) =>
 
 export const useStudios = (local) =>
   useCatalog((options) => fetchStudios(undefined, options), "studios", "cities", local);
+
+/**
+ * Add-ons for the Extras step — the same Products the sales team quotes.
+ * No bundled fallback: offering an add-on the studio does not sell, at a
+ * price it never set, is the thing this step must not do.
+ */
+export function useExtras() {
+  const { data, loading, error } = useApi(fetchExtras, null, []);
+  // Stable across renders, so effects keyed on the list do not re-fire.
+  const extras = useMemo(() => (Array.isArray(data) ? data : []), [data]);
+  return { extras, loading, error };
+}
+
+/**
+ * Vibes from the admin's Website CMS → Vibes tab. Until the request lands (or
+ * if it fails) the bundled set stands in, so the step is never empty.
+ */
+export function useVibes(fallback = []) {
+  const { data, loading } = useApi(fetchVibes, null, []);
+  const live = Array.isArray(data) ? data : null;
+  return { vibes: live ?? fallback, live: Boolean(live), loading };
+}
 
 /** The shoot types the studio actually runs. */
 export function useShootTypes(fallback = []) {

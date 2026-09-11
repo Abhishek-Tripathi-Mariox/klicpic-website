@@ -22,21 +22,21 @@ export default function SectionHeading({
     >
       {eyebrow && (
         <p
-          className={`font-script text-[30px] leading-[36px] font-normal ${isCenter ? "text-center" : ""} ${eyebrowClassName}`}
+          className={`font-script text-[26px] leading-8 font-normal sm:text-[30px] sm:leading-[36px] ${isCenter ? "text-center" : ""} ${eyebrowClassName}`}
         >
           {eyebrow}
         </p>
       )}
       {title && (
         <h2
-          className={`pt-1 text-[48px] leading-[48px] font-bold ${isCenter ? "text-center" : ""} ${titleClassName}`}
+          className={`pt-1 text-[32px] leading-[38px] font-bold sm:text-[40px] sm:leading-[44px] lg:text-[48px] lg:leading-[48px] ${isCenter ? "text-center" : ""} ${titleClassName}`}
         >
           {title}
         </h2>
       )}
       {subtitle && (
         <p
-          className={`pt-4 text-[18px] leading-[28px] ${isCenter ? "text-center" : ""} ${subtitleClassName}`}
+          className={`pt-3 text-[16px] leading-6 sm:pt-4 sm:text-[18px] sm:leading-[28px] ${isCenter ? "text-center" : ""} ${subtitleClassName}`}
         >
           {subtitle}
         </p>

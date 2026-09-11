@@ -6,6 +6,7 @@ import { LOCATION_OPTIONS as LOCAL_LOCATION_OPTIONS, OPTION_IMAGES } from "../lo
 import { useContent } from "../../api/useContent";
 import { useStudios } from "../../api/useCatalog";
 import { imageUrl } from "../../api/imageUrl";
+import FitImage from "../../components/FitImage";
 
 /**
  * Figma: booking wizard — Location sub-step.
@@ -107,7 +108,7 @@ export default function StepLocation({ onBack, onNext, onSkipAll }) {
       index={2}
       hint="Location required to continue"
       backLabel="Props"
-      nextLabel="Continue to Extras"
+      nextLabel="Continue to Package"
       canContinue={ready}
       onBack={onBack}
       onNext={onNext}
@@ -142,10 +143,10 @@ export default function StepLocation({ onBack, onNext, onSkipAll }) {
               >
                 {/* The thumbnail ships with this build. The content block
                     stores only a filename, which would resolve to nothing. */}
-                <img
+                <FitImage
                   src={OPTION_IMAGES[option.id] || option.image}
                   alt={option.name}
-                  className="size-[56px] shrink-0 rounded-xl object-cover"
+                  className="size-[56px] shrink-0 rounded-xl"
                 />
                 <span className="flex min-w-0 flex-1 flex-col items-start">
                   <span className="flex items-center gap-2 text-[14px] leading-[20px] font-bold text-[#1f2937]">
@@ -193,17 +194,17 @@ export default function StepLocation({ onBack, onNext, onSkipAll }) {
                             key={item.id}
                             type="button"
                             onClick={() => chooseBranch(item)}
-                            className={`overflow-hidden rounded-xl border-[0.701px] border-solid bg-white text-left transition-colors ${
+                            className={`flex flex-col overflow-hidden rounded-xl border-[0.701px] border-solid bg-white text-left transition-colors ${
                               active ? "border-[#f9a825]" : "border-[#e5e7eb] hover:border-[#f9a825]"
                             }`}
                           >
                             {/* A branch with no photo on record keeps the card's
                                 own styling rather than a broken frame. */}
                             {item.image && (
-                              <img
+                              <FitImage
                                 src={imageUrl(item.image, 480)}
                                 alt={item.name}
-                                className="h-[110px] w-full object-cover"
+                                className="h-[140px] w-full"
                               />
                             )}
                             <span className="flex flex-col items-start p-3">

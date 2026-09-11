@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import SiteLayout from "../../components/SiteLayout";
 import Pagination from "../../components/Pagination";
+import CatalogFilters from "../../components/CatalogFilters";
 import ThemeCard from "./ThemeCard";
 import { imagesFor } from "./themeData";
 import { usePagedThemes } from "../../api/useCatalog";
@@ -45,7 +46,7 @@ export default function ThemeLibrary({ variant = "themes", activeNav = "Themes" 
             <p className="font-script text-center text-[30px] leading-9 font-normal whitespace-nowrap text-[#f9a825]">
               Explore Our
             </p>
-            <h1 className="pt-1 text-center text-[60px] leading-[60px] font-bold text-[#1f2937]">
+            <h1 className="pt-1 text-center text-[40px] leading-[44px] font-bold text-[#1f2937] md:text-[60px] md:leading-[60px]">
               Theme Library
             </h1>
             <p className="pt-4 text-center text-[18px] leading-7 text-[#6a7282]">
@@ -56,25 +57,11 @@ export default function ThemeLibrary({ variant = "themes", activeNav = "Themes" 
             </p>
           </div>
 
-          <div className="flex w-full flex-wrap items-center justify-center gap-3">
-            {THEME_FILTERS.map((filter) => {
-              const isActive = filter === activeFilter;
-              return (
-                <button
-                  key={filter}
-                  type="button"
-                  onClick={() => setActiveFilter(filter)}
-                  className={`cursor-pointer rounded-full px-5 py-[10px] text-center text-[14px] leading-[20px] font-medium whitespace-nowrap transition-colors ${
-                    isActive
-                      ? "bg-[#f9a825] text-white shadow-[0px_1px_1.5px_rgba(0,0,0,0.1),0px_1px_1px_rgba(0,0,0,0.1)]"
-                      : "border-[0.701px] border-solid border-[#f3f4f6] bg-white text-[#4a5565] hover:border-[#f9a825] hover:text-[#f9a825]"
-                  }`}
-                >
-                  {filter}
-                </button>
-              );
-            })}
-          </div>
+          <CatalogFilters
+            filters={THEME_FILTERS}
+            active={activeFilter}
+            onChange={setActiveFilter}
+          />
 
           {!loading && shown.length === 0 ? (
             <p className="w-full pt-14 text-center text-[14px] leading-[20px] text-[#6a7282]">

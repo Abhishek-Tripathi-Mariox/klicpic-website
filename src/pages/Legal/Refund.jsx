@@ -116,7 +116,8 @@ export default function Refund() {
                         <Icon className={`size-[19.997px] ${tone.icon}`} strokeWidth={1.666} />
                       </span>
                       <div className="flex min-w-0 flex-1 flex-col items-start">
-                        <div className="flex w-full items-start justify-between gap-3">
+                        {/* The badge drops under the title when a phone is too narrow for both. */}
+                        <div className="flex w-full flex-wrap items-start justify-between gap-x-3 gap-y-1">
                           <p className="text-[14px] leading-[20px] font-bold text-[#1f2937]">
                             {tier.window}
                           </p>
@@ -147,25 +148,29 @@ export default function Refund() {
               {RESCHEDULE_ROWS.map((row, index) => (
                 <div
                   key={row.title}
-                  className={`flex items-center gap-4 px-5 py-4 ${
+                  className={`flex items-start gap-4 px-5 py-4 sm:items-center ${
                     index < RESCHEDULE_ROWS.length - 1
                       ? "border-b-[0.57px] border-solid border-[#f9fafb]"
                       : ""
                   }`}
                 >
                   <CalendarClock
-                    className="size-[15.998px] shrink-0 text-[#99a1af]"
+                    className="mt-[2px] size-[15.998px] shrink-0 text-[#99a1af] sm:mt-0"
                     strokeWidth={1.333}
                   />
-                  <div className="flex min-w-0 flex-1 flex-col items-start">
-                    <p className="text-[14px] leading-[20px] font-bold text-[#1f2937]">
-                      {row.title}
-                    </p>
-                    <p className="text-[12px] leading-4 text-[#99a1af]">{row.note}</p>
+                  {/* On a phone the charge sits under the row's title instead of
+                      squeezing it into a narrow column. */}
+                  <div className="flex min-w-0 flex-1 flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                    <div className="flex min-w-0 flex-col items-start">
+                      <p className="text-[14px] leading-[20px] font-bold text-[#1f2937]">
+                        {row.title}
+                      </p>
+                      <p className="text-[12px] leading-4 text-[#99a1af]">{row.note}</p>
+                    </div>
+                    <span className="text-[14px] leading-[20px] font-black text-[#f9a825] sm:shrink-0 sm:whitespace-nowrap">
+                      {row.value}
+                    </span>
                   </div>
-                  <span className="shrink-0 text-[14px] leading-[20px] font-black whitespace-nowrap text-[#f9a825]">
-                    {row.value}
-                  </span>
                 </div>
               ))}
             </div>

@@ -77,7 +77,7 @@ export default function PortalLogin({ onSuccess }) {
 
   return (
     <div
-      className="flex w-full flex-col items-center px-6 py-20"
+      className="flex w-full flex-col items-center px-4 py-12 sm:px-6 sm:py-20"
       style={{
         backgroundImage:
           "linear-gradient(148.56deg, rgb(255,251,242) 0%, rgb(255,250,240) 33.3%, rgb(255,248,239) 66.7%, rgb(255,247,237) 100%)",
@@ -87,14 +87,14 @@ export default function PortalLogin({ onSuccess }) {
         <span className="mx-auto flex size-20 items-center justify-center rounded-3xl bg-[#f9a825] shadow-[0px_20px_12.5px_rgba(249,168,37,0.3),0px_8px_5px_rgba(249,168,37,0.3)]">
           <Camera className="size-10 text-white" strokeWidth={1.666} />
         </span>
-        <h1 className="pt-5 text-center text-[30px] leading-9 font-bold text-[#1f2937]">
+        <h1 className="pt-5 text-center text-[26px] leading-8 font-bold text-[#1f2937] sm:text-[30px] sm:leading-9">
           Customer Portal
         </h1>
         <p className="pt-2 text-center text-[14px] leading-[20px] text-[#6a7282]">
           Track bookings, photos, and deliverables
         </p>
 
-        <div className="mt-10 w-full overflow-hidden rounded-3xl border-[0.57px] border-solid border-[#f3f4f6] bg-white shadow-[0px_20px_25px_-5px_rgba(0,0,0,0.08),0px_8px_10px_-6px_rgba(0,0,0,0.08)]">
+        <div className="mt-8 w-full overflow-hidden rounded-3xl sm:mt-10 border-[0.57px] border-solid border-[#f3f4f6] bg-white shadow-[0px_20px_25px_-5px_rgba(0,0,0,0.08),0px_8px_10px_-6px_rgba(0,0,0,0.08)]">
           {/* step tabs */}
           <div className="flex w-full border-b-[0.57px] border-solid border-[#f3f4f6]">
             {[
@@ -117,7 +117,7 @@ export default function PortalLogin({ onSuccess }) {
             })}
           </div>
 
-          <div className="flex flex-col items-start p-8">
+          <div className="flex flex-col items-start p-5 sm:p-8">
             {step === "phone" ? (
               <>
                 <h2 className="text-[18px] leading-7 font-bold text-[#1f2937]">
@@ -128,7 +128,7 @@ export default function PortalLogin({ onSuccess }) {
                 </p>
 
                 <div className="mt-6 flex h-[55.413px] w-full overflow-hidden rounded-2xl border-[1.71px] border-solid border-[#e5e7eb]">
-                  <span className="flex items-center gap-[6px] border-r-[0.57px] border-solid border-[#e5e7eb] bg-[#f9fafb] px-4">
+                  <span className="flex shrink-0 items-center gap-[6px] border-r-[0.57px] border-solid border-[#e5e7eb] bg-[#f9fafb] px-3 sm:px-4">
                     <Phone className="size-4 shrink-0 text-[#6a7282]" strokeWidth={1.666} />
                     <span className="text-[14px] leading-[20px] font-semibold text-[#4a5565]">
                       +91
@@ -170,7 +170,7 @@ export default function PortalLogin({ onSuccess }) {
                 <button
                   type="button"
                   onClick={() => setStep("phone")}
-                  className="cursor-pointer text-[12px] leading-4 text-[#99a1af] transition-colors hover:text-[#f9a825]"
+                  className="-my-3 cursor-pointer py-3 text-[12px] leading-4 text-[#99a1af] transition-colors hover:text-[#f9a825]"
                 >
                   ← Change number
                 </button>
@@ -184,7 +184,7 @@ export default function PortalLogin({ onSuccess }) {
                   </strong>
                 </p>
 
-                <div className="flex w-full items-center justify-center gap-3 pt-6">
+                <div className="flex w-full items-center justify-center gap-2 pt-6 sm:gap-3">
                   {digits.map((digit, index) => (
                     <input
                       key={index}

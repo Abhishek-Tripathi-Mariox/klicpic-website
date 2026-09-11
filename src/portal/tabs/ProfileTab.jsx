@@ -104,7 +104,7 @@ function Toggle({ on, onChange, label }) {
       aria-checked={on}
       aria-label={label}
       onClick={() => onChange(!on)}
-      className={`flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full p-[2px] transition-colors ${
+      className={`relative flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full p-[2px] transition-colors after:absolute after:-inset-2 ${
         on ? "bg-[#f9a825]" : "bg-[#e5e7eb]"
       }`}
     >
@@ -188,12 +188,12 @@ export default function ProfileTab({ customer, bookings = [], onLogout }) {
   return (
     <div className="w-full">
       <div className={`${CARD} flex flex-wrap items-center justify-between gap-4 p-5`}>
-        <div className="flex items-center gap-4">
+        <div className="flex min-w-0 items-center gap-4">
           <span className="flex size-14 shrink-0 items-center justify-center rounded-full bg-[#f9a825] text-[18px] leading-7 font-bold text-white">
             {initials}
           </span>
-          <span className="flex flex-col items-start">
-            <span className="text-[18px] leading-7 font-bold text-[#1f2937]">{name}</span>
+          <span className="flex min-w-0 flex-col items-start">
+            <span className="text-[18px] leading-7 font-bold break-words text-[#1f2937]">{name}</span>
             <span className="flex flex-wrap items-center gap-2 pt-[2px]">
               <span className="rounded-full bg-[#fffbeb] px-2 py-[2px] text-[11px] leading-4 font-bold text-[#d08700]">
                 🥇 Gold Member
@@ -208,7 +208,7 @@ export default function ProfileTab({ customer, bookings = [], onLogout }) {
         <button
           type="button"
           onClick={onLogout}
-          className="flex cursor-pointer items-center gap-2 rounded-full border-[0.57px] border-solid border-[#e5e7eb] px-4 py-2 text-[13px] leading-[18px] font-medium text-[#6a7282] transition-colors hover:border-[#f9a825] hover:text-[#f9a825]"
+          className="flex h-10 cursor-pointer items-center gap-2 rounded-full border-[0.57px] border-solid border-[#e5e7eb] px-4 text-[13px] leading-[18px] font-medium text-[#6a7282] transition-colors hover:border-[#f9a825] hover:text-[#f9a825]"
         >
           <LogOut className="size-4 shrink-0" strokeWidth={1.666} />
           Logout
@@ -222,9 +222,11 @@ export default function ProfileTab({ customer, bookings = [], onLogout }) {
         <Stat value={packages} label="Packages Used" />
       </div>
 
-      {/* 220px rail on the left, panel on the right (1615:18418). */}
-      <div className="flex w-full flex-col gap-6 pt-6 lg:flex-row lg:items-start lg:gap-6">
-        <nav className="flex w-full shrink-0 flex-col lg:w-[220px]">
+      {/* 220px rail on the left, panel on the right (1615:18418). Below lg the
+          rail becomes a sideways-scrolling strip above the panel, so the
+          panel is not pushed a screen down on a phone. */}
+      <div className="flex w-full flex-col gap-4 pt-6 lg:flex-row lg:items-start lg:gap-6">
+        <nav className="klicpic-rail -mx-4 flex w-[calc(100%+2rem)] shrink-0 gap-2 overflow-x-auto px-4 sm:-mx-6 sm:w-[calc(100%+3rem)] sm:px-6 lg:mx-0 lg:w-[220px] lg:flex-col lg:gap-0 lg:overflow-visible lg:px-0">
           {SECTIONS.map((item) => {
             const active = item.id === section;
             return (
@@ -232,7 +234,7 @@ export default function ProfileTab({ customer, bookings = [], onLogout }) {
                 key={item.id}
                 type="button"
                 onClick={() => openSection(item.id)}
-                className={`mt-2 flex w-full cursor-pointer items-center gap-3 rounded-2xl border-[1.14px] border-solid px-4 py-3 text-[14px] leading-[20px] font-semibold transition-colors first:mt-0 ${
+                className={`flex shrink-0 cursor-pointer items-center gap-3 rounded-2xl border-[1.14px] border-solid px-4 py-[10px] text-[14px] leading-[20px] font-semibold whitespace-nowrap transition-colors lg:mt-2 lg:w-full lg:py-3 lg:first:mt-0 ${
                   active
                     ? "border-[#f9a825] bg-[#fff8e1] text-[#f9a825]"
                     : "border-[#f3f4f6] bg-white text-[#6b7280] hover:border-[#f9a825] hover:text-[#f9a825]"
@@ -241,17 +243,19 @@ export default function ProfileTab({ customer, bookings = [], onLogout }) {
                 <item.icon className="size-4 shrink-0" strokeWidth={1.666} />
                 {item.label}
                 {item.chevron && (
-                  <ChevronRight className="ml-auto size-4 shrink-0" strokeWidth={1.666} />
+                  <ChevronRight className="ml-auto hidden size-4 shrink-0 lg:block" strokeWidth={1.666} />
                 )}
                 {item.dot && <span className="ml-auto size-2 rounded-full bg-[#ad46ff]" />}
               </button>
             );
           })}
 
-          <p className="px-1 pt-6 text-[10px] leading-[15px] font-bold tracking-[1px] text-[#99a1af] uppercase">
+          {/* The shortcuts repeat entries already in the strip, so they only
+              show beside the full rail. */}
+          <p className="hidden px-1 pt-6 text-[10px] leading-[15px] font-bold tracking-[1px] text-[#99a1af] uppercase lg:block">
             Quick Actions
           </p>
-          <div className="flex flex-col pt-3">
+          <div className="hidden flex-col pt-3 lg:flex">
             {QUICK_ACTIONS.map((action) => (
               <button
                 key={action.label}
@@ -271,7 +275,7 @@ export default function ProfileTab({ customer, bookings = [], onLogout }) {
         <div className="min-w-0 flex-1">
 
       {section === "info" && (
-        <div className={`${CARD} p-6`}>
+        <div className={`${CARD} p-5 sm:p-6`}>
           <h3 className="text-[18px] leading-[27px] font-bold text-[#1f2937]">
             Profile Information
           </h3>
@@ -286,9 +290,9 @@ export default function ProfileTab({ customer, bookings = [], onLogout }) {
                 className="flex items-center gap-3 rounded-[20px] border-[0.57px] border-solid border-[#f3f4f6] px-4 py-3"
               >
                 <field.icon className="size-4 shrink-0 text-[#f9a825]" strokeWidth={1.666} />
-                <span className="flex min-w-0 flex-col items-start">
+                <span className="flex min-w-0 flex-1 flex-col items-start">
                   <span className="text-[11px] leading-4 text-[#99a1af]">{field.label}</span>
-                  <span className="truncate text-[14px] leading-[20px] font-semibold text-[#1f2937]">
+                  <span className="max-w-full truncate text-[14px] leading-[20px] font-semibold text-[#1f2937]">
                     {field.value}
                   </span>
                 </span>
@@ -299,7 +303,7 @@ export default function ProfileTab({ customer, bookings = [], onLogout }) {
       )}
 
       {section === "security" && (
-        <div className={`${CARD} p-6`}>
+        <div className={`${CARD} p-5 sm:p-6`}>
           <h3 className="text-[18px] leading-[27px] font-bold text-[#1f2937]">Security</h3>
           <p className="pt-1 text-[14px] leading-[20px] text-[#99a1af]">
             Manage your account access
@@ -320,7 +324,7 @@ export default function ProfileTab({ customer, bookings = [], onLogout }) {
 
           <div className="mt-3 flex items-center gap-3 rounded-[20px] border-[0.57px] border-solid border-[#f3f4f6] px-4 py-3">
             <Shield className="size-4 shrink-0 text-[#f9a825]" strokeWidth={1.666} />
-            <span className="flex flex-col items-start">
+            <span className="flex min-w-0 flex-col items-start">
               <span className="text-[14px] leading-[20px] font-bold text-[#1f2937]">
                 Linked Phone
               </span>
@@ -328,7 +332,7 @@ export default function ProfileTab({ customer, bookings = [], onLogout }) {
                 {customer?.mobile ? `+91 ${customer.mobile}` : "—"} · Primary login
               </span>
             </span>
-            <span className="ml-auto rounded-full bg-[#dcfce7] px-2 py-[2px] text-[11px] leading-4 font-semibold text-[#00a63e]">
+            <span className="ml-auto shrink-0 rounded-full bg-[#dcfce7] px-2 py-[2px] text-[11px] leading-4 font-semibold text-[#00a63e]">
               Verified
             </span>
           </div>
@@ -376,7 +380,7 @@ export default function ProfileTab({ customer, bookings = [], onLogout }) {
       )}
 
       {section === "notifications" && (
-        <div className={`${CARD} p-6`}>
+        <div className={`${CARD} p-5 sm:p-6`}>
           <h3 className="text-[18px] leading-[27px] font-bold text-[#1f2937]">
             Notification Preferences
           </h3>
@@ -401,7 +405,7 @@ export default function ProfileTab({ customer, bookings = [], onLogout }) {
                     </span>
                     <span className="text-[12px] leading-4 text-[#99a1af]">{item.hint}</span>
                   </span>
-                  <span className="ml-auto">
+                  <span className="ml-auto shrink-0">
                     <Toggle
                       on={prefs[item.id]}
                       label={item.label}

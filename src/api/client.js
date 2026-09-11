@@ -77,4 +77,5 @@ async function request(path, { method = "GET", body, auth = false, signal } = {}
 export const api = {
   get: (path, options) => request(path, { ...options, method: "GET" }),
   post: (path, body, options) => request(path, { ...options, method: "POST", body }),
+  put: (path, body, options) => request(path, { ...options, method: "PUT", body }),
 };

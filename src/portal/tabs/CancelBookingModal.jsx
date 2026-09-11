@@ -78,7 +78,7 @@ export default function CancelBookingModal({ booking, onClose, onRequested }) {
       aria-label="Cancel booking"
       onClick={(event) => event.target === event.currentTarget && onClose()}
     >
-      <div className="max-h-full w-full max-w-[440px] overflow-y-auto rounded-2xl bg-white p-6 shadow-[0px_20px_25px_-5px_rgba(0,0,0,0.2)]">
+      <div className="max-h-full w-full max-w-[440px] overflow-y-auto rounded-2xl bg-white p-5 shadow sm:p-6-[0px_20px_25px_-5px_rgba(0,0,0,0.2)]">
         <div className="flex items-start justify-between gap-3">
           <span className="flex flex-col items-start">
             <span className="text-[18px] leading-[27px] font-bold text-[#1f2937]">
@@ -93,7 +93,7 @@ export default function CancelBookingModal({ booking, onClose, onRequested }) {
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="shrink-0 cursor-pointer rounded-full p-1 text-[#99a1af] transition-colors hover:bg-[#f3f4f6] hover:text-[#1f2937]"
+            className="-mt-2 -mr-2 flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full text-[#99a1af] transition-colors hover:bg-[#f3f4f6] hover:text-[#1f2937]"
           >
             <X className="size-4" strokeWidth={1.666} />
           </button>

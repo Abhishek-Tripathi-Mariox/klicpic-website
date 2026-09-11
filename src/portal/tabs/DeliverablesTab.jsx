@@ -1,174 +1,197 @@
-import React from "react";
-import { Images, Play } from "lucide-react";
-import { imageUrl } from "../../api/imageUrl";
+import React, { useEffect, useState } from "react";
+import {
+  BookOpen,
+  CheckCircle2,
+  Clock,
+  ExternalLink,
+  Film,
+  Frame,
+  Gift,
+  HardDrive,
+  Images,
+  Loader2,
+  PackageOpen,
+  Sparkles,
+  Video,
+} from "lucide-react";
 import { CARD } from "../portalStyles";
-import editedPhotos from "./assets/edited-photos.png";
-import premiumAlbum from "./assets/premium-album.png";
-import instagramReel from "./assets/instagram-reel.png";
-import cinematicVideo from "./assets/cinematic-video.png";
-import framedPrints from "./assets/framed-prints.png";
+import { fetchPortalDeliverables } from "../../api/endpoints";
+import BookingSwitch from "./BookingSwitch";
 
 /**
- * Figma: Selections / Deliverables (1615:12026 → content 1615:12105).
- * Five cards — a photo strip with a stage badge and title, then a footer row
- * carrying a coloured dot, a one-line spec, and sometimes a sample button.
+ * Deliverables — what the customer receives for the booking and where each
+ * item stands, from the CRM: the booking's delivery list (one row per quoted
+ * item — album, reel, soft copies — each with its own Drive folder), or its
+ * planned deliverables when no delivery list exists yet.
  *
- * The frame lists the studio's standard deliverables. Where the booking has
- * real deliverable rows, their status replaces the frame's stage label so the
- * customer sees where each one actually is.
+ * The frame's five cards (Edited Photos, Premium Album, Instagram Reel,
+ * Cinematic Video, Framed Prints) with stage labels like "Premium Only" were
+ * the same for every customer; they are gone.
  */
-const DELIVERABLES = [
-  {
-    key: "edited_photos",
-    image: editedPhotos,
-    title: "Edited Photos",
-    stage: "Pending Shoot",
-    spec: "30–60 photos post colour grading",
-    dot: "bg-[#7c3aed]",
-    wide: false,
-  },
-  {
-    key: "album",
-    image: premiumAlbum,
-    title: "Premium Album",
-    stage: "After Editing",
-    spec: "Hardbound album · Multiple sizes",
-    dot: "bg-[#059669]",
-    action: { label: "View Samples", className: "bg-[#059669]", icon: Images },
-    wide: false,
-  },
-  {
-    key: "reels",
-    image: instagramReel,
-    title: "Instagram Reel",
-    stage: "After Shoot",
-    spec: "60-sec edited reel with music",
-    dot: "bg-[#dc2626]",
-    action: {
-      label: "See Sample",
-      style: {
-        backgroundImage:
-          "linear-gradient(166.08deg, rgb(131,58,180) 0%, rgb(253,29,29) 100%)",
-      },
-      icon: Play,
-    },
-    wide: false,
-  },
-  {
-    key: "cinematic_video",
-    image: cinematicVideo,
-    title: "Cinematic Video",
-    stage: "Premium Only",
-    spec: "3–10 min film · 4K quality",
-    dot: "bg-[#d97706]",
-    action: { label: "See Sample", className: "bg-[#1f2937]", icon: Play },
-    playOverlay: true,
-    wide: false,
-  },
-  {
-    key: "frames",
-    image: framedPrints,
-    title: "Framed Prints",
-    stage: "Post Delivery",
-    note: "10×12 inch premium framed print",
-    dot: "",
-    wide: true,
-  },
-];
+const STATUS = {
+  pending: { label: "Waiting", tone: "bg-[#f3f4f6] text-[#6a7282]", icon: Clock },
+  in_progress: { label: "In progress", tone: "bg-[#fffbeb] text-[#b45309]", icon: Loader2 },
+  complete: { label: "Ready", tone: "bg-[#dcfce7] text-[#00a63e]", icon: CheckCircle2 },
+};
 
-/** Shown behind the photo while it loads, and if a live image 404s. */
-const STRIP_FALLBACK = "bg-gradient-to-br from-[#3f4550] to-[#1f2937]";
+/** A glyph for the row, read from the item's name or type. */
+const iconFor = (item) => {
+  const text = `${item.kind} ${item.name}`.toLowerCase();
+  if (/album|book/.test(text)) return BookOpen;
+  if (/frame|canvas|print/.test(text)) return Frame;
+  if (/reel/.test(text)) return Video;
+  if (/video|film|cinematic|bts|behind/.test(text)) return Film;
+  if (/raw|unedited|auesc/.test(text)) return HardDrive;
+  if (/effect|special/.test(text)) return Sparkles;
+  if (/photo|soft|edited|image/.test(text)) return Images;
+  return Gift;
+};
 
-function DeliverableCard({ item, live }) {
-  const Icon = item.action?.icon;
-  const stage = live?.status
-    ? live.status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
-    : item.stage;
+const specOf = (item) =>
+  [
+    item.quantity > 1 && `${item.quantity}`,
+    item.size && item.size,
+    item.pages && `${item.pages} pages`,
+    item.duration && item.duration,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+function Row({ item }) {
+  const status = STATUS[item.status] || STATUS.pending;
+  const Icon = iconFor(item);
+  const StatusIcon = status.icon;
+  const progress = item.quantity > 0 && item.uploaded > 0 ? Math.min(item.uploaded / item.quantity, 1) : null;
 
   return (
-    <article
-      className={`${CARD} flex flex-col overflow-hidden ${item.wide ? "sm:col-span-2" : ""}`}
-    >
-      <div className={`relative h-[143.996px] w-full shrink-0 overflow-hidden ${STRIP_FALLBACK}`}>
-        {/* The frame ships artwork for each deliverable; a booking that has a
-            real photo for one overrides it. */}
-        <img
-          src={live?.image ? imageUrl(live.image, item.wide ? 1280 : 640) : item.image}
-          alt={item.title}
-          loading="lazy"
-          className="pointer-events-none absolute inset-0 size-full object-cover"
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%)",
-          }}
-        />
+    <article className={`${CARD} flex flex-wrap items-center gap-4 p-4`}>
+      <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-[#fff7ed]">
+        <Icon className="size-6 text-[#f9a825]" strokeWidth={1.6} />
+      </span>
 
-        <span className="absolute top-3 right-3 rounded-full bg-[rgba(253,199,0,0.9)] px-3 py-1 text-[12px] leading-4 font-bold whitespace-nowrap text-[#1f2937]">
-          {stage}
-        </span>
-
-        {item.playOverlay && (
-          <span className="absolute inset-0 flex items-center justify-center">
-            <span className="flex size-10 items-center justify-center rounded-full border-[0.57px] border-solid border-[rgba(255,255,255,0.3)] bg-[rgba(255,255,255,0.2)] backdrop-blur-[8px]">
-              <Play className="size-5 text-white" strokeWidth={1.666} />
-            </span>
-          </span>
-        )}
-
-        <p className="absolute bottom-3 left-4 text-[16px] leading-6 font-bold text-white">
-          {item.title}
+      <div className="min-w-0 flex-1">
+        <p className="text-[15px] leading-6 font-bold text-[#1f2937]">{item.name}</p>
+        <p className="text-[12px] leading-4 text-[#99a1af]">
+          {[specOf(item), item.uploaded > 0 && `${item.uploaded} file${item.uploaded === 1 ? "" : "s"} uploaded`]
+            .filter(Boolean)
+            .join(" · ") || "—"}
         </p>
-        {item.note && (
-          <p className="absolute right-4 bottom-4 text-[12px] leading-4 text-[rgba(255,255,255,0.6)]">
-            {item.note}
-          </p>
+        {progress !== null && item.status !== "complete" && (
+          <span className="mt-2 block h-1.5 w-full max-w-[240px] overflow-hidden rounded-full bg-[#f3f4f6]">
+            <span className="block h-full rounded-full bg-[#f9a825]" style={{ width: `${progress * 100}%` }} />
+          </span>
         )}
       </div>
 
-      {item.spec && (
-        <div className="flex w-full items-center justify-between gap-2 px-4 py-3">
-          <span className="flex items-center gap-2">
-            <span className={`size-2 shrink-0 rounded-full ${item.dot}`} />
-            <span className="text-[12px] leading-4 text-[#99a1af]">{item.spec}</span>
-          </span>
+      <span className={`flex items-center gap-1 rounded-full px-3 py-1 text-[12px] font-bold ${status.tone}`}>
+        <StatusIcon className={`size-[13px] ${item.status === "in_progress" ? "animate-spin" : ""}`} />
+        {status.label}
+      </span>
 
-          {item.action && (
-            <button
-              type="button"
-              style={item.action.style}
-              className={`flex shrink-0 cursor-pointer items-center gap-1 rounded-[20px] px-3 py-[6px] text-[12px] leading-4 font-bold text-white transition-opacity hover:opacity-90 ${item.action.className || ""}`}
-            >
-              <Icon className="size-3 shrink-0" strokeWidth={1.666} />
-              {item.action.label}
-            </button>
-          )}
-        </div>
+      {item.link && (
+        <a
+          href={item.link}
+          target="_blank"
+          rel="noreferrer"
+          className="flex h-10 items-center gap-1 rounded-full bg-[#1f2937] px-4 text-[12px] font-bold text-white hover:bg-black"
+        >
+          <ExternalLink className="size-[13px]" /> Open
+        </a>
       )}
     </article>
   );
 }
 
-export default function DeliverablesTab({ booking }) {
-  const live = new Map(
-    (booking?.deliverables || []).map((item) => [item.type, item])
-  );
+export default function DeliverablesTab({ bookings, booking }) {
+  const [bookingId, setBookingId] = useState(booking?.id || "");
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!bookingId && booking?.id) setBookingId(booking.id);
+  }, [booking?.id, bookingId]);
+
+  useEffect(() => {
+    if (!bookingId) {
+      setLoading(false);
+      return undefined;
+    }
+    let active = true;
+    setLoading(true);
+    setError("");
+    fetchPortalDeliverables(bookingId)
+      .then((result) => active && setData(result))
+      .catch((cause) => active && setError(cause.message))
+      .finally(() => active && setLoading(false));
+    return () => {
+      active = false;
+    };
+  }, [bookingId]);
+
+  if (!booking) {
+    return (
+      <div className={`${CARD} px-6 py-12 text-center text-[14px] text-[#6a7282]`}>
+        Your deliverables will appear here once you have a booking.
+      </div>
+    );
+  }
+
+  const counts = data?.counts || { total: 0, complete: 0 };
 
   return (
-    <div className="w-full">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {DELIVERABLES.map((item) => (
-          <DeliverableCard key={item.key} item={item} live={live.get(item.key)} />
-        ))}
+    <div className="flex w-full flex-col gap-5">
+      <div className={`${CARD} flex flex-wrap items-center justify-between gap-4 p-5`}>
+        <div>
+          <h3 className="text-[18px] leading-7 font-bold text-[#1f2937]">Your deliverables</h3>
+          <p className="pt-1 text-[13px] leading-5 text-[#6a7282]">
+            {data?.source === "planned"
+              ? "What's planned for your shoot. Links appear here as each item is ready."
+              : "Everything you receive, and where each item stands. Open an item once it's ready."}
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          {counts.total > 0 && (
+            <span className="rounded-full bg-[#dcfce7] px-3 py-1 text-[12px] font-bold text-[#00a63e]">
+              {counts.complete} of {counts.total} ready
+            </span>
+          )}
+          <BookingSwitch bookings={bookings} value={bookingId} onChange={setBookingId} />
+        </div>
       </div>
 
-      <div className="mt-5 rounded-2xl border-[0.57px] border-solid border-[#ffedd4] bg-[#fff7ed] p-5">
-        <p className="text-[14px] leading-[20px] text-[#1f2937]">
-          💡 Deliverables will be updated in real-time as your shoot progresses.
-          You'll receive WhatsApp notifications at each stage.
+      {loading && (
+        <div className={`${CARD} flex items-center gap-3 px-6 py-10 text-[14px] text-[#6a7282]`}>
+          <Loader2 className="size-5 animate-spin" /> Loading your deliverables…
+        </div>
+      )}
+
+      {!loading && error && (
+        <p className="rounded-2xl border-[0.57px] border-solid border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-[13px] text-[#b91c1c]">
+          {error}
         </p>
+      )}
+
+      {!loading && data && data.items.length === 0 && (
+        <div className={`${CARD} flex flex-col items-center px-6 py-14 text-center`}>
+          <PackageOpen className="size-10 text-[#f9a825]" strokeWidth={1.4} />
+          <p className="pt-3 text-[16px] font-bold text-[#1f2937]">Nothing listed yet</p>
+          <p className="max-w-[420px] pt-1 text-[13px] leading-5 text-[#6a7282]">
+            Once your booking is confirmed, the team lists everything you'll receive here.
+          </p>
+        </div>
+      )}
+
+      {!loading && data && data.items.length > 0 && (
+        <div className="flex flex-col gap-3">
+          {data.items.map((item) => (
+            <Row key={item.id} item={item} />
+          ))}
+        </div>
+      )}
+
+      <div className="rounded-2xl border-[0.57px] border-solid border-[#fee685] bg-[#fffbeb] px-5 py-4 text-[13px] leading-5 text-[#973c00]">
+        💡 This page updates as the team uploads your files — check back here, or ask us on WhatsApp.
       </div>
     </div>
   );

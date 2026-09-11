@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { CalendarDays, Clock } from "lucide-react";
 import SiteLayout from "../../components/SiteLayout";
 import PolicyHero from "../../components/PolicyHero";
+import FitImage from "../../components/FitImage";
 import CatalogFilters from "../../components/CatalogFilters";
 import LoadMore from "../../components/LoadMore";
 import { imageUrl } from "../../api/imageUrl";
@@ -96,12 +97,12 @@ export default function Blog() {
                     className="group flex flex-col overflow-hidden rounded-2xl border-[0.57px] border-solid border-[#f3f4f6] bg-white shadow-[0px_1px_3px_0px_rgba(0,0,0,0.08)] transition-shadow hover:shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1)]"
                   >
                     <div className={`relative h-[180px] w-full shrink-0 overflow-hidden ${COVER_FALLBACK}`}>
+                      {/* The whole cover, never cropped — so no hover zoom either. */}
                       {post.coverImage && (
-                        <img
+                        <FitImage
                           src={imageUrl(post.coverImage, 640)}
                           alt={post.title}
-                          loading="lazy"
-                          className="pointer-events-none absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          className="absolute! inset-0 size-full"
                         />
                       )}
                       <span className="absolute top-3 left-3 rounded-full bg-[rgba(249,168,37,0.92)] px-3 py-1 text-[11px] leading-4 font-bold text-[#1f2937]">

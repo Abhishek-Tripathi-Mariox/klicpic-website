@@ -1,5 +1,5 @@
-import React from "react";
-import { Gift, MessageCircle, Phone } from "lucide-react";
+import React, { useState } from "react";
+import { ChevronDown, Gift, MessageCircle, Phone } from "lucide-react";
 import { useBooking } from "./BookingContext";
 import { useOffers } from "../api/useOffers";
 
@@ -27,8 +27,8 @@ export default function BookingSummary() {
     { label: "Location", value: booking.location },
     { label: "Date", value: booking.date, accent: true },
     { label: "Time Slot", value: booking.timeSlot, accent: true },
-    { label: "Extras", value: booking.extrasList?.length ? booking.extrasList.join(", ") : booking.extras },
     { label: "Package", value: booking.package, accent: true },
+    { label: "Extras", value: booking.extrasList?.length ? booking.extrasList.join(", ") : booking.extras },
   ].filter((row) => row.value);
 
   return (
@@ -120,5 +120,50 @@ export default function BookingSummary() {
         </div>
       )}
     </aside>
+  );
+}
+
+/**
+ * The sidebar only fits beside the steps from lg up. Below that the same
+ * summary folds into this bar above the step — choices so far and the
+ * estimated total at a glance, the full card a tap away. Nothing shows until
+ * the first choice is made, as there is nothing to summarise yet.
+ */
+export function BookingSummaryBar() {
+  const { booking } = useBooking();
+  const [open, setOpen] = useState(false);
+
+  const picks = [booking.shootType, booking.vibe, booking.theme, booking.date, booking.package].filter(Boolean);
+  if (!picks.length) return null;
+
+  return (
+    <div className="mb-5 w-full">
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+        className="flex w-full cursor-pointer items-center gap-3 rounded-2xl border-[0.701px] border-solid border-[#f3f4f6] bg-white px-4 py-3 text-left shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1)]"
+      >
+        <span className="flex min-w-0 flex-1 flex-col items-start">
+          <span className="text-[12px] leading-4 font-bold text-[#1f2937]">Booking Summary</span>
+          <span className="w-full truncate text-[11px] leading-4 text-[#99a1af]">{picks.join(" · ")}</span>
+        </span>
+        <span className="flex shrink-0 flex-col items-end">
+          <span className="text-[10px] leading-4 text-[#99a1af]">Estimated Total</span>
+          <span className="text-[16px] leading-5 font-bold whitespace-nowrap text-[#f9a825]">
+            {booking.total > 0 ? inr(booking.total) : "—"}
+          </span>
+        </span>
+        <ChevronDown
+          className={`size-4 shrink-0 text-[#99a1af] transition-transform ${open ? "rotate-180" : ""}`}
+          strokeWidth={1.666}
+        />
+      </button>
+      {open && (
+        <div className="pt-3">
+          <BookingSummary />
+        </div>
+      )}
+    </div>
   );
 }

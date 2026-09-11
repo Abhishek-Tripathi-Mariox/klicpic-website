@@ -1,15 +1,15 @@
 import React, { useMemo, useState } from "react";
-import SaveProgressButton from "../SaveProgressButton";
-import { ArrowLeft, ArrowRight, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useBooking } from "../BookingContext";
-import { DETAIL_SUBSTEPS } from "../bookingData";
+import DetailsShell from "../DetailsShell";
 import { THEMES as LOCAL_THEMES, THEME_FILTERS as LOCAL_THEME_FILTERS } from "../themeData";
 import { useThemes } from "../../api/useCatalog";
 import ThemeCard from "../ThemeCard";
 
 /**
  * Figma: Step3Details — Theme sub-step (1550:14898 empty, 1550:15939 selected).
- * Sub-stepper, search + category pills, the theme grid, and a sticky action bar.
+ * Search + category pills and the theme grid, inside the shared Details chrome
+ * (heading, sub-stepper, sticky action bar).
  */
 /** What this build shipped — the fallback when the API is unreachable. */
 const LOCAL_CATALOG = { items: LOCAL_THEMES, filters: LOCAL_THEME_FILTERS };
@@ -34,67 +34,22 @@ export default function StepThemes({ onNext, onBack, onOpenTheme }) {
   const vibeLabel = booking.vibe ?? "your";
 
   return (
-    <div className="flex w-full flex-col items-start pb-24">
-      {/* heading */}
-      <div className="flex w-full items-start justify-between gap-4">
-        <div className="flex flex-col items-start">
-          <h2 className="text-[30px] leading-9 font-bold text-[#1f2937]">
-            Customise Your Session
-          </h2>
-          <p className="pt-1 text-[12px] leading-4 text-[#99a1af]">
-            Step 1 of {DETAIL_SUBSTEPS.length} — {DETAIL_SUBSTEPS[0]}{" "}
-            {booking.date && (
-              <span className="font-semibold text-[#f9a825]">
-                📅 {booking.date}
-              </span>
-            )}
-          </p>
-        </div>
-        <SaveProgressButton />
-      </div>
-
-      {/* sub-stepper */}
-      <div className="flex w-full items-center pt-6">
-        {DETAIL_SUBSTEPS.map((label, index) => (
-          <div key={label} className="flex flex-1 items-center">
-            <div className="flex shrink-0 flex-col items-center gap-1">
-              <span
-                className={`flex size-8 items-center justify-center rounded-full text-[14px] leading-[20px] font-bold ${
-                  index === 0
-                    ? "bg-[#f9a825] text-white"
-                    : "bg-[#f3f4f6] text-[#99a1af]"
-                }`}
-              >
-                {index + 1}
-              </span>
-              <span
-                className={`text-[11px] leading-4 font-semibold ${
-                  index === 0 ? "text-[#f9a825]" : "text-[#99a1af]"
-                }`}
-              >
-                {label}
-              </span>
-            </div>
-            {index < DETAIL_SUBSTEPS.length - 1 && (
-              <span className="mx-2 mb-5 h-[1.993px] flex-1 rounded-full bg-[#e5e7eb]" />
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div className="flex w-full items-center justify-between pt-2">
-        <p className="text-[12px] leading-4 text-[#99a1af]">
-          Select options below to continue
-        </p>
-        <button
-          type="button"
-          onClick={onNext}
-          className="cursor-pointer text-[12px] leading-4 font-semibold text-[#6a7282] transition-colors hover:text-[#f9a825]"
-        >
-          Skip this step →
-        </button>
-      </div>
-
+    <DetailsShell
+      index={0}
+      hint="Select options below to continue"
+      onSkipStep={onNext}
+      backLabel="Vibe"
+      nextLabel="Next: Props"
+      canContinue={Boolean(booking.theme)}
+      onBack={onBack}
+      onNext={onNext}
+      onSkipAll={onNext}
+      footNote={
+        booking.theme
+          ? "All required selections made ✓"
+          : "Complete required selections to continue"
+      }
+    >
       <p className="pt-6 text-[14px] leading-[20px] text-[#1f2937]">
         Choose one or more themes for your{" "}
         <span className="font-bold text-[#f9a825]">{vibeLabel}</span> shoot ·{" "}
@@ -160,43 +115,6 @@ export default function StepThemes({ onNext, onBack, onOpenTheme }) {
           No themes match your search.
         </p>
       )}
-
-      {/* sticky action bar */}
-      <div className="sticky bottom-4 z-10 mt-6 flex w-full items-center gap-3 rounded-2xl border-[0.701px] border-solid border-[#f3f4f6] bg-white/95 p-3 shadow-[0px_10px_7.5px_rgba(0,0,0,0.1)] backdrop-blur">
-        <button
-          type="button"
-          onClick={onBack}
-          className="flex shrink-0 cursor-pointer items-center gap-2 rounded-2xl border-[0.701px] border-solid border-[#e5e7eb] px-4 py-3 text-[14px] leading-[20px] font-semibold text-[#1f2937] transition-colors hover:bg-[#f9fafb]"
-        >
-          <ArrowLeft className="size-4 shrink-0" strokeWidth={1.666} />
-          Vibe
-        </button>
-        <button
-          type="button"
-          onClick={onNext}
-          disabled={!booking.theme}
-          className={`flex flex-1 items-center justify-center gap-2 rounded-2xl py-3 text-center text-[14px] leading-[20px] font-bold transition-colors ${
-            booking.theme
-              ? "cursor-pointer bg-[#f9a825] text-white hover:bg-[#e69a1f]"
-              : "cursor-not-allowed bg-[#f3f4f6] text-[#99a1af]"
-          }`}
-        >
-          Next: Props
-          <ArrowRight className="size-4 shrink-0" strokeWidth={1.666} />
-        </button>
-        <button
-          type="button"
-          onClick={onNext}
-          className="shrink-0 cursor-pointer px-3 text-[12px] leading-4 font-semibold text-[#6a7282] transition-colors hover:text-[#f9a825]"
-        >
-          Skip all
-        </button>
-      </div>
-      <p className="w-full pt-2 text-center text-[11px] leading-4 text-[#99a1af]">
-        {booking.theme
-          ? "All required selections made ✓"
-          : "Complete required selections to continue"}
-      </p>
-    </div>
+    </DetailsShell>
   );
 }

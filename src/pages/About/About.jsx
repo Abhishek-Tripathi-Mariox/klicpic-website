@@ -4,15 +4,33 @@ import { fetchAbout } from "../../api/endpoints";
 import { Link } from "react-router-dom";
 import { Gem, Heart, MapPin, Smile, Users } from "lucide-react";
 import SiteLayout from "../../components/SiteLayout";
+import FitImage from "../../components/FitImage";
 import { STATS as LOCAL_STATS, STORY as LOCAL_STORY, STUDIO as LOCAL_STUDIO, TEAM as LOCAL_TEAM, VALUES as LOCAL_VALUES } from "./aboutData";
 import { useContent } from "../../api/useContent";
 import studioHero from "./assets/studio-hero.jpg";
+import { imageUrl } from "../../api/imageUrl";
 
 /**
  * Figma: Klicpic mithu / About (1550:9523)
  * Photo hero, story + stats, dark core-values band, team, studio, CTA.
  */
 const ICONS = { heart: Heart, gem: Gem, smile: Smile, users: Users };
+
+/**
+ * The CMS record was seeded with the bundled portraits' bare file names
+ * ("arjun-mehta.jpg"), which resolve to nothing in the browser. Map those back
+ * to the bundled files; a real URL goes through the resizing proxy.
+ */
+const BUNDLED_PORTRAITS = Object.fromEntries(
+  Object.entries(import.meta.glob("./assets/*.jpg", { eager: true, import: "default" })).map(
+    ([path, url]) => [path.split("/").pop(), url]
+  )
+);
+const portraitSrc = (src) => {
+  if (typeof src !== "string" || !src) return src;
+  if (/^(https?:|data:|blob:|\/)/i.test(src)) return imageUrl(src, 320);
+  return BUNDLED_PORTRAITS[src] || src;
+};
 
 const HERO_SCRIM =
   "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0) 100%)";
@@ -38,15 +56,20 @@ export default function About() {
       }}
     >
       {/* hero */}
-      <section className="relative min-h-[596.58px] w-full bg-[#101828]">
-        <img
+      <section className="relative min-h-[440px] w-full bg-[#101828] md:min-h-[596.58px]">
+        {/* The whole photo, never cropped. On phones a wide photo is only a
+            strip, so it sits at the top and the copy reads below it. */}
+        <FitImage
           src={studioHero}
           alt="Inside the Klicpic studio"
-          className="pointer-events-none absolute inset-0 size-full object-cover"
+          tone="dark"
+          loading="eager"
+          className="absolute! inset-0 size-full"
+          imgClassName="max-md:object-top"
         />
         <div className="absolute inset-0" style={{ background: HERO_SCRIM }} />
-        <div className="relative flex min-h-[596.58px] w-full flex-col items-center justify-end px-6 pb-20">
-          <p className="font-script pb-2 text-center text-[30px] leading-9 font-normal whitespace-nowrap text-[#f9a825]">
+        <div className="relative flex min-h-[440px] w-full flex-col items-center justify-end px-6 pb-12 md:min-h-[596.58px] md:pb-20">
+          <p className="font-script pb-2 text-center text-[30px] leading-9 font-normal text-[#f9a825]">
             Our Story
           </p>
           <h1 className="pb-4 text-center text-[40px] leading-[48px] font-bold text-white md:text-[60px] md:leading-[60px]">
@@ -65,7 +88,7 @@ export default function About() {
             <p className="text-[14px] leading-[20px] font-bold tracking-[1.4px] text-[#f9a825] uppercase">
               Since 2015
             </p>
-            <h2 className="pt-3 text-[36px] leading-[45px] font-bold text-[#1f2937]">
+            <h2 className="pt-3 text-[28px] leading-[36px] font-bold text-[#1f2937] sm:text-[36px] sm:leading-[45px]">
               Born from a love for authentic moments
             </h2>
             {STORY.map((paragraph, index) => (
@@ -82,9 +105,9 @@ export default function About() {
             {STATS.map((stat) => (
               <div
                 key={stat.label}
-                className="flex flex-col items-center rounded-2xl border-[0.701px] border-solid border-[rgba(249,168,37,0.15)] bg-[rgba(249,168,37,0.07)] p-6"
+                className="flex flex-col items-center rounded-2xl border-[0.701px] border-solid border-[rgba(249,168,37,0.15)] bg-[rgba(249,168,37,0.07)] px-3 py-5 sm:p-6"
               >
-                <p className="text-center text-[30px] leading-9 font-bold whitespace-nowrap text-[#1f2937]">
+                <p className="text-center text-[24px] leading-8 font-bold whitespace-nowrap text-[#1f2937] sm:text-[30px] sm:leading-9">
                   {stat.value}
                 </p>
                 <p className="pt-1 text-center text-[14px] leading-[20px] font-medium whitespace-nowrap text-[#99a1af]">
@@ -138,13 +161,15 @@ export default function About() {
           <h2 className="pt-1 text-center text-[36px] leading-10 font-bold text-[#1f2937]">
             Meet Our Team
           </h2>
-          <div className="grid w-full grid-cols-1 gap-8 pt-14 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid w-full grid-cols-2 gap-x-4 gap-y-10 pt-14 sm:gap-8 xl:grid-cols-4">
             {TEAM.map((member) => (
               <div key={member.name} className="flex flex-col items-center">
-                <img
-                  src={member.image}
+                {/* A rounded square rather than a circle, so no corner of the
+                    portrait is cut away. */}
+                <FitImage
+                  src={portraitSrc(member.image)}
                   alt={member.name}
-                  className="size-[143.998px] shrink-0 rounded-full object-cover"
+                  className="size-[120px] shrink-0 rounded-[28px] sm:size-[143.998px] sm:rounded-[32px]"
                 />
                 <h3 className="pt-4 text-center text-[18px] leading-[27px] font-bold text-[#1f2937]">
                   {member.name}

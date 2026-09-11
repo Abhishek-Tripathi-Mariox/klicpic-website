@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { fetchOffer } from "../api/endpoints";
+import { fetchOffer, resumeJourney } from "../api/endpoints";
 import BookingLayout from "./BookingLayout";
 import { BookingProvider, useBooking } from "./BookingContext";
+import { JourneyProvider, useJourney } from "./JourneyContext";
 import StepType from "./steps/StepType";
 import StepVibe from "./steps/StepVibe";
 import StepDate from "./steps/StepDate";
@@ -38,8 +39,8 @@ const SCREENS = [
   "themeDetail",
   "props",
   "location",
-  "extras",
   "package",
+  "extras",
   "book",
   "success",
 ];
@@ -52,14 +53,17 @@ const STEP_FOR_SCREEN = {
   themeDetail: 3,
   props: 3,
   location: 3,
-  extras: 4,
-  package: 5,
+  package: 4,
+  extras: 5,
   book: 6,
   success: 6,
 };
 
-function Flow() {
-  const { booking, set, reset } = useBooking();
+function Flow({ screen, setScreen }) {
+  const { booking, set, reset, restore } = useBooking();
+  const journeyApi = useJourney();
+  // "Welcome back" after a resume link, or why the link could not restore.
+  const [notice, setNotice] = useState("");
 
   // A visitor who clicked "Claim Offer" arrives at /book?offer=CODE. Resolve it
   // once, so the summary shows what they came for and the request records it.
@@ -91,7 +95,6 @@ function Flow() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const [screen, setScreen] = useState("type");
   const [openTheme, setOpenTheme] = useState(null);
   const [submitted, setSubmitted] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -139,6 +142,52 @@ function Flow() {
   }, []);
 
   /**
+   * The WhatsApp reminder links to /book?resume=TOKEN. Restore what was saved
+   * and land on the step they left, with that journey carried on — so the
+   * team sees the same visit continue rather than a new one.
+   */
+  // Read once: the effect below takes it out of the address bar, and a
+  // re-run of the effect must still know it.
+  const [resumeToken] = useState(() => new URLSearchParams(window.location.search).get("resume"));
+
+  useEffect(() => {
+    const token = resumeToken;
+    if (!token) return undefined;
+
+    const params = new URLSearchParams(window.location.search);
+    // Out of the address bar, so a refresh or a forwarded URL doesn't reuse it.
+    params.delete("resume");
+    const query = params.toString();
+    window.history.replaceState(
+      window.history.state,
+      "",
+      `${window.location.pathname}${query ? `?${query}` : ""}`
+    );
+
+    let active = true;
+    resumeJourney(token)
+      .then((result) => {
+        if (!active || !result) return;
+        if (result.completed) {
+          setNotice("You've already sent this booking request — our team will be in touch. You can start a new one below.");
+          return;
+        }
+        restore(result.snapshot || {});
+        journeyApi?.adopt({ id: result.id, token, saved: result.saved, name: result.name || "" });
+        const first = (result.name || "").trim().split(/\s+/)[0];
+        setNotice(`Welcome back${first ? `, ${first}` : ""} — your plan is just as you left it.`);
+        const target = result.screen === "themeDetail" ? "themes" : result.screen;
+        if (target && target !== "type" && SCREENS.includes(target)) go(target);
+      })
+      .catch(() => active && setNotice("That link has expired — let's start fresh."));
+
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /**
    * Sends the whole wizard — the contact details from this step plus every
    * choice held in BookingContext — and only advances once the backend has it.
    * A failure keeps the customer on the form with their answers intact.
@@ -155,7 +204,8 @@ function Flow() {
         city: details.city,
         whatsapp: details.whatsapp,
         message: details.notes,
-        shootType: booking.shootType,
+        // The Lead stores the admin's value; the backend also normalises it.
+        shootType: booking.shootTypeValue || booking.shootType,
         vibe: booking.vibe,
         theme: booking.theme,
         props: booking.props,
@@ -170,13 +220,19 @@ function Flow() {
         date: booking.date,
         timeSlot: booking.timeSlot,
         extrasList: booking.extrasList,
+        extrasItems: booking.extrasItems,
         package: booking.package,
+        packageId: booking.packageId,
         coupon: booking.coupon,
         // Lets the backend count the claim against the offer record.
         offerCode: booking.coupon?.code || booking.coupon?.id || null,
         total: booking.total,
+        // Closes this visit's journey, so no reminder follows a finished request.
+        journeyId: journeyApi?.journey?.id || null,
+        journeyToken: journeyApi?.journey?.token || null,
       });
 
+      journeyApi?.finish();
       if (result?.requestId) setRequestId(result.requestId);
       setSubmitted(details);
       go("success", { replace: true });
@@ -204,6 +260,20 @@ function Flow() {
 
   return (
     <BookingLayout step={STEP_FOR_SCREEN[screen]}>
+      {notice && (
+        <div className="mb-5 flex w-full items-start justify-between gap-3 rounded-2xl border-[0.57px] border-solid border-[#fee685] bg-[#fffbeb] px-4 py-3 text-[13px] leading-5 font-semibold text-[#973c00]">
+          <span>{notice}</span>
+          <button
+            type="button"
+            onClick={() => setNotice("")}
+            aria-label="Dismiss"
+            className="shrink-0 cursor-pointer text-[#b45309] hover:text-[#1f2937]"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {screen === "type" && <StepType onNext={() => go("vibe")} />}
 
       {screen === "vibe" && (
@@ -250,26 +320,26 @@ function Flow() {
       {screen === "location" && (
         <StepLocation
           onBack={() => go("props")}
-          onNext={() => go("extras")}
-          onSkipAll={() => go("extras")}
-        />
-      )}
-
-      {screen === "extras" && (
-        <StepExtras
-          onBack={() => go("location")}
           onNext={() => go("package")}
-          onSkip={() => go("package")}
+          onSkipAll={() => go("package")}
         />
       )}
 
       {screen === "package" && (
-        <StepPackage onBack={() => go("extras")} onNext={() => go("book")} />
+        <StepPackage onBack={() => go("location")} onNext={() => go("extras")} />
+      )}
+
+      {screen === "extras" && (
+        <StepExtras
+          onBack={() => go("package")}
+          onNext={() => go("book")}
+          onSkip={() => go("book")}
+        />
       )}
 
       {screen === "book" && (
         <StepBook
-          onBack={() => go("package")}
+          onBack={() => go("extras")}
           submitting={submitting}
           error={submitError}
           onSubmit={sendRequest}
@@ -280,9 +350,14 @@ function Flow() {
 }
 
 export default function BookingFlow() {
+  // Held here, above the journey, so every step change is recorded.
+  const [screen, setScreen] = useState("type");
+
   return (
     <BookingProvider>
-      <Flow />
+      <JourneyProvider screen={screen}>
+        <Flow screen={screen} setScreen={setScreen} />
+      </JourneyProvider>
     </BookingProvider>
   );
 }

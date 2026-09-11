@@ -96,38 +96,40 @@ export default function AvailabilityCalendar() {
   const days = Array.from({ length: view.days }, (_, index) => index + 1);
 
   return (
-    <section className="flex w-full flex-col items-center bg-white px-6 py-24">
+    <section className="flex w-full flex-col items-center bg-white px-4 py-16 sm:px-6 md:py-24">
       <div className="flex w-full max-w-[896px] flex-col items-start">
         <div className="flex w-full flex-col items-center">
-          <p className="font-script text-center text-[30px] leading-9 font-normal whitespace-nowrap text-[#f9a825]">
+          <p className="font-script text-center text-[26px] leading-8 font-normal whitespace-nowrap text-[#f9a825] sm:text-[30px] sm:leading-9">
             Secure Your Date
           </p>
-          <h2 className="pt-1 pb-3 text-center text-[36px] leading-10 font-bold text-[#1f2937]">
+          <h2 className="pt-1 pb-3 text-center text-[28px] leading-[34px] font-bold text-[#1f2937] sm:text-[36px] sm:leading-10">
             Live Availability Calendar
           </h2>
-          <div className="flex items-center gap-2 rounded-full border-[0.701px] border-solid border-[#dbeafe] bg-[#eff6ff] px-3 py-[6px]">
+          {/* Too long for one line on a phone: there it breaks after the
+              title, and the separator dot goes with the line it joined. */}
+          <div className="flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-0.5 rounded-[18px] border-[0.701px] border-solid border-[#dbeafe] bg-[#eff6ff] px-3 py-[6px] sm:rounded-full">
             <CalendarDays className="size-[13.996px] shrink-0 text-[#155dfc]" strokeWidth={1.666} />
             <span className="text-center text-[12px] leading-4 font-bold whitespace-nowrap text-[#155dfc]">
               Sales Display Calendar
             </span>
             <span className="text-center text-[12px] leading-4 whitespace-nowrap text-[#51a2ff]">
-              · Booking calendar is separate
+              <span className="hidden sm:inline">· </span>Booking calendar is separate
             </span>
           </div>
         </div>
 
-        <div className="w-full pt-10">
+        <div className="w-full pt-8 md:pt-10">
           <div className="flex w-full flex-col items-start overflow-hidden rounded-3xl border-[0.701px] border-solid border-[#f3f4f6] bg-white shadow-[0px_20px_25px_-5px_rgba(0,0,0,0.1),0px_8px_10px_-6px_rgba(0,0,0,0.1)]">
             {/* header */}
-            <div className="flex w-full flex-col items-start border-b-[0.701px] border-solid border-[#f3f4f6] px-6 pt-6 pb-4">
-              <div className="flex w-full items-center justify-between">
-                <div className="flex items-center gap-3">
+            <div className="flex w-full flex-col items-start border-b-[0.701px] border-solid border-[#f3f4f6] px-4 pt-5 pb-4 sm:px-6 sm:pt-6">
+              <div className="flex w-full flex-wrap items-center justify-center gap-x-4 gap-y-3 sm:justify-between">
+                <div className="flex items-center gap-1 sm:gap-3">
                   <button
                     type="button"
                     aria-label="Previous month"
                     disabled={monthOffset === 0}
                     onClick={() => setMonthOffset(monthOffset - 1)}
-                    className="rounded-[20px] p-2 transition-colors enabled:cursor-pointer enabled:hover:bg-[#f3f4f6] disabled:opacity-30"
+                    className="flex size-10 items-center justify-center rounded-[20px] transition-colors enabled:cursor-pointer enabled:hover:bg-[#f3f4f6] disabled:opacity-30"
                   >
                     <ChevronLeft className="size-4 text-[#1f2937]" strokeWidth={1.333} />
                   </button>
@@ -138,14 +140,14 @@ export default function AvailabilityCalendar() {
                     type="button"
                     aria-label="Next month"
                     onClick={() => setMonthOffset(monthOffset + 1)}
-                    className="cursor-pointer rounded-[20px] p-2 transition-colors hover:bg-[#f3f4f6]"
+                    className="flex size-10 cursor-pointer items-center justify-center rounded-[20px] transition-colors hover:bg-[#f3f4f6]"
                   >
                     <ChevronRight className="size-4 text-[#1f2937]" strokeWidth={1.333} />
                   </button>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-3 pr-2">
+                  <div className="flex items-center gap-3 sm:pr-2">
                     {LEGEND.map(({ color, label }) => (
                       <div key={label} className="flex items-center gap-[6px]">
                         <span
@@ -183,8 +185,8 @@ export default function AvailabilityCalendar() {
             </div>
 
             {/* grid */}
-            <div className="flex w-full flex-col items-start p-6">
-              <div className="grid w-full grid-cols-7 gap-[6px]">
+            <div className="flex w-full flex-col items-start p-3 sm:p-6">
+              <div className="grid w-full grid-cols-7 gap-1 sm:gap-[6px]">
                 {WEEKDAYS.map((weekday) => (
                   <div key={weekday} className="flex flex-col items-center py-[6px]">
                     <span className="text-center text-[10px] leading-[15px] font-semibold text-[#99a1af]">
@@ -194,7 +196,7 @@ export default function AvailabilityCalendar() {
                 ))}
               </div>
 
-              <div className="grid w-full grid-cols-7 gap-[6px] pt-2">
+              <div className="grid w-full grid-cols-7 gap-1 pt-2 sm:gap-[6px]">
                 {Array.from({ length: view.leadingBlanks }, (_, index) => (
                   <div key={`blank-${index}`} />
                 ))}
@@ -208,13 +210,13 @@ export default function AvailabilityCalendar() {
                         {day}
                       </span>
                       {entry && (
-                        <span className="pt-[2px] text-center text-[9px] leading-[9px] font-semibold text-white opacity-90">
+                        <span className="pt-[2px] text-center text-[8px] leading-[9px] font-semibold whitespace-nowrap text-white opacity-90 sm:text-[9px]">
                           {entry.note}
                         </span>
                       )}
                     </>
                   );
-                  const shape = `flex h-[55.994px] flex-col items-center justify-center rounded-[20px] transition-transform ${STATE_STYLES[state]}`;
+                  const shape = `flex h-[55.994px] min-w-0 flex-col items-center justify-center rounded-[14px] transition-transform sm:rounded-[20px] ${STATE_STYLES[state]}`;
 
                   return isBookable ? (
                     <Link
@@ -243,7 +245,7 @@ export default function AvailabilityCalendar() {
                 <div className="flex w-full flex-col items-stretch gap-3 sm:flex-row sm:items-center">
                   <div className="flex flex-1 items-center gap-3 rounded-[20px] border-[0.701px] border-solid border-[#ffedd4] bg-[#fff7ed] px-4 py-3">
                     <Flame className="size-4 shrink-0 text-[#f9a825]" strokeWidth={1.333} />
-                    <p className="text-[14px] leading-[20px] text-[#1f2937]">
+                    <p className="min-w-0 text-[14px] leading-[20px] text-[#1f2937]">
                       <span className="font-bold">Only 7 weekend slots</span> open this
                       month — weekends fill up 3× faster.
                     </p>

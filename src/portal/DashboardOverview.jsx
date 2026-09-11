@@ -84,8 +84,8 @@ export default function DashboardOverview({ onOpenTab }) {
               My Bookings
             </h3>
             <Link
-          to="/book"
-              className="flex cursor-pointer items-center gap-1 text-[11px] leading-4 font-semibold text-[#f9a825]"
+              to="/book"
+              className="-my-3 flex cursor-pointer items-center gap-1 py-3 text-[11px] leading-4 font-semibold text-[#f9a825]"
             >
               <Plus className="size-3" strokeWidth={2.5} />
               New Booking
@@ -226,11 +226,11 @@ export default function DashboardOverview({ onOpenTab }) {
           )}
           <div className="grid grid-cols-2 gap-x-6 gap-y-3 pt-4">
             {(details?.rows || []).map((row) => (
-              <div key={row.label} className="flex flex-col items-start">
+              <div key={row.label} className="flex min-w-0 flex-col items-start">
                 <span className="text-[11px] leading-4 text-[#99a1af]">
                   {row.label}
                 </span>
-                <span className="text-[13px] leading-[18px] font-semibold text-[#1f2937]">
+                <span className="text-[13px] leading-[18px] font-semibold break-words text-[#1f2937]">
                   {row.value}
                 </span>
               </div>
@@ -253,7 +253,7 @@ export default function DashboardOverview({ onOpenTab }) {
                   key={chip}
                   type="button"
                   onClick={() => toggleChip(chip)}
-                  className={`cursor-pointer rounded-full border-[0.57px] border-solid px-3 py-[5px] text-[11px] leading-4 font-semibold transition-colors ${
+                  className={`cursor-pointer rounded-full border-[0.57px] border-solid px-3 py-3 text-[11px] leading-4 font-semibold transition-colors lg:py-[5px] ${
                     on
                       ? "border-[#f9a825] bg-[#fffbeb] text-[#f9a825]"
                       : "border-[#e5e7eb] bg-white text-[#6a7282] hover:border-[#f9a825]"
@@ -281,7 +281,7 @@ export default function DashboardOverview({ onOpenTab }) {
             <button
               type="button"
               onClick={() => onOpenTab?.("messages")}
-              className="cursor-pointer text-[11px] leading-4 font-semibold text-[#f9a825]"
+              className="-my-3 cursor-pointer py-3 text-[11px] leading-4 font-semibold text-[#f9a825]"
             >
               View All
             </button>

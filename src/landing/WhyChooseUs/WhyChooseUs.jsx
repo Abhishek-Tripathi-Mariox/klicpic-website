@@ -37,25 +37,25 @@ export default function WhyChooseUs() {
   );
 
   return (
-    <section className="flex w-full flex-col items-center bg-[#1f2937] px-6 py-20">
+    <section className="flex w-full flex-col items-center bg-[#1f2937] px-4 py-16 sm:px-6 md:py-20">
       <div className="flex w-full max-w-[1440px] flex-col items-start">
         <div className="flex w-full flex-col items-center">
-          <h2 className="text-center text-[36px] leading-10 font-bold text-white">
+          <h2 className="text-center text-[28px] leading-[34px] font-bold text-white sm:text-[36px] sm:leading-10">
             Why Families Choose Klicpic
           </h2>
-          <p className="pt-3 text-center text-[16px] leading-6 text-[rgba(255,255,255,0.5)]">
+          <p className="pt-3 text-center text-[14px] leading-[20px] text-[rgba(255,255,255,0.5)] sm:text-[16px] sm:leading-6">
             More than a studio — a complete photography experience
           </p>
         </div>
 
-        <div className="grid w-full grid-cols-2 gap-4 pt-12 md:grid-cols-3 xl:grid-cols-6">
+        <div className="grid w-full grid-cols-2 gap-3 pt-8 sm:gap-4 md:grid-cols-3 md:pt-12 xl:grid-cols-6">
           {STATS.map(({ Icon, value, label }) => (
             <div
               key={label}
-              className="flex flex-col items-center rounded-2xl border-[0.701px] border-solid border-[rgba(249,168,37,0.2)] bg-[rgba(249,168,37,0.1)] p-6"
+              className="flex min-w-0 flex-col items-center rounded-2xl border-[0.701px] border-solid border-[rgba(249,168,37,0.2)] bg-[rgba(249,168,37,0.1)] px-3 py-5 sm:p-6"
             >
               <Icon className="size-8 shrink-0 text-[#f9a825]" strokeWidth={1.666} />
-              <p className="pt-3 text-center text-[24px] leading-8 font-bold whitespace-nowrap text-white">
+              <p className="pt-3 text-center text-[22px] leading-8 font-bold whitespace-nowrap text-white sm:text-[24px]">
                 {value}
               </p>
               <p className="pt-1 text-center text-[12px] leading-4 font-medium whitespace-nowrap text-[rgba(255,255,255,0.5)]">

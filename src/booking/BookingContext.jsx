@@ -29,6 +29,8 @@ function readSaved() {
  */
 const INITIAL = {
   shootType: null,
+  /** The admin's exact "Type of Photoshoot" value, e.g. "Newborn Photoshoot". */
+  shootTypeValue: null,
   vibe: null,
   theme: null,
   props: [],
@@ -43,7 +45,11 @@ const INITIAL = {
   timeSlot: null,
   extras: null,
   extrasList: [],
+  /** The chosen add-ons with their amounts — names alone cannot be priced. */
+  extrasItems: [],
   package: null,
+  /** The CRM package the customer picked, so the lead's request can name it exactly. */
+  packageId: null,
   /** Kept so add-ons can re-price without re-reading the catalogue. */
   packagePrice: 0,
   coupon: null,
@@ -74,6 +80,8 @@ export function BookingProvider({ children }) {
     () => ({
       booking,
       set: (patch) => setBooking((current) => ({ ...current, ...patch })),
+      /** Replaces everything with a saved plan — the resume link's. */
+      restore: (saved) => setBooking({ ...INITIAL, ...saved }),
       reset: () => {
         try {
           window.localStorage.removeItem(STORAGE_KEY);
@@ -114,8 +122,8 @@ const JOURNEY_STEPS = [
   { label: "Shoot Type", done: (b) => Boolean(b.shootType) },
   { label: "Vibe", done: (b) => Boolean(b.vibe) },
   { label: "Theme", done: (b) => Boolean(b.theme) },
-  { label: "Extras", done: (b) => Boolean(b.extrasList?.length || b.extras) },
   { label: "Package", done: (b) => Boolean(b.package) },
+  { label: "Extras", done: (b) => Boolean(b.extrasList?.length || b.extras) },
   { label: "Date & Time", done: (b) => Boolean(b.date && b.timeSlot) },
 ];
 

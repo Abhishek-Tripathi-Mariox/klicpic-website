@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { useShootTypes } from "../../api/useCatalog";
 import SectionHeading from "../../components/SectionHeading";
+import FitImage from "../../components/FitImage";
 import maternity from "./assets/maternity.jpg";
 import newborn from "./assets/newborn.jpg";
 import baby from "./assets/baby.jpg";
@@ -43,7 +44,7 @@ export default function Categories() {
   );
 
   return (
-    <section className="flex w-full flex-col items-center bg-[#fafafa] px-6 py-24">
+    <section className="flex w-full flex-col items-center bg-[#fafafa] px-4 py-16 sm:px-6 md:py-24">
       <div className="flex w-full max-w-[1440px] flex-col items-start">
         <SectionHeading
           eyebrow="Choose Your"
@@ -51,16 +52,19 @@ export default function Categories() {
           subtitle={`${CATEGORIES.length} categories · infinite memories`}
         />
 
-        <div className="grid w-full grid-cols-1 gap-5 pt-16 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid w-full grid-cols-1 gap-5 pt-10 sm:grid-cols-2 md:pt-16 lg:grid-cols-3">
           {CATEGORIES.map((category) => (
+            // The hover lift scales the card, not the photo: zooming the photo
+            // inside its frame would trim its edges.
             <article
               key={category.name}
-              className="group relative h-[419.991px] overflow-hidden rounded-2xl bg-[#e5e7eb]"
+              className="group relative aspect-[3/4] overflow-hidden sm:aspect-auto sm:h-[419.991px] rounded-2xl bg-[#e5e7eb] transition-transform duration-500 hover:scale-[1.02]"
             >
-              <img
+              <FitImage
                 src={category.image}
                 alt={`${category.name} photoshoot`}
-                className="pointer-events-none absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                tone="dark"
+                className="absolute! inset-0 size-full"
               />
               <div
                 className="absolute inset-0"
@@ -70,7 +74,7 @@ export default function Categories() {
                 <h3 className="text-[24px] leading-8 font-bold text-white">
                   {category.name}
                 </h3>
-                <div className="flex items-center gap-2 pt-1">
+                <div className="flex flex-wrap items-center gap-x-2 pt-1">
                   {/* Only a category the CRM actually holds themes for gets a
                       count; the rest simply do not show one. */}
                   {themeCounts.get(category.name.toLowerCase()) > 0 && (

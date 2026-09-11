@@ -41,18 +41,18 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState(null);
 
   return (
-    <section className="flex w-full flex-col items-center bg-[#fff7ed] px-6 py-24">
+    <section className="flex w-full flex-col items-center bg-[#fff7ed] px-4 py-16 sm:px-6 md:py-24">
       <div className="flex w-full max-w-[768px] flex-col items-start">
         <div className="flex w-full flex-col items-center">
-          <p className="font-script text-center text-[30px] leading-9 font-normal whitespace-nowrap text-[#f9a825]">
+          <p className="font-script text-center text-[26px] leading-8 font-normal whitespace-nowrap text-[#f9a825] sm:text-[30px] sm:leading-9">
             Got Questions?
           </p>
-          <h2 className="pt-1 text-center text-[36px] leading-10 font-bold text-[#1f2937]">
+          <h2 className="pt-1 text-center text-[28px] leading-[34px] font-bold text-[#1f2937] sm:text-[36px] sm:leading-10">
             Everything You Need to Know
           </h2>
         </div>
 
-        <div className="flex w-full flex-col items-start gap-3 pt-12">
+        <div className="flex w-full flex-col items-start gap-3 pt-8 md:pt-12">
           {FAQS.map((faq, index) => {
             const isOpen = openIndex === index;
             return (
@@ -64,9 +64,9 @@ export default function FAQ() {
                   type="button"
                   aria-expanded={isOpen}
                   onClick={() => setOpenIndex(isOpen ? null : index)}
-                  className="flex w-full cursor-pointer items-center justify-between px-6 py-5 text-left"
+                  className="flex w-full cursor-pointer items-center justify-between px-4 py-4 text-left sm:px-6 sm:py-5"
                 >
-                  <span className="text-[16px] leading-6 font-semibold text-[#1f2937]">
+                  <span className="text-[15px] leading-6 font-semibold text-[#1f2937] sm:text-[16px]">
                     {faq.question}
                   </span>
                   <span className="flex shrink-0 items-start pl-4">
@@ -79,7 +79,7 @@ export default function FAQ() {
                   </span>
                 </button>
                 {isOpen && (
-                  <p className="px-6 pb-5 text-[14px] leading-[22px] text-[#6a7282]">
+                  <p className="px-4 pb-4 text-[14px] leading-[22px] text-[#6a7282] sm:px-6 sm:pb-5">
                     {faq.answer}
                   </p>
                 )}

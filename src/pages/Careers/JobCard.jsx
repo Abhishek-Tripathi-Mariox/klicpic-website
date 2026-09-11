@@ -57,7 +57,8 @@ export default function JobCard({ job, isOpen, onToggle, onSubmitted }) {
 
   return (
     <article className="w-full overflow-hidden rounded-2xl border-[0.701px] border-solid border-[#f3f4f6] bg-white shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)]">
-      <div className="flex items-start justify-between gap-6 p-6">
+      {/* Apply sits under the details on a phone, beside them from sm up. */}
+      <div className="flex flex-col items-start gap-4 p-5 sm:flex-row sm:justify-between sm:gap-6 sm:p-6">
         <div className="flex min-w-px flex-col items-start">
           <div className="flex flex-wrap items-center gap-2">
             {(job.tags ?? []).map((tag) => (
@@ -101,7 +102,7 @@ export default function JobCard({ job, isOpen, onToggle, onSubmitted }) {
       </div>
 
       {isOpen && (
-        <div className="flex flex-col items-start border-t-[0.701px] border-solid border-[#f3f4f6] p-6">
+        <div className="flex flex-col items-start border-t-[0.701px] border-solid border-[#f3f4f6] p-5 sm:p-6">
           {job.description && (
             <p className="text-[14px] leading-[22.75px] text-[#6a7282]">
               {job.description}
@@ -182,7 +183,7 @@ export default function JobCard({ job, isOpen, onToggle, onSubmitted }) {
             <button
               type="button"
               onClick={() => resumeInput.current?.click()}
-              className="mt-3 flex cursor-pointer items-center gap-2 rounded-[20px] border-[0.701px] border-dashed border-[#e5e7eb] px-4 py-3 text-[13px] leading-[18px] font-semibold text-[#6a7282] transition-colors hover:border-[#f9a825] hover:text-[#f9a825]"
+              className="mt-3 flex max-w-full cursor-pointer items-center gap-2 rounded-[20px] border-[0.701px] border-dashed border-[#e5e7eb] px-4 py-3 text-left text-[13px] leading-[18px] font-semibold break-all text-[#6a7282] transition-colors hover:border-[#f9a825] hover:text-[#f9a825]"
             >
               <Paperclip className="size-4 shrink-0" strokeWidth={1.666} />
               {resume ? resume.name : "Attach your CV (PDF or Word)"}

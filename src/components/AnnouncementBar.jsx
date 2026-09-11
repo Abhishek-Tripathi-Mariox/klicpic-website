@@ -20,13 +20,16 @@ export default function AnnouncementBar({
 
   return (
     <div
-      className="flex w-full items-center gap-2 border-b-[0.701px] border-solid border-[rgba(249,168,37,0.2)] px-4"
+      className="flex w-full items-center gap-1 border-b-[0.701px] border-solid border-[rgba(249,168,37,0.2)] px-4 md:gap-2"
       style={{
         background:
           "linear-gradient(to right, #1f2937 0%, #1a1a2e 40%, #1f2937 100%)",
       }}
     >
-      <div className="flex min-w-px flex-1 items-center justify-center gap-2 overflow-hidden py-[11px]">
+      {/* One line from md up. On a phone the message wraps to two lines
+          instead — clipped mid-sentence it read as a glitch — and the pill
+          flows after it like a word. */}
+      <div className="flex min-w-px flex-1 items-center justify-center gap-2 py-1.5 md:overflow-hidden md:py-[11px]">
         <div className="flex shrink-0 items-center gap-[6px]">
           {Array.from({ length: dotCount }, (_, index) => (
             <span
@@ -38,28 +41,26 @@ export default function AnnouncementBar({
           ))}
         </div>
 
-        <div className="flex shrink-0 items-center gap-2">
-          <p className="text-[14px] leading-[20px] whitespace-nowrap">{emoji}</p>
-          <p className="text-[13px] leading-[17.333px] font-medium whitespace-nowrap text-[rgba(255,255,255,0.9)]">
-            {message}
-          </p>
+        <p className="min-w-0 text-center text-[12px] leading-[18px] font-medium text-[rgba(255,255,255,0.9)] md:shrink-0 md:text-[13px] md:leading-[17.333px] md:whitespace-nowrap">
+          <span className="mr-1.5 text-[14px] leading-none md:mr-2">{emoji}</span>
+          {message}
           {cta && (
             <Link
               to={ctaTo}
-              className="rounded-full bg-[#f9a825] px-[10px] py-[2px] text-center text-[11px] leading-[16.5px] font-black whitespace-nowrap text-[#1f2937] transition-colors hover:bg-[#e69a1f]"
+              className="ml-1.5 inline-block rounded-full md:ml-2 bg-[#f9a825] px-[10px] py-[2px] text-center align-middle text-[11px] leading-[16.5px] font-black whitespace-nowrap text-[#1f2937] transition-colors hover:bg-[#e69a1f]"
             >
               {cta}
             </Link>
           )}
-        </div>
+        </p>
       </div>
 
-      <div className="flex shrink-0 items-start pl-2">
+      <div className="flex shrink-0 items-center md:pl-2">
         <button
           type="button"
           aria-label="Dismiss announcement"
           onClick={() => setVisible(false)}
-          className="flex cursor-pointer items-center justify-center rounded-full p-1 transition-colors hover:bg-white/10"
+          className="-mr-1 flex size-10 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-white/10 md:mr-0 md:size-auto md:p-1"
         >
           <X className="size-[13.996px] text-white/50" strokeWidth={1.16631} />
         </button>

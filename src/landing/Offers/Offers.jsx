@@ -2,6 +2,7 @@ import React from "react";
 import { useOffers, useOfferCountdown } from "../../api/useOffers";
 import { Link } from "react-router-dom";
 import { Clock } from "lucide-react";
+import FitImage from "../../components/FitImage";
 import freeInstagramReel from "./assets/free-instagram-reel.jpg";
 import freePremiumFrame from "./assets/free-premium-frame.jpg";
 import flat3000Off from "./assets/flat-3000-off.jpg";
@@ -60,17 +61,17 @@ export default function Offers() {
   const countdown = useOfferCountdown(endsAt);
 
   return (
-    <section className="flex w-full flex-col items-center bg-[#1f2937] px-6 py-24">
+    <section className="flex w-full flex-col items-center bg-[#1f2937] px-4 py-16 sm:px-6 md:py-24">
       <div className="flex w-full max-w-[1440px] flex-col items-start">
         <div className="flex w-full flex-col items-center">
-          <p className="font-script text-center text-[30px] leading-9 font-normal whitespace-nowrap text-[#f9a825]">
+          <p className="font-script text-center text-[26px] leading-8 font-normal whitespace-nowrap text-[#f9a825] sm:text-[30px] sm:leading-9">
             Limited Time
           </p>
-          <h2 className="pt-1 text-center text-[36px] leading-10 font-bold text-white">
+          <h2 className="pt-1 text-center text-[28px] leading-[34px] font-bold text-white sm:text-[36px] sm:leading-10">
             Exclusive Offers
           </h2>
           {countdown && (
-            <div className="mt-6 flex items-center gap-3 rounded-full border-[0.701px] border-solid border-[rgba(249,168,37,0.25)] bg-[rgba(249,168,37,0.12)] px-6 py-3">
+            <div className="mt-6 flex max-w-full items-center gap-2 rounded-full border-[0.701px] border-solid border-[rgba(249,168,37,0.25)] bg-[rgba(249,168,37,0.12)] px-4 py-3 sm:gap-3 sm:px-6">
               <Clock className="size-4 shrink-0 text-[#f9a825]" strokeWidth={1.333} />
               <span className="text-center text-[14px] leading-[20px] whitespace-nowrap text-[rgba(255,255,255,0.6)]">
                 Offer ends in:
@@ -82,23 +83,22 @@ export default function Offers() {
           )}
         </div>
 
-        <div className="grid w-full grid-cols-1 gap-5 pt-12 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid w-full grid-cols-1 gap-5 pt-8 sm:grid-cols-2 md:pt-12 xl:grid-cols-4">
           {OFFERS.map((offer) => (
             <article
               key={offer.title}
-              className="relative flex flex-col items-start rounded-2xl border-[0.701px] border-solid border-[rgba(249,168,37,0.18)] bg-[rgba(255,255,255,0.04)] p-6"
+              className="relative flex min-w-0 flex-col items-start rounded-2xl border-[0.701px] border-solid border-[rgba(249,168,37,0.18)] bg-[rgba(255,255,255,0.04)] p-5 sm:p-6"
             >
-              <span className="absolute top-4 right-4 rounded-full bg-[#f9a825] px-[10px] py-1 text-[10px] leading-[15px] font-bold whitespace-nowrap text-white">
+              <span className="absolute top-4 right-4 z-10 rounded-full bg-[#f9a825] px-[10px] py-1 text-[10px] leading-[15px] font-bold whitespace-nowrap text-white">
                 {offer.ribbon}
               </span>
 
-              <div className="h-[143.998px] w-full overflow-hidden rounded-[20px]">
-                <img
-                  src={offer.image}
-                  alt={offer.title}
-                  className="pointer-events-none size-full object-cover"
-                />
-              </div>
+              <FitImage
+                src={offer.image}
+                alt={offer.title}
+                tone="dark"
+                className="h-[180px] w-full rounded-[20px] xl:h-[143.998px]"
+              />
 
               <h3 className="pt-4 text-[18px] leading-7 font-bold text-white">
                 {offer.title}

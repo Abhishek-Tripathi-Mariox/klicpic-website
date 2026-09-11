@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, CalendarDays, Clock } from "lucide-react";
 import SiteLayout from "../../components/SiteLayout";
 import NotFound from "../NotFound";
+import FitImage from "../../components/FitImage";
 import { imageUrl } from "../../api/imageUrl";
 import { useApi } from "../../api/useApi";
 import { fetchBlogPost } from "../../api/endpoints";
@@ -38,7 +39,7 @@ export default function BlogPost() {
 
   return (
     <SiteLayout>
-      <article className="flex w-full flex-col items-center bg-white px-6 pt-32 pb-20">
+      <article className="flex w-full flex-col items-center bg-white px-6 pt-16 pb-20 md:pt-32">
         <div className="flex w-full max-w-[720px] flex-col items-start">
           <Link
             to="/blog"
@@ -52,7 +53,7 @@ export default function BlogPost() {
             {post.category}
           </span>
 
-          <h1 className="pt-4 text-[32px] leading-[40px] font-bold text-[#1f2937] md:text-[40px] md:leading-[48px]">
+          <h1 className="pt-4 text-[28px] leading-[36px] font-bold break-words text-[#1f2937] sm:text-[32px] sm:leading-[40px] md:text-[40px] md:leading-[48px]">
             {post.title}
           </h1>
 
@@ -69,10 +70,11 @@ export default function BlogPost() {
           </span>
 
           {post.coverImage && (
-            <img
+            <FitImage
               src={imageUrl(post.coverImage, 1280)}
               alt={post.title}
-              className="mt-8 h-[360px] w-full rounded-2xl object-cover"
+              loading="eager"
+              className="mt-8 h-[240px] w-full rounded-2xl sm:h-[360px]"
             />
           )}
 

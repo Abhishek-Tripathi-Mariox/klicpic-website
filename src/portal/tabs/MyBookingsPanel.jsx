@@ -45,7 +45,7 @@ export default function MyBookingsPanel({ bookings = [], cancelRequests = [], on
 
   return (
     <div className="w-full overflow-hidden rounded-[24px] border-[0.57px] border-solid border-[#f3f4f6] bg-white shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)]">
-      <div className="flex w-full items-center gap-3 border-b-[0.57px] border-solid border-[#f3f4f6] px-6 py-5">
+      <div className="flex w-full items-center gap-3 border-b-[0.57px] border-solid border-[#f3f4f6] px-5 py-5 sm:px-6">
         <Bookmark className="size-5 shrink-0 text-[#f9a825]" strokeWidth={1.666} />
         <span className="flex flex-col items-start">
           <span className="text-[20px] leading-[30px] font-black text-[#1f2937]">
@@ -57,7 +57,7 @@ export default function MyBookingsPanel({ bookings = [], cancelRequests = [], on
         </span>
       </div>
 
-      <div className="flex w-full flex-col p-5">
+      <div className="flex w-full flex-col p-3 sm:p-5">
         {bookings.length === 0 && (
           <p className="py-8 text-center text-[13px] leading-[20px] text-[#99a1af]">
             No bookings yet — your shoots will appear here.
@@ -91,7 +91,7 @@ export default function MyBookingsPanel({ bookings = [], cancelRequests = [], on
                   setClosedId(open ? entry.id : null);
                 }}
                 aria-expanded={open}
-                className="flex w-full cursor-pointer items-center gap-3 p-4 text-left"
+                className="flex w-full cursor-pointer items-center gap-3 p-3 text-left sm:p-4"
               >
                 <span
                   className={`flex size-10 shrink-0 items-center justify-center rounded-[20px] text-[20px] leading-7 ${tone.tint}`}
@@ -165,7 +165,7 @@ export default function MyBookingsPanel({ bookings = [], cancelRequests = [], on
                       <button
                         type="button"
                         onClick={() => setCancelling({ ...booking, id: entry.id })}
-                        className="mt-4 h-9 w-full cursor-pointer rounded-[20px] bg-[#fef2f2] text-center text-[12px] leading-4 font-bold text-[#dc2626] transition-colors hover:bg-[#fee2e2]"
+                        className="mt-4 h-10 w-full cursor-pointer rounded-[20px] bg-[#fef2f2] text-center text-[12px] leading-4 font-bold text-[#dc2626] transition-colors hover:bg-[#fee2e2]"
                       >
                         Cancel Booking
                       </button>

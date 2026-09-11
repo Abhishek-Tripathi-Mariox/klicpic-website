@@ -53,7 +53,7 @@ export default function FAQPage() {
         onSearchChange={setQuery}
       />
 
-      <section className="flex w-full flex-col items-center bg-white px-6 pb-24">
+      <section className="flex w-full flex-col items-center bg-white px-6 pb-16 sm:pb-24">
         <div className="flex w-full max-w-[896px] flex-col items-start">
           {/* category pills */}
           <div className="flex w-full flex-wrap items-center gap-2 pt-14">
@@ -64,7 +64,7 @@ export default function FAQPage() {
                   key={item}
                   type="button"
                   onClick={() => setCategory(item)}
-                  className={`cursor-pointer rounded-full px-4 py-2 text-[12px] leading-4 font-semibold whitespace-nowrap transition-colors ${
+                  className={`cursor-pointer rounded-full px-4 py-3 text-[12px] leading-4 font-semibold whitespace-nowrap transition-colors lg:py-2 ${
                     isActive
                       ? "bg-[#f9a825] text-[#1f2937]"
                       : "border-[0.57px] border-solid border-[#f3f4f6] bg-white text-[#6a7282] hover:border-[#f9a825] hover:text-[#f9a825]"
@@ -125,7 +125,7 @@ export default function FAQPage() {
           {/* still have questions */}
           <div className="w-full pt-16">
             <div
-              className="flex w-full flex-col items-center rounded-3xl p-8"
+              className="flex w-full flex-col items-center rounded-3xl px-5 py-8 sm:p-8"
               style={{
                 backgroundImage:
                   "linear-gradient(164.88deg, rgb(31, 41, 55) 0%, rgb(55, 65, 81) 100%)",

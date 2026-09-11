@@ -3,26 +3,34 @@
  * Step 1 Type (1550:11454 / 11817), Step 2 Vibe (1550:12236),
  * Step 3 Details (1550:13236 date, 1550:14898 / 15939 themes).
  */
-import maternity from "./assets/types/maternity.jpg";
-import baby from "./assets/types/baby.jpg";
-import birthday from "./assets/types/birthday.jpg";
-import family from "./assets/types/family.jpg";
-import wedding from "./assets/types/wedding.jpg";
-import couple from "./assets/types/couple.jpg";
+import maternityImage from "./assets/types/maternity.jpg";
+import newbornImage from "./assets/types/newborn.jpg";
+import toddlerImage from "./assets/types/toddler.jpg";
+import birthdayImage from "./assets/types/birthday.jpg";
+import familyImage from "./assets/types/family.jpg";
+import preWeddingImage from "./assets/types/pre-wedding.jpg";
+import productImage from "./assets/types/product.jpg";
+import corporateImage from "./assets/types/corporate.jpg";
 
 /**
- * Emoji, tagline and a stand-in photo per shoot type. The names, prices and
- * cover photos the wizard actually shows come from the CRM; this only fills
- * the gaps the CRM has no column for. No prices here — a figure the studio
- * never set is a promise it never made.
+ * Step 1 Type — the admin's "Type of Photoshoot" list (Add New Lead form), so a
+ * website lead carries a value the CRM's filters know. `value` is what the Lead
+ * stores; `name` is what the card says. Price comes from the CRM
+ * (/website/shoot-types), and so does the photo when the studio has one — a
+ * theme cover, or a Media Library photo filed under the type. `image` here is
+ * the related picture the card shows until then: Birthday is the studio's own
+ * "Cake smash" set; Product and Corporate are Unsplash photos (free licence);
+ * the rest are the photoshoot-catalog pictures, re-cropped to keep faces in.
  */
 export const SHOOT_TYPES = [
-  { name: "Maternity", emoji: "🤰", tagline: "Celebrate your glow", image: maternity },
-  { name: "Baby", emoji: "👶", tagline: "Precious early milestones", image: baby },
-  { name: "Birthday", emoji: "🎂", tagline: "Royally styled celebrations", image: birthday },
-  { name: "Family", emoji: "👨‍👩‍👧‍👦", tagline: "Timeless togetherness", image: family },
-  { name: "Wedding", emoji: "💍", tagline: "Cinematic love stories", image: wedding },
-  { name: "Couple", emoji: "💑", tagline: "Celebrate your chemistry", image: couple },
+  { value: "Maternity Photoshoot", name: "Maternity", emoji: "🤰", tagline: "Celebrate your glow", image: maternityImage },
+  { value: "Newborn Photoshoot", name: "Newborn", emoji: "👶", tagline: "Precious first days", image: newbornImage },
+  { value: "Toddler Photoshoot", name: "Toddler", emoji: "🧸", tagline: "Little personalities, big smiles", image: toddlerImage },
+  { value: "Birthday Photoshoot", name: "Birthday", emoji: "🎂", tagline: "Royally styled celebrations", image: birthdayImage },
+  { value: "Family Photoshoot", name: "Family", emoji: "👨‍👩‍👧‍👦", tagline: "Timeless togetherness", image: familyImage },
+  { value: "Pre-Wedding Photoshoot", name: "Pre-Wedding", emoji: "💑", tagline: "Your story, before the big day", image: preWeddingImage },
+  { value: "Product Photoshoot", name: "Product", emoji: "📦", tagline: "Clean shots that sell", image: productImage },
+  { value: "Corporate Photoshoot", name: "Corporate", emoji: "💼", tagline: "Headshots and team portraits", image: corporateImage },
 ];
 
 import boho from "./assets/vibes/boho.jpg";

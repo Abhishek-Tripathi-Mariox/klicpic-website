@@ -11,12 +11,37 @@ import { fetchMyReview, saveMyReview } from "../api/endpoints";
  */
 const RATING_LABELS = ["", "Poor", "Fair", "Good", "Great", "Excellent"];
 
+/**
+ * A review only reaches the website once the team publishes it, and an edit
+ * goes back for another look — so the card says where it stands rather than
+ * claiming "Published" the moment it is sent.
+ */
+const MODERATION = {
+  pending: {
+    label: "Awaiting approval",
+    chip: "bg-[#eff6ff] text-[#1d4ed8]",
+    note: "Thanks! It will appear on the website once our team approves it.",
+  },
+  published: {
+    label: "Published",
+    chip: "bg-[#dcfce7] text-[#00a63e]",
+    note: "Live on the website. Editing it sends it back for approval.",
+  },
+  hidden: {
+    label: "Not shown",
+    chip: "bg-[#f3f4f6] text-[#6a7282]",
+    note: "Our team chose not to show this one. You can update it and resubmit.",
+  },
+};
+
 export default function ReviewCard({ bookings = [] }) {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [body, setBody] = useState("");
   const [bookingId, setBookingId] = useState("");
   const [status, setStatus] = useState("loading");
+  // Where the team has got to with it: pending, published or hidden.
+  const [moderation, setModeration] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -31,6 +56,7 @@ export default function ReviewCard({ bookings = [] }) {
           setRating(review.rating || 0);
           setBody(review.body || "");
           setBookingId(review.bookingId || "");
+          setModeration(review.status || "pending");
           setStatus("saved");
         } else {
           setStatus("idle");
@@ -56,7 +82,9 @@ export default function ReviewCard({ bookings = [] }) {
     setError("");
 
     try {
-      await saveMyReview({ rating, body, bookingId: bookingId || undefined });
+      const saved = await saveMyReview({ rating, body, bookingId: bookingId || undefined });
+      // Every save goes back to the team, including edits to a live review.
+      setModeration(saved?.status || "pending");
       setStatus("saved");
     } catch (cause) {
       setStatus("idle");
@@ -75,20 +103,22 @@ export default function ReviewCard({ bookings = [] }) {
         <h3 className="text-[15px] leading-[22px] font-bold text-[#1f2937]">
           {status === "saved" ? "Your Review" : "Leave a Review"}
         </h3>
-        {status === "saved" && (
-          <span className="rounded-full bg-[#dcfce7] px-2 py-[2px] text-[10px] leading-4 font-semibold text-[#00a63e]">
-            Published
+        {status === "saved" && MODERATION[moderation] && (
+          <span
+            className={`rounded-full px-2 py-[2px] text-[10px] leading-4 font-semibold ${MODERATION[moderation].chip}`}
+          >
+            {MODERATION[moderation].label}
           </span>
         )}
       </div>
 
       <p className="pt-1 text-[12px] leading-[18px] text-[#99a1af]">
         {status === "saved"
-          ? "Thanks — you can update it any time."
-          : "Tell other families what your shoot was like."}
+          ? MODERATION[moderation]?.note || "Thanks — you can update it any time."
+          : "Tell other families what your shoot was like. Our team reviews it before it goes on the website."}
       </p>
 
-      <div className="flex items-center gap-1 pt-4" onMouseLeave={() => setHover(0)}>
+      <div className="flex flex-wrap items-center pt-4 lg:gap-1" onMouseLeave={() => setHover(0)}>
         {[1, 2, 3, 4, 5].map((value) => (
           <button
             key={value}
@@ -96,7 +126,7 @@ export default function ReviewCard({ bookings = [] }) {
             aria-label={`${value} star${value > 1 ? "s" : ""}`}
             onClick={() => setRating(value)}
             onMouseEnter={() => setHover(value)}
-            className="cursor-pointer p-[2px]"
+            className="cursor-pointer p-2 lg:p-[2px]"
           >
             <Star
               className={`size-6 transition-colors ${
@@ -117,7 +147,7 @@ export default function ReviewCard({ bookings = [] }) {
         <select
           value={bookingId}
           onChange={(event) => setBookingId(event.target.value)}
-          className="mt-4 w-full cursor-pointer rounded-xl border-[0.57px] border-solid border-[#e5e7eb] bg-white px-3 py-2 text-[13px] leading-[18px] text-[#1f2937]"
+          className="mt-4 w-full cursor-pointer rounded-xl border-[0.57px] border-solid border-[#e5e7eb] bg-white px-3 py-[10px] text-[13px] leading-[18px] text-[#1f2937]"
         >
           <option value="">Which shoot? (optional)</option>
           {bookings.map((booking) => (
@@ -144,7 +174,7 @@ export default function ReviewCard({ bookings = [] }) {
       <button
         type="submit"
         disabled={status === "saving" || status === "loading"}
-        className="mt-3 h-[38px] w-full rounded-xl bg-[#f9a825] text-[13px] leading-[18px] font-bold text-white transition-colors enabled:cursor-pointer enabled:hover:bg-[#e69a1f] disabled:opacity-50"
+        className="mt-3 h-10 w-full rounded-xl bg-[#f9a825] text-[13px] leading-[18px] font-bold text-white transition-colors enabled:cursor-pointer enabled:hover:bg-[#e69a1f] disabled:opacity-50"
       >
         {status === "saving"
           ? "Saving…"

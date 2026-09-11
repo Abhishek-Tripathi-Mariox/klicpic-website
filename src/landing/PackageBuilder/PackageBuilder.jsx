@@ -41,7 +41,7 @@ export default function PackageBuilder() {
   );
 
   return (
-    <section className="flex w-full flex-col items-center bg-[#fff7ed] px-6 py-24">
+    <section className="flex w-full flex-col items-center bg-[#fff7ed] px-4 py-16 sm:px-6 md:py-24">
       <div className="flex w-full max-w-[1440px] flex-col items-start">
         <SectionHeading
           eyebrow="Customize Your"
@@ -50,7 +50,7 @@ export default function PackageBuilder() {
           subtitleClassName="text-[#6a7282] text-[16px]"
         />
 
-        <div className="flex w-full justify-center pt-16">
+        <div className="flex w-full justify-center pt-10 md:pt-16">
           <div className="grid w-full max-w-[1024px] grid-cols-1 gap-10 lg:grid-cols-2">
             {/* Add-on list */}
             <div className="flex flex-col items-start gap-3">
@@ -62,13 +62,13 @@ export default function PackageBuilder() {
                     type="button"
                     disabled={addOn.included}
                     onClick={() => toggle(addOn.id)}
-                    className={`flex w-full items-center justify-between rounded-[20px] border-[1.402px] border-solid p-4 text-left transition-colors ${
+                    className={`flex min-h-12 w-full items-center justify-between gap-3 rounded-[20px] border-[1.402px] border-solid p-4 text-left transition-colors ${
                       isOn
                         ? "border-[#f9a825] bg-white shadow-[0px_1px_1.5px_rgba(0,0,0,0.1),0px_1px_1px_rgba(0,0,0,0.1)]"
                         : "cursor-pointer border-[#e5e7eb] bg-[rgba(255,255,255,0.6)] hover:border-[#f9a825]"
                     } ${addOn.included ? "cursor-default" : ""}`}
                   >
-                    <span className="flex items-center gap-3">
+                    <span className="flex min-w-0 items-center gap-3">
                       <span
                         className={`flex size-[19.997px] shrink-0 items-center justify-center rounded-full border-[1.402px] border-solid ${
                           isOn
@@ -84,7 +84,7 @@ export default function PackageBuilder() {
                         {addOn.label}
                       </span>
                       {addOn.included && (
-                        <span className="rounded-full bg-[#22c55e] px-2 py-[2px] text-[10px] leading-[15px] font-semibold whitespace-nowrap text-white">
+                        <span className="shrink-0 rounded-full bg-[#22c55e] px-2 py-[2px] text-[10px] leading-[15px] font-semibold whitespace-nowrap text-white">
                           Included
                         </span>
                       )}
@@ -101,12 +101,12 @@ export default function PackageBuilder() {
 
             {/* Summary */}
             <div className="lg:sticky lg:top-6 lg:self-start">
-              <div className="flex w-full flex-col items-start rounded-2xl border-[0.701px] border-solid border-[#f3f4f6] bg-white p-8 shadow-[0px_10px_7.5px_rgba(0,0,0,0.1),0px_4px_3px_rgba(0,0,0,0.1)]">
+              <div className="flex w-full flex-col items-start rounded-2xl border-[0.701px] border-solid border-[#f3f4f6] bg-white p-6 shadow-[0px_10px_7.5px_rgba(0,0,0,0.1),0px_4px_3px_rgba(0,0,0,0.1)] sm:p-8">
                 <h3 className="text-[20px] leading-7 font-bold text-[#1f2937]">
                   Your Package Summary
                 </h3>
 
-                <div className="flex w-full items-start justify-between pt-6">
+                <div className="flex w-full items-start justify-between gap-3 pt-6">
                   <span className="text-[14px] leading-[20px] text-[#6a7282]">
                     {BASE.label}
                   </span>
@@ -118,7 +118,7 @@ export default function PackageBuilder() {
                 {chosen.map((addOn) => (
                   <div
                     key={addOn.id}
-                    className="flex w-full items-start justify-between pt-3"
+                    className="flex w-full items-start justify-between gap-3 pt-3"
                   >
                     <span className="text-[14px] leading-[20px] text-[#6a7282]">
                       {addOn.label}

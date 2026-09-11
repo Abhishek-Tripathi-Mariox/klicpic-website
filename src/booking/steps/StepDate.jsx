@@ -72,7 +72,7 @@ export default function StepDate({ onNext, onRestart }) {
 
   return (
     <div className="flex w-full flex-col items-start">
-      <h2 className="text-[30px] leading-9 font-bold text-[#1f2937]">
+      <h2 className="text-[26px] leading-8 font-bold text-[#1f2937] sm:text-[30px] sm:leading-9">
         Customise Your Session
       </h2>
       <p className="pt-2 text-[16px] leading-6 text-[#6a7282]">

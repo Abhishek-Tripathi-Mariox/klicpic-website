@@ -36,7 +36,7 @@ export default function StepBook({ onBack, onSubmit, submitting = false, error =
         Back to Package
       </button>
 
-      <h2 className="pt-4 text-[30px] leading-9 font-bold text-[#1f2937]">
+      <h2 className="pt-4 text-[26px] leading-8 font-bold text-[#1f2937] sm:text-[30px] sm:leading-9">
         Confirm your booking
       </h2>
       <p className="pt-2 text-[16px] leading-6 text-[#6a7282]">
@@ -45,7 +45,7 @@ export default function StepBook({ onBack, onSubmit, submitting = false, error =
 
       <form
         onSubmit={submit}
-        className="mt-8 flex w-full max-w-[576px] flex-col items-start rounded-2xl border-[0.701px] border-solid border-[#f3f4f6] bg-white p-6 shadow-[0px_1px_1.5px_rgba(0,0,0,0.1),0px_1px_1px_rgba(0,0,0,0.1)]"
+        className="mt-8 flex w-full max-w-[576px] flex-col items-start rounded-2xl border-[0.701px] border-solid border-[#f3f4f6] bg-white p-5 shadow-[0px_1px_1.5px_rgba(0,0,0,0.1),0px_1px_1px_rgba(0,0,0,0.1)] sm:p-6"
       >
         <h3 className="text-[18px] leading-7 font-bold text-[#1f2937]">
           Your Details

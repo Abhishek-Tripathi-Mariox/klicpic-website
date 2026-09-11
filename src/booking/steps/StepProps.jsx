@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import FitImage from "../../components/FitImage";
 import { imageUrl } from "../../api/imageUrl";
 import { Check, Search } from "lucide-react";
 import { useBooking } from "../BookingContext";
@@ -10,8 +11,8 @@ import { usePropsCatalog } from "../../api/useCatalog";
  * Figma: booking wizard — Props sub-step (1552:16994).
  * Multi-select grid of 20 props with search and category pills.
  */
-const SCRIM =
-  "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.15) 55%, rgba(0,0,0,0) 100%)";
+/** Cards added per "Show more" — six rows of two. */
+const BATCH = 12;
 
 /** What this build shipped — the fallback when the API is unreachable. */
 const LOCAL_CATALOG = { items: LOCAL_PROPS, filters: LOCAL_PROP_FILTERS };
@@ -41,6 +42,11 @@ export default function StepProps({ onBack, onNext, onSkipAll }) {
         (!needle || item.name.toLowerCase().includes(needle))
     );
   }, [query, filter, PROPS]);
+
+  const [limit, setLimit] = useState(BATCH);
+  // A new search or category starts from the top of its own list.
+  useEffect(() => setLimit(BATCH), [query, filter]);
+  const shown = visible.slice(0, limit);
 
   return (
     <DetailsShell
@@ -100,8 +106,12 @@ export default function StepProps({ onBack, onNext, onSkipAll }) {
         })}
       </div>
 
-      <div className="grid w-full grid-cols-2 gap-4 pt-5 sm:grid-cols-3 lg:grid-cols-4">
-        {visible.map((item) => {
+      {/* Two across, like the Theme step. Prop photos come in every shape —
+          tall gowns, wide backdrops — so no crop suits them all: each photo is
+          shown whole, over a blurred copy of itself that fills the rest of the
+          card, and the name sits below it rather than over the garment. */}
+      <div className="grid w-full grid-cols-1 gap-4 pt-5 sm:grid-cols-2">
+        {shown.map((item) => {
           const selected = chosen.includes(item.name);
           return (
             <button
@@ -109,55 +119,62 @@ export default function StepProps({ onBack, onNext, onSkipAll }) {
               type="button"
               onClick={() => toggle(item.name)}
               aria-pressed={selected}
-              className={`group relative aspect-square w-full cursor-pointer overflow-hidden rounded-2xl bg-gradient-to-br from-[#3f4550] to-[#1f2937] text-left ${
-                selected ? "ring-2 ring-[#f9a825] ring-offset-2" : ""
+              className={`group flex w-full cursor-pointer flex-col overflow-hidden rounded-2xl border-[0.57px] border-solid bg-white text-left transition-shadow ${
+                selected
+                  ? "border-[#f9a825] ring-2 ring-[#f9a825] ring-offset-2"
+                  : "border-[#e5e7eb] hover:shadow-[0px_10px_7.5px_rgba(0,0,0,0.1)]"
               }`}
             >
-              {item.image && (
-                <img
-                  loading="lazy"
-                  src={imageUrl(item.image, 480)}
-                  alt={item.name}
-                  className="pointer-events-none absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-              )}
-              <span className="absolute inset-0" style={{ background: SCRIM }} />
+              <FitImage
+                src={item.image ? imageUrl(item.image, 640) : ""}
+                alt={item.name}
+                className="h-[260px] w-full sm:h-[320px]"
+                imgClassName="transition-transform duration-500 group-hover:scale-[1.03]"
+              >
 
-              {item.viewing && (
-                <span className="absolute top-2 left-2 flex items-center gap-[5px] rounded-full bg-[rgba(0,0,0,0.65)] px-2 py-1">
-                  <span className="relative flex size-[7px] shrink-0">
-                    <span className="absolute inline-flex size-full rounded-full bg-[#4ade80] opacity-25" />
-                    <span className="relative inline-flex size-[7px] rounded-full bg-[#4ade80]" />
+                {item.viewing && (
+                  <span className="absolute top-2 left-2 flex items-center gap-[5px] rounded-full bg-[rgba(0,0,0,0.65)] px-2 py-1">
+                    <span className="relative flex size-[7px] shrink-0">
+                      <span className="absolute inline-flex size-full rounded-full bg-[#4ade80] opacity-25" />
+                      <span className="relative inline-flex size-[7px] rounded-full bg-[#4ade80]" />
+                    </span>
+                    <span className="text-[9px] leading-[10px] font-bold whitespace-nowrap text-white">
+                      {item.viewing}
+                    </span>
                   </span>
-                  <span className="text-[9px] leading-[10px] font-bold whitespace-nowrap text-white">
-                    {item.viewing}
+                )}
+
+                {selected && (
+                  <span className="absolute top-2 right-2 flex size-6 items-center justify-center rounded-full bg-[#f9a825]">
+                    <Check className="size-[14px] text-white" strokeWidth={3} />
                   </span>
-                </span>
-              )}
+                )}
 
-              {selected && (
-                <span className="absolute top-2 right-2 flex size-6 items-center justify-center rounded-full bg-[#f9a825]">
-                  <Check className="size-[14px] text-white" strokeWidth={3} />
-                </span>
-              )}
-
-              <span className="absolute inset-x-0 bottom-0 flex flex-col items-start p-2">
                 {item.slots && (
-                  <span className="mb-1 rounded-full bg-[rgba(249,168,37,0.92)] px-[6px] py-[2px] text-[8px] leading-[12px] font-extrabold whitespace-nowrap text-white">
+                  <span className="absolute bottom-2 left-2 rounded-full bg-[rgba(249,168,37,0.92)] px-[6px] py-[2px] text-[8px] leading-[12px] font-extrabold whitespace-nowrap text-white">
                     {item.slots}
                   </span>
                 )}
-                <span className="text-[13px] leading-[17px] font-bold text-white">
-                  {item.name}
-                </span>
-                <span className="text-[10px] leading-[14px] text-[rgba(255,255,255,0.6)]">
-                  {item.category}
-                </span>
+              </FitImage>
+
+              <span className="flex flex-col items-start px-4 py-3">
+                <span className="text-[14px] leading-5 font-bold text-[#1f2937]">{item.name}</span>
+                <span className="text-[11px] leading-4 text-[#99a1af] capitalize">{item.category}</span>
               </span>
             </button>
           );
         })}
       </div>
+
+      {visible.length > shown.length && (
+        <button
+          type="button"
+          onClick={() => setLimit((current) => current + BATCH)}
+          className="mt-5 w-full cursor-pointer rounded-2xl border-[1.4px] border-solid border-[#f9a825] py-3 text-[14px] font-bold text-[#f9a825] transition-colors hover:bg-[#f9a825]/10"
+        >
+          Show more props ({visible.length - shown.length} more)
+        </button>
+      )}
 
       {visible.length === 0 && (
         <p className="w-full py-12 text-center text-[14px] text-[#6a7282]">
