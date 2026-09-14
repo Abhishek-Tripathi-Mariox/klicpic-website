@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Star } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import SiteLayout from "../../components/SiteLayout";
 import FitImage from "../../components/FitImage";
 import PageHeading from "../../components/PageHeading";
@@ -11,19 +11,21 @@ import { useShootTypes } from "../../api/useCatalog";
 
 /**
  * Figma: Klicpic mithu / Photoshoots — Photoshoot Catalog (1616:18859)
- * 3x3 grid of category cards: photo with a rating badge, then copy,
+ * 3x3 grid of category cards: photo, copy, the CRM's theme count, two CTAs.
  *
  * The frame also put a "From ₹…" pill on each card. Those figures were design
  * copy, not the studio's: the CRM's cheapest Maternity package is ₹6,999, not
  * the ₹4,999 the card promised, and six of the nine categories have no package
  * at all. Quoting a price nobody can honour is worse than quoting none.
- * the CRM's theme count and the two CTAs.
+ *
+ * The frame's rating star and "N+ Booked" tally are gone for the same reason:
+ * neither exists anywhere in the CRM and the site has no published reviews. The
+ * CMS block still carries the seeded strings, so they are dropped here at the
+ * render rather than only in the bundled copy. The photo scrim went with them —
+ * it was there to keep that white badge legible and had nothing left to cover.
  */
 /** Cards per page — twelve fills the three-column grid four rows deep. */
 const PAGE_SIZE = 12;
-
-const SCRIM =
-  "linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%)";
 
 export default function PhotoshootCatalog() {
   // Live copy from the backend, falling back to what this build shipped.
@@ -82,22 +84,7 @@ export default function PhotoshootCatalog() {
                   alt={`${item.name} photoshoot`}
                   className="h-[320px] w-full shrink-0"
                   imgClassName="transition-transform duration-500 group-hover:scale-105"
-                >
-                  <div className="absolute inset-0" style={{ background: SCRIM }} />
-
-                  <div className="absolute bottom-4 left-4 flex items-center gap-1">
-                    <Star
-                      className="size-[15.998px] shrink-0 fill-[#f9a825] text-[#f9a825]"
-                      strokeWidth={1.333}
-                    />
-                    <span className="text-[14px] leading-[20px] font-semibold text-white">
-                      {item.rating}
-                    </span>
-                    <span className="pl-1 text-[12px] leading-4 whitespace-nowrap text-[rgba(255,255,255,0.6)]">
-                      {item.booked}
-                    </span>
-                  </div>
-                </FitImage>
+                />
 
                 <div className="flex w-full flex-1 flex-col items-start p-5 sm:p-6">
                   <h3 className="text-[24px] leading-8 font-bold text-[#1f2937]">

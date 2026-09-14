@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { ArrowLeft, Send } from "lucide-react";
 
 /**
@@ -96,8 +97,14 @@ export default function StepBook({ onBack, onSubmit, submitting = false, error =
           {submitting ? "Sending your request…" : "Request Booking"}
         </button>
 
+        {/* "Easy EMI" is not an arrangement anyone offers, and "free
+            cancellation within 24hrs" is the opposite of the Refund policy,
+            where the 30% advance is non-refundable as cash. */}
         <p className="w-full pt-4 text-center text-[12px] leading-4 text-[#99a1af]">
-          30% advance to confirm · Easy EMI · Free cancellation within 24hrs
+          30% advance to confirm · See our{" "}
+          <Link to="/refund" className="font-semibold text-[#f9a825] hover:underline">
+            refund policy
+          </Link>
         </p>
       </form>
     </div>

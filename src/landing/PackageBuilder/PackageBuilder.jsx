@@ -2,27 +2,70 @@ import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Check } from "lucide-react";
 import SectionHeading from "../../components/SectionHeading";
+import { useExtras, usePackages } from "../../api/useCatalog";
 
 /**
  * Figma: Klicpic mithu / Home — Customize Your Dream Package (1550:2783)
  * Add-on checklist on the left, live package summary card on the right.
+ *
+ * Every figure here used to be written into the build — a ₹7,999 base session,
+ * a ₹4,000 canvas, a ₹1,500 USB of RAW files the Terms say we never hand over.
+ * The studio sells none of that at those prices, so a customer could tick a
+ * total we would not honour. Base and add-ons are the CRM's own records now,
+ * and with either list empty the builder does not draw at all.
  */
-const BASE = { label: "Base Session (30 Photos)", price: 7999 };
-
-const ADD_ONS = [
-  { id: "photos", label: "30 Edited Photos (High-Res)", price: 0, included: true },
-  { id: "album", label: "Premium Photo Album (30 pages)", price: 3500 },
-  { id: "prints", label: "3 Framed Prints (10×12 inch)", price: 2500 },
-  { id: "canvas", label: "Canvas Wall Art (24×36 inch)", price: 4000 },
-  { id: "reel", label: "Instagram Reel (60 sec, edited)", price: 2000 },
-  { id: "video", label: "Cinematic Video (3 min)", price: 6000 },
-  { id: "usb", label: "Branded USB with RAW Files", price: 1500 },
-];
+// usePackages memoises against this object, so it has to be a stable one.
+const NO_LOCAL = { items: [], filters: [] };
 
 const inr = (value) => `₹${value.toLocaleString("en-IN")}`;
 
 export default function PackageBuilder() {
+  const { items: packages } = usePackages(NO_LOCAL);
+  const { extras } = useExtras();
   const [selected, setSelected] = useState([]);
+
+  // The cheapest live package is what "start from the base and add on" means.
+  const base = useMemo(() => {
+    const priced = packages.filter((item) => Number(item.price) > 0);
+    return priced.reduce(
+      (cheapest, item) => (!cheapest || item.price < cheapest.price ? item : cheapest),
+      null
+    );
+  }, [packages]);
+
+  // What the base package already covers, shown the way the frame drew its
+  // "Included" row — from the package's own feature list rather than a number.
+  const included = useMemo(
+    () =>
+      (base?.features || [])
+        .filter((feature) => feature.included)
+        .map((feature) => ({
+          id: `included-${feature.label}`,
+          label: feature.label,
+          price: 0,
+          included: true,
+        })),
+    [base]
+  );
+
+  const addOns = useMemo(() => {
+    // Extras and package features are the same Products, so an extra the base
+    // already covers would otherwise be offered for sale beside its own
+    // "Included" row.
+    const covered = new Set(
+      included.map((row) => row.label.trim().toLowerCase())
+    );
+    return extras
+      .filter((extra) => Number(extra.price) > 0)
+      .filter((extra) => !covered.has(String(extra.name).trim().toLowerCase()))
+      .map((extra) => ({
+        id: extra.id,
+        label: extra.description || extra.name,
+        price: Number(extra.price),
+      }));
+  }, [extras, included]);
+
+  const rows = useMemo(() => [...included, ...addOns], [included, addOns]);
 
   const toggle = (id) =>
     setSelected((current) =>
@@ -32,13 +75,16 @@ export default function PackageBuilder() {
     );
 
   const chosen = useMemo(
-    () => ADD_ONS.filter((addOn) => selected.includes(addOn.id)),
-    [selected]
+    () => addOns.filter((addOn) => selected.includes(addOn.id)),
+    [addOns, selected]
   );
   const total = useMemo(
-    () => BASE.price + chosen.reduce((sum, addOn) => sum + addOn.price, 0),
-    [chosen]
+    () => (base?.price || 0) + chosen.reduce((sum, addOn) => sum + addOn.price, 0),
+    [base, chosen]
   );
+
+  // Nothing to price against — no builder rather than an invented quote.
+  if (!base || addOns.length === 0) return null;
 
   return (
     <section className="flex w-full flex-col items-center bg-[#fff7ed] px-4 py-16 sm:px-6 md:py-24">
@@ -54,7 +100,7 @@ export default function PackageBuilder() {
           <div className="grid w-full max-w-[1024px] grid-cols-1 gap-10 lg:grid-cols-2">
             {/* Add-on list */}
             <div className="flex flex-col items-start gap-3">
-              {ADD_ONS.map((addOn) => {
+              {rows.map((addOn) => {
                 const isOn = addOn.included || selected.includes(addOn.id);
                 return (
                   <button
@@ -108,10 +154,11 @@ export default function PackageBuilder() {
 
                 <div className="flex w-full items-start justify-between gap-3 pt-6">
                   <span className="text-[14px] leading-[20px] text-[#6a7282]">
-                    {BASE.label}
+                    {base.name}
+                    {base.category ? ` — ${base.category}` : ""}
                   </span>
                   <span className="text-[14px] leading-[20px] font-medium whitespace-nowrap text-[#1f2937]">
-                    {inr(BASE.price)}
+                    {inr(base.price)}
                   </span>
                 </div>
 

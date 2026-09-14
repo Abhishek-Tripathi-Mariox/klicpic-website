@@ -7,9 +7,9 @@ import { useBooking } from "../BookingContext";
  * Figma: Booking Request Submitted (1615:9520).
  * Full-width success screen — no stepper or summary sidebar.
  */
+/** "2hr Response" was a promise nobody measures or owns. */
 const HIGHLIGHTS = [
   { emoji: "📸", label: "Shoot Booked" },
-  { emoji: "⏱", label: "2hr Response" },
   { emoji: "💛", label: "Memories Made" },
 ];
 

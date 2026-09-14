@@ -1,13 +1,7 @@
 import React, { useState } from "react";
 import { useAvailability } from "../../api/useAvailability";
 import { Link } from "react-router-dom";
-import {
-  CalendarDays,
-  ChevronLeft,
-  ChevronRight,
-  Flame,
-  Users,
-} from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 
 /**
  * Figma: Klicpic mithu / Home — Live Availability Calendar (1550:2870)
@@ -240,24 +234,6 @@ export default function AvailabilityCalendar() {
                   Showing indicative availability — call us to confirm a slot.
                 </p>
               )}
-
-              <div className="flex w-full flex-col items-center pt-5">
-                <div className="flex w-full flex-col items-stretch gap-3 sm:flex-row sm:items-center">
-                  <div className="flex flex-1 items-center gap-3 rounded-[20px] border-[0.701px] border-solid border-[#ffedd4] bg-[#fff7ed] px-4 py-3">
-                    <Flame className="size-4 shrink-0 text-[#f9a825]" strokeWidth={1.333} />
-                    <p className="min-w-0 text-[14px] leading-[20px] text-[#1f2937]">
-                      <span className="font-bold">Only 7 weekend slots</span> open this
-                      month — weekends fill up 3× faster.
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-2 rounded-[20px] border-[0.701px] border-solid border-[#f3f4f6] bg-[#f9fafb] px-4 py-3">
-                    <Users className="size-4 shrink-0 text-[#6a7282]" strokeWidth={1.333} />
-                    <span className="text-[12px] leading-4 font-medium whitespace-nowrap text-[#6a7282]">
-                      24 people viewing this month
-                    </span>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>

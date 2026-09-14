@@ -48,12 +48,6 @@ export default function About() {
 
   return (
     <SiteLayout
-      announcement={{
-        emoji: "🔥",
-        message: "Only 7 weekend slots left for July — don't miss out!",
-        cta: "Book →",
-        activeDot: 2,
-      }}
     >
       {/* hero */}
       <section className="relative min-h-[440px] w-full bg-[#101828] md:min-h-[596.58px]">

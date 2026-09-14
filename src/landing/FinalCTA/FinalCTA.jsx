@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Flame, Star } from "lucide-react";
 import FitImage from "../../components/FitImage";
 import klicpicStudio from "./assets/klicpic-studio.jpg";
 
@@ -38,32 +37,15 @@ export default function FinalCTA() {
             Starts Here
           </h2>
 
-          <p className="w-[576px] max-w-full pt-5 pb-8 text-center text-[16px] leading-[26px] text-[rgba(255,255,255,0.65)] sm:pt-6 sm:pb-10 sm:text-[18px] sm:leading-7">
-            Join 12,500+ families who chose Klicpic to capture their most
-            precious moments.
-          </p>
-
+          {/* The headline used to be followed by a family count and two trust
+              badges; nothing counted them, so the button now carries the
+              spacing they held. */}
           <Link
             to="/book"
-            className="flex h-[67.996px] w-[301.115px] max-w-full items-center justify-center rounded-full bg-white text-center text-[18px] leading-7 font-bold text-[#1f2937] shadow-[0px_20px_12.5px_rgba(0,0,0,0.1),0px_8px_5px_rgba(0,0,0,0.1)] transition-colors hover:bg-[#f3f4f6]"
+            className="mt-8 flex h-[67.996px] w-[301.115px] max-w-full items-center justify-center rounded-full sm:mt-10 bg-white text-center text-[18px] leading-7 font-bold text-[#1f2937] shadow-[0px_20px_12.5px_rgba(0,0,0,0.1),0px_8px_5px_rgba(0,0,0,0.1)] transition-colors hover:bg-[#f3f4f6]"
           >
             Start Booking Journey
           </Link>
-
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 pt-8 sm:pt-10">
-            <div className="flex items-center gap-2">
-              <Flame className="size-[19.997px] shrink-0 text-[#f9a825]" strokeWidth={1.666} />
-              <span className="text-center text-[14px] leading-[20px] font-medium whitespace-nowrap text-white">
-                Only 4 Weekend Slots Left
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Star className="size-[19.997px] shrink-0 fill-[#f9a825] text-[#f9a825]" strokeWidth={1.666} />
-              <span className="text-center text-[14px] leading-[20px] font-medium whitespace-nowrap text-white">
-                Rated 4.9 by 12,500+ Customers
-              </span>
-            </div>
-          </div>
         </div>
       </div>
     </section>

@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import SiteLayout from "../../components/SiteLayout";
 import JobCard from "./JobCard";
-import { ANNOUNCEMENT as LOCAL_ANNOUNCEMENT, BENEFITS as LOCAL_BENEFITS, HERO as LOCAL_HERO, JOBS as LOCAL_JOBS, OPEN_APPLICATION as LOCAL_OPEN_APPLICATION } from "./careersData";
+import { BENEFITS as LOCAL_BENEFITS, HERO as LOCAL_HERO, JOBS as LOCAL_JOBS, OPEN_APPLICATION as LOCAL_OPEN_APPLICATION } from "./careersData";
 import { useContent } from "../../api/useContent";
 
 /**
@@ -25,10 +25,27 @@ const ICONS = { Sparkles, TrendingUp, Clock, Wallet, Camera, Heart };
 
 export default function Careers() {
   // Live copy from the backend, falling back to what this build shipped.
-  const { content } = useContent("careers", { ANNOUNCEMENT: LOCAL_ANNOUNCEMENT, BENEFITS: LOCAL_BENEFITS, HERO: LOCAL_HERO, OPEN_APPLICATION: LOCAL_OPEN_APPLICATION });
-  const { ANNOUNCEMENT, BENEFITS, HERO, OPEN_APPLICATION } = content;
+  const { content } = useContent("careers", { BENEFITS: LOCAL_BENEFITS, HERO: LOCAL_HERO, OPEN_APPLICATION: LOCAL_OPEN_APPLICATION });
+  const { BENEFITS, HERO, OPEN_APPLICATION } = content;
   // Postings are records now, managed in the CRM; the rest is page copy.
   const { jobs: JOBS } = useCareers(LOCAL_JOBS);
+
+  /**
+   * Open roles is the live count, not a number typed into the copy. The two
+   * invented hero stats ("12 Team Members", a hardcoded "4 Open Roles") are
+   * filtered out by label as well as removed from the bundled copy, because
+   * the CMS block still serves the seeded versions of both.
+   */
+  const roleStat = {
+    value: String(JOBS.length),
+    label: JOBS.length === 1 ? "Open Role" : "Open Roles",
+  };
+  const stats = [
+    roleStat,
+    ...(HERO.stats ?? []).filter(
+      ({ label }) => !/^(open roles?|team members?)$/i.test(String(label).trim())
+    ),
+  ];
 
   const [openJob, setOpenJob] = useState(null);
   const [submittedJob, setSubmittedJob] = useState(null);
@@ -45,7 +62,7 @@ export default function Careers() {
   };
 
   return (
-    <SiteLayout active="Careers" announcement={ANNOUNCEMENT}>
+    <SiteLayout active="Careers">
       {/* Hero */}
       <section className="flex w-full flex-col items-center bg-[#1f2937] px-6 pt-20 pb-16 md:pt-36">
         <div className="flex w-full max-w-[1440px] flex-col items-center">
@@ -60,7 +77,7 @@ export default function Careers() {
           </p>
 
           <div className="flex flex-wrap items-start justify-center gap-x-10 gap-y-6 pt-8">
-            {HERO.stats.map(({ value, label }) => (
+            {stats.map(({ value, label }) => (
               <div key={label} className="flex flex-col items-center">
                 <p className="text-center text-[24px] leading-8 font-bold whitespace-nowrap text-[#f9a825]">
                   {value}

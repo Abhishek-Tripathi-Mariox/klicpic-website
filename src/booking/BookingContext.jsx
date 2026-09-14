@@ -53,6 +53,8 @@ const INITIAL = {
   /** Kept so add-ons can re-price without re-reading the catalogue. */
   packagePrice: 0,
   coupon: null,
+  /** True when the offer link they arrived on had expired. */
+  couponFailed: false,
   total: 0,
 };
 

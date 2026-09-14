@@ -8,15 +8,17 @@ import { X } from "lucide-react";
  * a different progress dot.
  */
 export default function AnnouncementBar({
-  emoji = "🎁",
-  message = "Refer a friend and get ₹500 off your next shoot. Ask us how!",
+  emoji = "🎉",
+  // No default message: the strip used to ship a "₹500 referral" offer the
+  // studio does not run. It says what a live offer record says, or nothing.
+  message = "",
   cta = null,
   ctaTo = "/book",
   activeDot = 1,
   dotCount = 3,
 }) {
   const [visible, setVisible] = useState(true);
-  if (!visible) return null;
+  if (!visible || !message) return null;
 
   return (
     <div

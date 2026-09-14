@@ -10,13 +10,17 @@ const DATE_FORMAT = { day: "2-digit", month: "short", year: "numeric" };
  * The backend returns the full record; the overview only shows a title, a
  * one-line reference and a status, so the mapping happens here rather than in
  * the component.
+ *
+ * There is deliberately no sample fallback. `data` is null while the request is
+ * in flight and stays null if it fails, so both cases come back as an empty
+ * list with `loading` or `error` set — the caller must say "loading" or "we
+ * couldn't reach us", never show a stranger's shoots as this customer's.
  */
-export function usePortalBookings(fallback = []) {
+export function usePortalBookings() {
   const { data, loading, error } = useApi(fetchPortalBookings, null, []);
 
   const bookings = useMemo(() => {
-    if (!Array.isArray(data)) return fallback;
-    if (data.length === 0) return [];
+    if (!Array.isArray(data)) return [];
 
     return data.map((booking) => ({
       id: booking.id,
@@ -32,9 +36,7 @@ export function usePortalBookings(fallback = []) {
       status: booking.cancelled ? "Cancelled" : booking.status || "Pending",
       raw: booking,
     }));
-    // fallback is a module constant in the caller.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  return { bookings, loading, error, live: Array.isArray(data) };
+  return { bookings, loading, error };
 }

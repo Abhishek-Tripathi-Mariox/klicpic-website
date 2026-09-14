@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Clock } from "lucide-react";
 import SiteLayout from "../../components/SiteLayout";
 import FitImage from "../../components/FitImage";
-import { HOW_IT_WORKS as LOCAL_HOW_IT_WORKS, OFFERS as LOCAL_OFFERS } from "./offersData";
+import { HOW_IT_WORKS as LOCAL_HOW_IT_WORKS } from "./offersData";
 import { useContent } from "../../api/useContent";
 
 /**
@@ -17,8 +17,8 @@ export default function Offers() {
   // Live copy from the backend, falling back to what this build shipped.
   const { content } = useContent("offers", { HOW_IT_WORKS: LOCAL_HOW_IT_WORKS });
   const { HOW_IT_WORKS } = content;
-  // Offers are records now, not page copy.
-  const { offers: OFFERS, endsAt } = useOffers(LOCAL_OFFERS);
+  // Offers are records now, not page copy — and only real ones are shown.
+  const { offers: OFFERS, endsAt } = useOffers();
 
   // Counts to the soonest expiry among the live offers; null when none is set.
   const countdown = useOfferCountdown(endsAt);
@@ -67,14 +67,16 @@ export default function Offers() {
                   className="h-[176px] w-full shrink-0"
                 >
                   <div className="absolute inset-0" style={{ background: SCRIM }} />
-                  <span
-                    className="absolute top-3 right-3 rounded-full px-[10px] py-1 text-[10px] leading-[15px] font-bold whitespace-nowrap text-[#0f1117]"
-                    // CRM offers carry no ribbon colour; without one the dark
-                    // label sat straight on the photo and vanished into it.
-                    style={{ backgroundColor: offer.ribbonBg || "#f9a825" }}
-                  >
-                    {offer.ribbon}
-                  </span>
+                  {offer.ribbon && (
+                    <span
+                      className="absolute top-3 right-3 rounded-full px-[10px] py-1 text-[10px] leading-[15px] font-bold whitespace-nowrap text-[#0f1117]"
+                      // CRM offers carry no ribbon colour; without one the dark
+                      // label sat straight on the photo and vanished into it.
+                      style={{ backgroundColor: offer.ribbonBg || "#f9a825" }}
+                    >
+                      {offer.ribbon}
+                    </span>
+                  )}
                 </FitImage>
 
                 <div className="flex w-full flex-1 flex-col items-start p-5">
@@ -84,12 +86,14 @@ export default function Offers() {
                   <p className="pt-1 pb-3 text-[14px] leading-[20px] text-[rgba(15,17,23,0.45)]">
                     {offer.description}
                   </p>
-                  <span
-                    className="rounded-full px-3 py-1 text-[12px] leading-4 font-bold whitespace-nowrap"
-                    style={{ backgroundColor: offer.worthBg, color: offer.worthColor }}
-                  >
-                    {offer.worth}
-                  </span>
+                  {offer.worth && (
+                    <span
+                      className="rounded-full px-3 py-1 text-[12px] leading-4 font-bold whitespace-nowrap"
+                      style={{ backgroundColor: offer.worthBg, color: offer.worthColor }}
+                    >
+                      {offer.worth}
+                    </span>
+                  )}
 
                   <div className="h-4 w-full shrink-0" />
                   <Link
@@ -103,9 +107,17 @@ export default function Offers() {
             ))}
           </div>
 
-          <p className="w-full pt-10 text-center text-[14px] leading-[20px] text-[rgba(15,17,23,0.5)]">
-            Click any offer to view details and generate your code
-          </p>
+          {OFFERS.length === 0 && (
+            <p className="w-full py-10 text-center text-[15px] leading-6 text-[rgba(15,17,23,0.5)]">
+              No offers are running right now. New ones are announced here — and on WhatsApp when you book.
+            </p>
+          )}
+
+          {OFFERS.length > 0 && (
+            <p className="w-full pt-10 text-center text-[14px] leading-[20px] text-[rgba(15,17,23,0.5)]">
+              Claim an offer and our team applies it to your booking
+            </p>
+          )}
         </div>
       </section>
 

@@ -6,16 +6,16 @@ import DashboardOverview from "./DashboardOverview";
 import PaymentsTab from "./tabs/PaymentsTab";
 import DeliverablesTab from "./tabs/DeliverablesTab";
 import SelectionsTab from "./tabs/SelectionsTab";
-import MessagesTab from "./tabs/MessagesTab";
 import ProfileTab from "./tabs/ProfileTab";
 import { usePortalBookings } from "../api/usePortalBookings";
+import { CARD } from "./portalStyles";
 
 /**
  * Figma: Customer Portal dashboard shell (1615:10258).
  * Greeting header with booking id and status, then the tab bar.
  *
  * Every tab is built: Overview, Payments (1615:11685), Selections and
- * Deliverables (1615:12026), Messages (1615:12408) and Profile
+ * Deliverables (1615:12026) and Profile
  * (1615:12707 · 13295 · 13847).
  *
  * The bookings are fetched once here and passed down, so switching tabs does
@@ -46,7 +46,11 @@ export default function PortalDashboard() {
     window.history.replaceState(null, "", id === "overview" ? " " : `#${id}`);
   };
 
-  const { bookings } = usePortalBookings([]);
+  const {
+    bookings,
+    loading: bookingsLoading,
+    error: bookingsError,
+  } = usePortalBookings();
   // Panels describe the most recent booking; Overview lets the customer pick.
   const booking = bookings[0]?.raw;
 
@@ -127,15 +131,46 @@ export default function PortalDashboard() {
       </div>
 
       <div className="mx-auto w-full max-w-[1200px] px-4 pt-6 sm:px-6 sm:pt-8">
-        {tab === "overview" && <DashboardOverview onOpenTab={openTab} />}
-        {tab === "payments" && <PaymentsTab booking={booking} />}
-        {/* The frame drew Selections and Deliverables alike (1615:12026); they
-            are different things — photos to pick, and what is delivered. */}
-        {tab === "selections" && <SelectionsTab bookings={bookings} booking={booking} />}
-        {tab === "deliverables" && <DeliverablesTab bookings={bookings} booking={booking} />}
-        {tab === "messages" && <MessagesTab />}
-        {tab === "profile" && (
-          <ProfileTab customer={user} bookings={bookings} onLogout={logout} />
+        {/* Every panel describes the customer's bookings, and the list is
+            fetched once here. Until it lands we say so, and if it fails we say
+            that too — an empty list rendered as "no bookings", "0 completed"
+            or "₹0" would read as fact. */}
+        {bookingsLoading ? (
+          <p className={`${CARD} px-6 py-16 text-center text-[14px] leading-[20px] text-[#6a7282]`}>
+            Loading your bookings…
+          </p>
+        ) : bookingsError ? (
+          <div className={`${CARD} px-6 py-14 text-center`}>
+            <p className="text-[16px] leading-6 font-bold text-[#1f2937]">
+              We couldn't load your bookings
+            </p>
+            <p className="mx-auto max-w-[420px] pt-2 text-[13px] leading-5 text-[#6a7282]">
+              Something went wrong reaching us just now, so nothing on this page
+              is up to date. Please try again in a moment.
+            </p>
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="mt-5 h-10 cursor-pointer rounded-[20px] bg-[#f9a825] px-5 text-[13px] leading-[18px] font-bold text-white transition-colors hover:bg-[#e69a1f]"
+            >
+              Try again
+            </button>
+          </div>
+        ) : (
+          <>
+            {tab === "overview" && (
+              <DashboardOverview bookings={bookings} onOpenTab={openTab} />
+            )}
+            {tab === "payments" && <PaymentsTab booking={booking} />}
+            {/* The frame drew Selections and Deliverables alike (1615:12026);
+                they are different things — photos to pick, and what is
+                delivered. */}
+            {tab === "selections" && <SelectionsTab bookings={bookings} booking={booking} />}
+            {tab === "deliverables" && <DeliverablesTab bookings={bookings} booking={booking} />}
+            {tab === "profile" && (
+              <ProfileTab customer={user} bookings={bookings} onLogout={logout} />
+            )}
+          </>
         )}
       </div>
     </div>

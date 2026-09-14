@@ -40,11 +40,6 @@ function RichText({ runs }) {
 export default function LegalDocument({ meta, callout, sections, links }) {
   return (
     <SiteLayout
-      announcement={{
-        emoji: "⭐",
-        message: "Rated 4.9/5 by 12,500+ happy families across India",
-        activeDot: 1,
-      }}
     >
       <PolicyHero
         variant="legal"

@@ -1,23 +1,18 @@
 import React, { useMemo } from "react";
-import { Camera, Package, Palette, Shirt, Star, Zap } from "lucide-react";
+import { Package, Palette, Shirt } from "lucide-react";
 import { useThemes } from "../../api/useCatalog";
 import { usePagedProps } from "../../api/useCatalog";
 
 /**
  * Figma: Klicpic mithu / Home — Why Families Choose Klicpic (1550:2719)
- * Six stat tiles on the dark ink band.
+ * Stat tiles on the dark ink band.
  *
  * The frame's catalogue figures were roughly triple what the studio holds —
  * 500+ themes against 178, 1,500+ props against 551, 300+ gowns against 182.
- * Those three now count the CRM. Sessions, rating and turnaround stay as the
- * frame had them: no record here can back them either way.
+ * Those three now count the CRM. The other three tiles are gone: nothing
+ * counts sessions or ratings, and "48hr delivery" contradicted the Terms,
+ * which promise 5–10 business days.
  */
-const STATIC_STATS = [
-  { Icon: Camera, value: "12,500+", label: "Sessions" },
-  { Icon: Star, value: "4.9", label: "Rating" },
-  { Icon: Zap, value: "48hr", label: "Delivery" },
-];
-
 const count = (n, fallback) => (n > 0 ? n.toLocaleString("en-IN") : fallback);
 
 export default function WhyChooseUs() {
@@ -31,7 +26,6 @@ export default function WhyChooseUs() {
       { Icon: Palette, value: count(themes.length, "—"), label: "Themes" },
       { Icon: Package, value: count(props, "—"), label: "Props" },
       { Icon: Shirt, value: count(gowns, "—"), label: "Gowns" },
-      ...STATIC_STATS,
     ],
     [themes.length, props, gowns]
   );
@@ -48,7 +42,9 @@ export default function WhyChooseUs() {
           </p>
         </div>
 
-        <div className="grid w-full grid-cols-2 gap-3 pt-8 sm:gap-4 md:grid-cols-3 md:pt-12 xl:grid-cols-6">
+        {/* Three tiles, so the row is capped and centred rather than stretched
+            across the full 1440. */}
+        <div className="mx-auto grid w-full max-w-[720px] grid-cols-3 gap-3 pt-8 sm:gap-4 md:pt-12">
           {STATS.map(({ Icon, value, label }) => (
             <div
               key={label}

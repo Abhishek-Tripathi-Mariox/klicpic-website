@@ -14,7 +14,9 @@ import { CARD } from "../portalStyles";
  * Figma: Activity History (1615:15635).
  * A single timeline of everything that happened on the account, newest first.
  */
-const ICONS = {
+// Shared with the Overview tab's Recent Activity card, so one kind of event
+// looks the same wherever it is shown.
+export const ACTIVITY_ICONS = {
   booking: { icon: CalendarCheck, tone: "bg-[#dcfce7] text-[#00a63e]" },
   cancelled: { icon: XCircle, tone: "bg-[#fef2f2] text-[#e7000b]" },
   refund: { icon: Undo2, tone: "bg-[#faf5ff] text-[#7c3aed]" },
@@ -25,7 +27,7 @@ const ICONS = {
 };
 
 /** "2 days ago" — the frame labels everything relatively. */
-function ago(value) {
+export function ago(value) {
   const then = new Date(value).getTime();
   if (!Number.isFinite(then)) return "";
 
@@ -57,7 +59,7 @@ export default function ActivityPanel({ events = [] }) {
         ) : (
           <ol className="flex flex-col pt-5">
             {events.map((event, index) => {
-              const { icon: Icon, tone } = ICONS[event.kind] || ICONS.message;
+              const { icon: Icon, tone } = ACTIVITY_ICONS[event.kind] || ACTIVITY_ICONS.message;
               return (
                 <li
                   key={`${event.title}-${event.at}-${index}`}

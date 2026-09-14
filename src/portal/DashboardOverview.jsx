@@ -1,24 +1,28 @@
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Check, Circle, Plus } from "lucide-react";
-import {
-  BOOKING_DETAILS,
-  MY_BOOKINGS as LOCAL_MY_BOOKINGS,
-  RECENT_MESSAGES,
-  REQUEST_CHIPS,
-  TIMELINE,
-} from "./portalData";
-import { usePortalBookings } from "../api/usePortalBookings";
+import { Check, Circle, MessageSquare, Plus } from "lucide-react";
 import { readSavedJourney } from "../booking/BookingContext";
+import { useApi } from "../api/useApi";
+import { fetchActivity } from "../api/endpoints";
 import ReviewCard from "./ReviewCard";
+import { ACTIVITY_ICONS, ago } from "./tabs/ActivityPanel";
 
 /**
  * Figma: Dashboard — Overview tab (1615:10258 / 10956).
- * Three columns: bookings + saved journey · booking details, requests,
- * messages · the booking timeline.
+ * Three columns: bookings + saved journey · booking details and recent
+ * activity · the booking timeline.
+ *
+ * The frame's "Add a Request" form and "Recent Messages" thread are gone. The
+ * form had no endpoint to post to, so everything typed into it was thrown
+ * away, and the thread was one hardcoded message greeting a customer by
+ * somebody else's name. What replaces them is real: the account's own activity
+ * feed, and a pointer at the channel the team actually answers on.
  */
 const CARD =
   "rounded-2xl border-[0.57px] border-solid border-[#f3f4f6] bg-white shadow-[0px_1px_3px_0px_rgba(0,0,0,0.08)]";
+
+/** The channel the team actually answers on. */
+const WHATSAPP_NUMBER = "919876543210";
 
 const STATUS_TONE = {
   Active: "bg-[#fff7ed] text-[#f9a825]",
@@ -26,21 +30,23 @@ const STATUS_TONE = {
   Cancelled: "bg-[#fef2f2] text-[#dc2626]",
 };
 
-export default function DashboardOverview({ onOpenTab }) {
+export default function DashboardOverview({ bookings = [], onOpenTab }) {
   // Whatever "Save Progress" actually parked in the wizard. Null when the
   // customer never saved one, in which case the card does not render — the
   // frame's filled-in 7/7 example is not a journey anybody took.
   const journey = useMemo(() => readSavedJourney(), []);
 
-  // Real bookings for the signed-in customer; the bundled list only shows
-  // if the request never lands.
-  const { bookings: MY_BOOKINGS, loading: bookingsLoading } =
-    usePortalBookings(LOCAL_MY_BOOKINGS);
-
+  // The shell has already resolved the customer's bookings — this tab only
+  // renders once they are in hand, so an empty list here means no bookings.
   const [openBooking, setOpenBooking] = useState(0);
 
   // Details and timeline follow whichever booking is selected in the list.
-  const selected = MY_BOOKINGS[openBooking]?.raw;
+  const selected = bookings[openBooking]?.raw;
+
+  // The account's own history — the only "recent" the portal can truthfully
+  // show, since there is no message thread behind the Messages tab yet.
+  const { data: activity } = useApi(fetchActivity, null, []);
+  const recentActivity = Array.isArray(activity) ? activity.slice(0, 3) : [];
 
   const details = selected
     ? {
@@ -66,14 +72,6 @@ export default function DashboardOverview({ onOpenTab }) {
       }))
     : null;
 
-  const [request, setRequest] = useState("");
-  const [chips, setChips] = useState([]);
-
-  const toggleChip = (chip) =>
-    setChips((current) =>
-      current.includes(chip) ? current.filter((c) => c !== chip) : [...current, chip]
-    );
-
   return (
     <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-[280px_minmax(0,1fr)_320px]">
       {/* left: bookings + saved journey */}
@@ -92,13 +90,7 @@ export default function DashboardOverview({ onOpenTab }) {
             </Link>
           </div>
           <div className="flex flex-col gap-2 pt-3">
-            {bookingsLoading && MY_BOOKINGS.length === 0 && (
-              <p className="py-6 text-center text-[12px] leading-4 text-[#99a1af]">
-                Loading your bookings…
-              </p>
-            )}
-
-            {!bookingsLoading && MY_BOOKINGS.length === 0 && (
+            {bookings.length === 0 && (
               <div className="rounded-xl border-[0.57px] border-dashed border-[#e5e7eb] p-6 text-center">
                 <p className="text-[13px] leading-[18px] font-semibold text-[#1f2937]">
                   No bookings yet
@@ -116,7 +108,7 @@ export default function DashboardOverview({ onOpenTab }) {
               </div>
             )}
 
-            {MY_BOOKINGS.map((booking, index) => (
+            {bookings.map((booking, index) => (
               <button
                 key={booking.id || booking.meta}
                 type="button"
@@ -203,10 +195,10 @@ export default function DashboardOverview({ onOpenTab }) {
             </div>
           </div>
         )}
-        <ReviewCard bookings={MY_BOOKINGS} />
+        <ReviewCard bookings={bookings} />
       </div>
 
-      {/* middle: details, request, messages */}
+      {/* middle: details, how to reach the team, recent activity */}
       <div className="flex flex-col gap-4">
         <div className={`${CARD} p-5`}>
           <div className="flex items-center justify-between">
@@ -238,75 +230,76 @@ export default function DashboardOverview({ onOpenTab }) {
           </div>
         </div>
 
-        <div className={`${CARD} p-5`}>
-          <h3 className="flex items-center gap-2 text-[15px] leading-[22px] font-bold text-[#1f2937]">
-            <span>✏️</span> Add a Request
-          </h3>
-          <p className="pt-1 text-[12px] leading-4 text-[#6a7282]">
-            Want to add a gown change, extra location, prop, or anything else?
+        {/* The team takes shoot changes on WhatsApp — the frame's request form
+            posted nowhere, and the Messages tab behind this button was only a
+            "coming soon" card, so it now opens the channel that answers. */}
+        <div className="rounded-2xl border-[0.57px] border-solid border-[#fee685] bg-[#fffbeb] px-5 py-4">
+          <p className="text-[14px] leading-[20px] font-bold text-[#973c00]">
+            Need a change to your shoot?
           </p>
-          <div className="flex flex-wrap gap-2 pt-3">
-            {REQUEST_CHIPS.map((chip) => {
-              const on = chips.includes(chip);
+          <p className="pt-1 text-[12px] leading-[18px] text-[#973c00]">
+            A gown change, an extra location, props, different timing — message
+            the team and they will update your booking.
+          </p>
+          <a
+            href={`https://wa.me/${WHATSAPP_NUMBER}`}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-3 flex h-9 w-fit cursor-pointer items-center gap-2 rounded-full bg-[#f9a825] px-4 text-[12px] leading-4 font-bold text-white transition-colors hover:bg-[#e69a1f]"
+          >
+            <MessageSquare className="size-[14px] shrink-0" strokeWidth={2} />
+            Message the team
+          </a>
+        </div>
+
+        {/* Only rendered when the account has history — an empty "Recent
+            Activity" card would be a heading over nothing. */}
+        {recentActivity.length > 0 && (
+          <div className={`${CARD} p-5`}>
+            <div className="flex items-center justify-between">
+              <h3 className="text-[15px] leading-[22px] font-bold text-[#1f2937]">
+                Recent Activity
+              </h3>
+              <button
+                type="button"
+                // Both this shell and the Profile panel read the hash, so one
+                // assignment opens Profile on its Activity section.
+                onClick={() => {
+                  window.location.hash = "profile/activity";
+                }}
+                className="-my-3 cursor-pointer py-3 text-[11px] leading-4 font-semibold text-[#f9a825]"
+              >
+                View All
+              </button>
+            </div>
+            {recentActivity.map((event, index) => {
+              const { icon: Icon, tone } =
+                ACTIVITY_ICONS[event.kind] || ACTIVITY_ICONS.message;
               return (
-                <button
-                  key={chip}
-                  type="button"
-                  onClick={() => toggleChip(chip)}
-                  className={`cursor-pointer rounded-full border-[0.57px] border-solid px-3 py-3 text-[11px] leading-4 font-semibold transition-colors lg:py-[5px] ${
-                    on
-                      ? "border-[#f9a825] bg-[#fffbeb] text-[#f9a825]"
-                      : "border-[#e5e7eb] bg-white text-[#6a7282] hover:border-[#f9a825]"
-                  }`}
-                >
-                  + {chip}
-                </button>
+                <div key={`${event.title}-${event.at}-${index}`} className="flex gap-3 pt-4">
+                  <span
+                    className={`flex size-8 shrink-0 items-center justify-center rounded-full ${tone}`}
+                  >
+                    <Icon className="size-4" strokeWidth={1.666} />
+                  </span>
+                  <span className="flex min-w-0 flex-col items-start">
+                    <span className="flex flex-wrap items-center gap-2">
+                      <span className="text-[13px] leading-[18px] font-semibold text-[#1f2937]">
+                        {event.title}
+                      </span>
+                      <span className="text-[10px] leading-4 text-[#99a1af]">
+                        {ago(event.at)}
+                      </span>
+                    </span>
+                    <span className="pt-1 text-[12px] leading-[18px] text-[#6a7282]">
+                      {event.detail}
+                    </span>
+                  </span>
+                </div>
               );
             })}
           </div>
-          <textarea
-            rows={3}
-            value={request}
-            onChange={(event) => setRequest(event.target.value)}
-            placeholder="Describe your request…"
-            className="mt-3 w-full resize-none rounded-2xl border-[0.57px] border-solid border-[#e5e7eb] px-4 py-3 text-[13px] leading-[20px] text-[#1f2937] outline-none transition-colors placeholder:text-[#99a1af] focus:border-[#f9a825]"
-          />
-        </div>
-
-        <div className={`${CARD} p-5`}>
-          <div className="flex items-center justify-between">
-            <h3 className="text-[15px] leading-[22px] font-bold text-[#1f2937]">
-              Recent Messages
-            </h3>
-            <button
-              type="button"
-              onClick={() => onOpenTab?.("messages")}
-              className="-my-3 cursor-pointer py-3 text-[11px] leading-4 font-semibold text-[#f9a825]"
-            >
-              View All
-            </button>
-          </div>
-          {RECENT_MESSAGES.map((message) => (
-            <div key={message.body} className="flex gap-3 pt-4">
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#f9a825] text-[13px] font-bold text-white">
-                {message.initial}
-              </span>
-              <span className="flex min-w-0 flex-col items-start">
-                <span className="flex items-center gap-2">
-                  <span className="text-[13px] leading-[18px] font-semibold text-[#1f2937]">
-                    {message.from}
-                  </span>
-                  <span className="text-[10px] leading-4 text-[#99a1af]">
-                    {message.time}
-                  </span>
-                </span>
-                <span className="pt-1 text-[12px] leading-[18px] text-[#6a7282]">
-                  {message.body}
-                </span>
-              </span>
-            </div>
-          ))}
-        </div>
+        )}
       </div>
 
       {/* right: timeline */}

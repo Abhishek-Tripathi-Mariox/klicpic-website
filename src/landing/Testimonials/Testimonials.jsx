@@ -8,16 +8,12 @@ import { ChevronLeft, ChevronRight, Star } from "lucide-react";
  *
  * The carousel shows published customer reviews only. The frame's sample quote
  * ("Priya Sharma", with a stock portrait) is gone — until the team publishes a
- * real review the section stays off the page.
+ * real review the section stays off the page. So is the Google / Facebook /
+ * Justdial score strip that sat under it: those ratings and review counts were
+ * written into the build, not read from any platform.
  */
 /** The frame draws four dots; with fewer reviews there are fewer dots. */
 const MAX_DOTS = 4;
-
-const PLATFORMS = [
-  { name: "Google", rating: "4.9", reviews: "3,842 reviews" },
-  { name: "Facebook", rating: "4.8", reviews: "1,291 reviews" },
-  { name: "Justdial", rating: "4.9", reviews: "987 reviews" },
-];
 
 export default function Testimonials() {
   // Real customer reviews, left through the portal.
@@ -120,28 +116,6 @@ export default function Testimonials() {
           >
             Read all {total} review{total === 1 ? "" : "s"} →
           </Link>
-        </div>
-
-        <div className="flex w-full flex-wrap items-stretch justify-center gap-3 pt-10 sm:gap-5 md:pt-14">
-          {PLATFORMS.map((platform) => (
-            <div
-              key={platform.name}
-              className="flex items-center gap-3 rounded-[20px] border-[0.701px] border-solid border-[#f3f4f6] bg-white px-5 py-3 shadow-[0px_1px_1.5px_rgba(0,0,0,0.1),0px_1px_1px_rgba(0,0,0,0.1)] sm:px-6"
-            >
-              <span className="text-[16px] leading-6 font-bold whitespace-nowrap text-[#1f2937]">
-                {platform.name}
-              </span>
-              <span className="flex items-center gap-1">
-                <Star className="size-4 shrink-0 fill-[#f9a825] text-[#f9a825]" strokeWidth={1.333} />
-                <span className="text-[16px] leading-6 font-bold whitespace-nowrap text-[#1f2937]">
-                  {platform.rating}
-                </span>
-              </span>
-              <span className="text-[14px] leading-[20px] whitespace-nowrap text-[#99a1af]">
-                {platform.reviews}
-              </span>
-            </div>
-          ))}
         </div>
       </div>
     </section>

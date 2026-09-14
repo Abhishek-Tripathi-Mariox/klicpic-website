@@ -54,6 +54,11 @@ export const OFFERS = [
   },
 ];
 
+/**
+ * How claiming actually works. The frames described generating a unique code
+ * and redeeming it at a checkout — there is no code generator and no checkout,
+ * so this says what the three steps really are.
+ */
 export const HOW_IT_WORKS = [
   {
     step: "01",
@@ -62,13 +67,13 @@ export const HOW_IT_WORKS = [
   },
   {
     step: "02",
-    title: "Claim Your Code",
-    text: "Enter your details and generate a unique discount code instantly.",
+    title: "Claim It",
+    text: "Claim Offer opens the booking form with the offer already attached.",
   },
   {
     step: "03",
-    title: "Apply at Booking",
-    text: "Enter the code during booking checkout to redeem your benefit.",
+    title: "We Apply It",
+    text: "Send your booking request and our team applies the offer to your quotation.",
   },
 ];
 

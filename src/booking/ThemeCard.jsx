@@ -5,8 +5,14 @@ import { Check, Flame } from "lucide-react";
 
 /**
  * Figma: theme card on the Theme sub-step (1550:16054 and siblings).
- * Photo with a viewing pill, optional TRENDING flag, a gold "booked in <city>"
- * strip, and the name + category. Selected cards gain a gold ring and check.
+ * Photo, name and category. Selected cards gain a gold ring and check.
+ *
+ * The frame's viewing pill, TRENDING flag and gold "#18 booked in Bangalore
+ * this week" strip only ever render if the record itself carries the value —
+ * and no record does: the CRM has no column for any of them, and the bundled
+ * fallback no longer invents them. The markup stays so a card can show the
+ * facts the day something real counts them, but it never fills a pill in on
+ * the theme's behalf.
  */
 const SCRIM =
   "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.15) 55%, rgba(0,0,0,0) 100%)";

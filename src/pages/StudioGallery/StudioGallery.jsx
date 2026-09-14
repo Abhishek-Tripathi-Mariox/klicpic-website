@@ -12,15 +12,12 @@ import { useGallery } from "../../api/useGallery";
  * The full portfolio from the admin's Media Library, twelve to a page. The
  * pills are the types that actually hold live photos, each with its real count;
  * the backend pages and filters. The frame's twelve stock shoots are gone.
+ *
+ * So is the page's own announcement strip ("Only 7 weekend slots left for
+ * July"): nothing counts weekend slots, and the month was wrong besides. The
+ * page now shows the site-wide strip, like every other inner page.
  */
 const PAGE_SIZE = 12;
-
-const ANNOUNCEMENT = {
-  emoji: "🔥",
-  message: "Only 7 weekend slots left for July — don't miss out!",
-  cta: "Book →",
-  activeDot: 0,
-};
 
 export default function StudioGallery() {
   const [active, setActive] = useState("All");
@@ -45,7 +42,7 @@ export default function StudioGallery() {
   };
 
   return (
-    <SiteLayout active="Gallery" announcement={ANNOUNCEMENT}>
+    <SiteLayout active="Gallery">
       <section className="flex w-full flex-col items-center bg-white px-6 pt-16 pb-16 md:pt-36">
         <div className="flex w-full max-w-[1440px] flex-col items-center">
           <p className="font-script text-center text-[30px] leading-9 font-normal whitespace-nowrap text-[#f9a825]">
@@ -139,7 +136,7 @@ export default function StudioGallery() {
           Book Your Own Session
         </h2>
         <p className="w-[448px] max-w-full pt-4 pb-8 text-center text-[16px] leading-6 text-[rgba(64,63,63,0.5)]">
-          Join thousands of families who have created timeless memories with
+          Join the families who have created timeless memories with
           Klicpic.
         </p>
         <Link

@@ -3,62 +3,20 @@ import { useOffers, useOfferCountdown } from "../../api/useOffers";
 import { Link } from "react-router-dom";
 import { Clock } from "lucide-react";
 import FitImage from "../../components/FitImage";
-import freeInstagramReel from "./assets/free-instagram-reel.jpg";
-import freePremiumFrame from "./assets/free-premium-frame.jpg";
-import flat3000Off from "./assets/flat-3000-off.jpg";
-import weekendSpecial from "./assets/weekend-special.jpg";
-
+import { imageUrl } from "../../api/imageUrl";
 /**
  * Figma: Klicpic mithu / Home — Exclusive Offers (1550:3078)
  * Four offer cards on the dark band with a countdown to the offer deadline.
  */
-const LOCAL_OFFERS = [
-  {
-    title: "Free Instagram Reel",
-    image: freeInstagramReel,
-    description: "Get a professionally edited 60-second Instagram reel absolut...",
-    ribbon: "Limited",
-    worth: "✦ Worth ₹2,000",
-    worthBg: "rgba(124,58,237,0.14)",
-    worthColor: "#a78bfa",
-  },
-  {
-    title: "Free Premium Frame",
-    image: freePremiumFrame,
-    description: "Receive a stunning 10×12 inch premium frame with your favour...",
-    ribbon: "Hot",
-    worth: "✦ Worth ₹1,200",
-    worthBg: "rgba(5,150,105,0.14)",
-    worthColor: "#34d399",
-  },
-  {
-    title: "₹3,000 OFF",
-    image: flat3000Off,
-    description: "Flat ₹3,000 off on any package valued above ₹15,000. Perfect...",
-    ribbon: "Weekend",
-    worth: "✦ ₹3,000 Savings",
-    worthBg: "rgba(220,38,38,0.14)",
-    worthColor: "#fca5a5",
-  },
-  {
-    title: "Weekend Special",
-    image: weekendSpecial,
-    description: "Book any weekend slot and receive double the edited photos —...",
-    ribbon: "New",
-    worth: "✦ 2× Photos",
-    worthBg: "rgba(217,119,6,0.14)",
-    worthColor: "#fcd34d",
-  },
-];
-
-/** Design shows 02:13:44 remaining; it ticks down from there. */
-
 export default function Offers() {
   // Offer records, live from the CRM.
-  const { offers: OFFERS, endsAt } = useOffers(LOCAL_OFFERS);
+  const { offers: OFFERS, endsAt } = useOffers();
 
   // Counts to the soonest expiry among the live offers; null when none is set.
   const countdown = useOfferCountdown(endsAt);
+
+  // Nothing running today: no band at all, rather than an empty promise.
+  if (OFFERS.length === 0) return null;
 
   return (
     <section className="flex w-full flex-col items-center bg-[#1f2937] px-4 py-16 sm:px-6 md:py-24">
@@ -89,12 +47,14 @@ export default function Offers() {
               key={offer.title}
               className="relative flex min-w-0 flex-col items-start rounded-2xl border-[0.701px] border-solid border-[rgba(249,168,37,0.18)] bg-[rgba(255,255,255,0.04)] p-5 sm:p-6"
             >
-              <span className="absolute top-4 right-4 z-10 rounded-full bg-[#f9a825] px-[10px] py-1 text-[10px] leading-[15px] font-bold whitespace-nowrap text-white">
-                {offer.ribbon}
-              </span>
+              {offer.ribbon && (
+                <span className="absolute top-4 right-4 z-10 rounded-full bg-[#f9a825] px-[10px] py-1 text-[10px] leading-[15px] font-bold whitespace-nowrap text-white">
+                  {offer.ribbon}
+                </span>
+              )}
 
               <FitImage
-                src={offer.image}
+                src={offer.image ? imageUrl(offer.image, 640) : ""}
                 alt={offer.title}
                 tone="dark"
                 className="h-[180px] w-full rounded-[20px] xl:h-[143.998px]"
@@ -107,12 +67,14 @@ export default function Offers() {
                 {offer.description}
               </p>
 
-              <span
-                className="rounded-full px-3 py-1 text-[12px] leading-4 font-bold whitespace-nowrap"
-                style={{ backgroundColor: offer.worthBg, color: offer.worthColor }}
-              >
-                {offer.worth}
-              </span>
+              {offer.worth && (
+                <span
+                  className="rounded-full px-3 py-1 text-[12px] leading-4 font-bold whitespace-nowrap"
+                  style={{ backgroundColor: offer.worthBg, color: offer.worthColor }}
+                >
+                  {offer.worth}
+                </span>
+              )}
 
               <div className="h-4 w-full shrink-0" />
 
@@ -127,7 +89,7 @@ export default function Offers() {
         </div>
 
         <p className="w-full pt-8 text-center text-[14px] leading-[20px] text-[rgba(255,255,255,0.3)]">
-          Click any offer to view details and generate your code
+          Claim an offer and our team applies it to your booking
         </p>
       </div>
     </section>

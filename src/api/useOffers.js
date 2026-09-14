@@ -5,26 +5,41 @@ import { useApi } from "./useApi";
 /**
  * Live offers from the CRM's Settings → Website Offers tab.
  *
- * Records carry their own uploaded artwork, so a card without one falls back to
- * the bundled photo in the same position rather than rendering an empty frame.
+ * Only real records are ever shown. There used to be a bundled set of offers
+ * behind this — so a backend hiccup advertised "₹3,000 OFF" the studio may
+ * have retired, with Claim buttons that led nowhere — and a record without
+ * artwork borrowed the photo of whichever bundled offer sat in the same
+ * position, putting the wrong picture on three of four live cards. Neither is
+ * worth a filled-looking strip: with nothing live, the section hides itself.
+ *
+ * An offer that runs out while the page is open drops out on the next tick,
+ * so its Claim button cannot outlive it.
  */
-export function useOffers(fallback = []) {
-  const { data, loading, error } = useApi(fetchOffers, null, []);
+export function useOffers() {
+  const { data } = useApi(fetchOffers, null, []);
+  const [now, setNow] = useState(() => Date.now());
+
+  const live = Array.isArray(data?.offers) ? data.offers : [];
+  const timed = live.some((offer) => offer.endsAt);
+
+  useEffect(() => {
+    if (!timed) return undefined;
+    const timer = setInterval(() => setNow(Date.now()), 30000);
+    return () => clearInterval(timer);
+  }, [timed]);
 
   return useMemo(() => {
-    const live = data?.offers;
-    if (!Array.isArray(live) || live.length === 0) {
-      return { offers: fallback, endsAt: null, live: false };
-    }
+    const running = live.filter((offer) => !offer.endsAt || new Date(offer.endsAt).getTime() > now);
+    if (running.length === 0) return { offers: [], endsAt: null, live: false };
 
-    const offers = live.map((offer, index) => ({
-      ...offer,
-      image: offer.image || fallback[index % Math.max(fallback.length, 1)]?.image,
-    }));
+    const soonest = running
+      .map((offer) => offer.endsAt)
+      .filter(Boolean)
+      .sort()[0];
 
-    return { offers, endsAt: data.endsAt, live: true };
+    return { offers: running, endsAt: soonest || null, live: true };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
+  }, [data, now]);
 }
 
 const pad = (value) => String(value).padStart(2, "0");

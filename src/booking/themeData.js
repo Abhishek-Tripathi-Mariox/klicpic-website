@@ -1,6 +1,14 @@
 /**
  * Figma: booking wizard — Theme sub-step (1550:14898 / 15939).
- * 24 themes across six categories, with the live-activity badges from the frame.
+ *
+ * The bundled stand-in for the CRM's theme list: what the step shows while the
+ * request is in flight, and if it never lands. Names, categories and pictures
+ * only — the frame's "live activity" dressing ("13 viewing", TRENDING, "#18
+ * booked in Bangalore this week") is gone. Nothing counts viewers or ranks
+ * bookings by city, and the cities named are ones Klicpic has no studio in.
+ * Leaving the fields here was not harmless either: useCatalog overlays a live
+ * record on the bundled one of the same name, so any CRM theme that happened to
+ * match picked the badges up as if they were its own.
  */
 import royalBoho from "./assets/themes/royal-boho.jpg";
 import desertBoho from "./assets/themes/desert-boho.jpg";
@@ -30,28 +38,28 @@ import vintageDrama from "./assets/themes/vintage-drama.jpg";
 export const THEME_FILTERS = ["All", "Boho", "Floral", "Classic", "Royal", "Outdoor", "Fantasy"];
 
 export const THEMES = [
-  { name: "Royal Boho", category: "Boho", image: royalBoho, viewing: "13 viewing", trending: true, booked: "#18 booked in Bangalore this week" },
-  { name: "Desert Boho", category: "Boho", image: desertBoho, viewing: "6 viewing", booked: "#9 booked in Pune this week" },
-  { name: "Forest Boho", category: "Boho", image: forestBoho, booked: "#11 booked in Hyderabad this week" },
-  { name: "Moonlit Boho", category: "Boho", image: moonlitBoho, booked: "#6 booked in Chennai this week" },
-  { name: "Floral Dream", category: "Floral", image: floralDream, viewing: "14 viewing", trending: true, booked: "#22 booked in Bangalore this week" },
-  { name: "Princess Garden", category: "Floral", image: princessGarden, viewing: "11 viewing", trending: true, booked: "#16 booked in Mumbai this week" },
-  { name: "Spring Bloom", category: "Floral", image: springBloom, viewing: "8 viewing", booked: "#10 booked in Delhi this week" },
-  { name: "Rose Garden", category: "Floral", image: roseGarden, viewing: "5 viewing", booked: "#7 booked in Pune this week" },
-  { name: "Classic White", category: "Classic", image: classicWhite, viewing: "11 viewing", booked: "#13 booked in Mumbai this week" },
-  { name: "Timeless Grey", category: "Classic", image: timelessGrey, viewing: "5 viewing", booked: "#5 booked in Chennai this week" },
-  { name: "Pearl Elegance", category: "Classic", image: pearlElegance, viewing: "6 viewing", booked: "#8 booked in Bangalore this week" },
-  { name: "Soft Ivory", category: "Classic", image: softIvory, viewing: "6 viewing", booked: "#6 booked in Hyderabad this week" },
-  { name: "Golden Hour", category: "Royal", image: goldenHour, viewing: "15 viewing", trending: true, booked: "#24 booked in Bangalore this week" },
-  { name: "Velvet Royal", category: "Royal", image: velvetRoyal, viewing: "9 viewing", booked: "#12 booked in Mumbai this week" },
-  { name: "Palace Dreams", category: "Royal", image: palaceDreams, viewing: "14 viewing", trending: true, booked: "#19 booked in Delhi this week" },
-  { name: "Regal Crimson", category: "Royal", image: regalCrimson, viewing: "7 viewing", booked: "#7 booked in Pune this week" },
-  { name: "Sunlit Meadow", category: "Outdoor", image: sunlitMeadow, viewing: "12 viewing", booked: "#15 booked in Bangalore this week" },
-  { name: "Ocean Breeze", category: "Outdoor", image: oceanBreeze, viewing: "8 viewing", booked: "#10 booked in Mumbai this week" },
-  { name: "Garden Party", category: "Outdoor", image: gardenParty, viewing: "7 viewing", booked: "#9 booked in Chennai this week" },
-  { name: "Mountain Mist", category: "Outdoor", image: mountainMist, viewing: "6 viewing", booked: "#5 booked in Hyderabad this week" },
-  { name: "Fairy Tale", category: "Fantasy", image: fairyTale, viewing: "11 viewing", booked: "#14 booked in Bangalore this week" },
-  { name: "Enchanted Forest", category: "Fantasy", image: enchantedForest, viewing: "7 viewing", booked: "#7 booked in Pune this week" },
-  { name: "Celestial Dreams", category: "Fantasy", image: celestialDreams, viewing: "9 viewing", booked: "#10 booked in Mumbai this week" },
-  { name: "Vintage Drama", category: "Fantasy", image: vintageDrama, viewing: "6 viewing", booked: "#6 booked in Delhi this week" },
+  { name: "Royal Boho", category: "Boho", image: royalBoho },
+  { name: "Desert Boho", category: "Boho", image: desertBoho },
+  { name: "Forest Boho", category: "Boho", image: forestBoho },
+  { name: "Moonlit Boho", category: "Boho", image: moonlitBoho },
+  { name: "Floral Dream", category: "Floral", image: floralDream },
+  { name: "Princess Garden", category: "Floral", image: princessGarden },
+  { name: "Spring Bloom", category: "Floral", image: springBloom },
+  { name: "Rose Garden", category: "Floral", image: roseGarden },
+  { name: "Classic White", category: "Classic", image: classicWhite },
+  { name: "Timeless Grey", category: "Classic", image: timelessGrey },
+  { name: "Pearl Elegance", category: "Classic", image: pearlElegance },
+  { name: "Soft Ivory", category: "Classic", image: softIvory },
+  { name: "Golden Hour", category: "Royal", image: goldenHour },
+  { name: "Velvet Royal", category: "Royal", image: velvetRoyal },
+  { name: "Palace Dreams", category: "Royal", image: palaceDreams },
+  { name: "Regal Crimson", category: "Royal", image: regalCrimson },
+  { name: "Sunlit Meadow", category: "Outdoor", image: sunlitMeadow },
+  { name: "Ocean Breeze", category: "Outdoor", image: oceanBreeze },
+  { name: "Garden Party", category: "Outdoor", image: gardenParty },
+  { name: "Mountain Mist", category: "Outdoor", image: mountainMist },
+  { name: "Fairy Tale", category: "Fantasy", image: fairyTale },
+  { name: "Enchanted Forest", category: "Fantasy", image: enchantedForest },
+  { name: "Celestial Dreams", category: "Fantasy", image: celestialDreams },
+  { name: "Vintage Drama", category: "Fantasy", image: vintageDrama },
 ];

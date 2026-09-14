@@ -9,14 +9,17 @@ import snehaKapoor from "./assets/sneha-kapoor.jpg";
 
 export const STORY = [
   "Klicpic started in a 200 sq. ft. studio in Bangalore with one camera, two softboxes, and an obsession with perfect light. Founder Arjun Mehta quit his corporate job to pursue what he truly loved — capturing the raw emotion of families, couples, and new lives.",
-  "Today we operate across 3 cities, have a team of 12 artists, and have delivered memories to over 12,500 families. But the spirit remains the same: every click matters.",
+  "Today we shoot from two studios — HSR Layout in Bengaluru and Nizampet in Hyderabad — and travel to homes and venues for select shoots. The spirit remains the same: every click matters.",
 ];
 
+/**
+ * Only what can be checked. "12,500+ Sessions Done" and "4.9 ★ Average
+ * Rating" were invented — the studio has no published reviews at all — and
+ * "3 Cities" was wrong: there are two studios, in two cities.
+ */
 export const STATS = [
-  { value: "12,500+", label: "Sessions Done" },
-  { value: "4.9 ★", label: "Average Rating" },
   { value: "11 yrs", label: "In Business" },
-  { value: "3", label: "Cities" },
+  { value: "2", label: "Studios" },
 ];
 
 /** icon keys map to lucide components in About.jsx */

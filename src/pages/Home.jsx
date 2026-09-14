@@ -1,5 +1,5 @@
 import React from "react";
-import AnnouncementBar from "../components/AnnouncementBar";
+import { OfferAnnouncement } from "../components/SiteLayout";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Hero from "../landing/Hero/Hero";
@@ -24,7 +24,7 @@ export default function Home() {
   return (
     <div id="top" className="min-h-screen w-full bg-white">
       <div className="relative z-20">
-        <AnnouncementBar />
+        <OfferAnnouncement />
         <div className="absolute inset-x-0 top-full z-20">
           <Header variant="overlay" />
         </div>

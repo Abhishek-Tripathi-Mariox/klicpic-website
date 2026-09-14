@@ -135,7 +135,10 @@ export default function Packages() {
           <PageHeading
             eyebrow="Choose Your"
             title="Package"
-            subtitle="Transparent pricing · No hidden charges · 100% satisfaction guaranteed"
+            /* "100% satisfaction guaranteed" is gone: the site's own Refund
+               policy says refunds are not given for subjective creative
+               differences, so the page cannot promise the opposite. */
+            subtitle="Transparent pricing · No hidden charges"
           />
 
           {/* The bundle ships { label, emoji }; the API sends plain strings —

@@ -16,21 +16,21 @@ import corporate from "./assets/corporate.jpg";
  * Figma: Klicpic mithu / Home — Choose Your Perfect Photoshoot (1550:2077)
  * 3x3 grid of category cards, image + bottom-up scrim + title/meta.
  *
- * The frame's "From ₹…" price, theme count and "Booked" tally are gone: all
- * The frame's "From ₹…" price is gone — those figures undercut what the CRM's
- * packages actually cost — and the theme count now comes from the CRM, which
- * holds 2 Maternity themes where the frame claimed 48.
+ * The frame's "From ₹…", rating and "Booked" tally are all gone — the prices
+ * undercut what the CRM's packages actually cost and nothing counts bookings
+ * per category. The theme count is the one figure that survives, because the
+ * CRM holds it: 2 Maternity themes where the frame claimed 48.
  */
 const CATEGORIES = [
-  { name: "Maternity", image: maternity, booked: "1,240+ Booked" },
-  { name: "Newborn", image: newborn, booked: "890+ Booked" },
-  { name: "Baby", image: baby, booked: "1,580+ Booked" },
-  { name: "Birthday", image: birthday, booked: "2,100+ Booked" },
-  { name: "Family", image: family, booked: "1,340+ Booked" },
-  { name: "Wedding", image: wedding, booked: "760+ Booked" },
-  { name: "Pre-Wedding", image: preWedding, booked: "540+ Booked" },
-  { name: "Couple", image: couple, booked: "870+ Booked" },
-  { name: "Corporate", image: corporate, booked: "320+ Booked" },
+  { name: "Maternity", image: maternity },
+  { name: "Newborn", image: newborn },
+  { name: "Baby", image: baby },
+  { name: "Birthday", image: birthday },
+  { name: "Family", image: family },
+  { name: "Wedding", image: wedding },
+  { name: "Pre-Wedding", image: preWedding },
+  { name: "Couple", image: couple },
+  { name: "Corporate", image: corporate },
 ];
 
 const CARD_SCRIM =
@@ -74,21 +74,13 @@ export default function Categories() {
                 <h3 className="text-[24px] leading-8 font-bold text-white">
                   {category.name}
                 </h3>
-                <div className="flex flex-wrap items-center gap-x-2 pt-1">
-                  {/* Only a category the CRM actually holds themes for gets a
-                      count; the rest simply do not show one. */}
-                  {themeCounts.get(category.name.toLowerCase()) > 0 && (
-                    <>
-                      <span className="text-[14px] leading-[20px] whitespace-nowrap text-[rgba(255,255,255,0.65)]">
-                        {themeCounts.get(category.name.toLowerCase())} Themes
-                      </span>
-                      <span className="text-[14px] leading-[20px] text-[rgba(255,255,255,0.65)]">·</span>
-                    </>
-                  )}
-                  <span className="text-[14px] leading-[20px] whitespace-nowrap text-[rgba(255,255,255,0.65)]">
-                    {category.booked}
-                  </span>
-                </div>
+                {/* Only a category the CRM actually holds themes for gets a
+                    line of meta; the rest show the title alone. */}
+                {themeCounts.get(category.name.toLowerCase()) > 0 && (
+                  <p className="pt-1 text-[14px] leading-[20px] whitespace-nowrap text-[rgba(255,255,255,0.65)]">
+                    {themeCounts.get(category.name.toLowerCase())} Themes
+                  </p>
+                )}
               </div>
             </article>
           ))}

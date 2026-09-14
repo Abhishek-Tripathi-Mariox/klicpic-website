@@ -33,6 +33,13 @@ const STATE_TONE = {
 
 const money = (value) => `₹${Math.round(Number(value) || 0).toLocaleString("en-IN")}`;
 
+/**
+ * A booking that has not been quoted yet carries no amount, and the backend
+ * sends an empty label for it. "₹0" would read as "this shoot is free".
+ */
+const amountText = (booking) =>
+  booking.amountLabel || (Number(booking.amount) > 0 ? money(booking.amount) : "Pending quote");
+
 export default function MyBookingsPanel({ bookings = [], cancelRequests = [], onChanged }) {
   // `bookings` arrives after the first render, so an initial-state default would
   // capture undefined. Track what the customer opened or closed instead, and
@@ -117,7 +124,7 @@ export default function MyBookingsPanel({ bookings = [], cancelRequests = [], on
 
                 <span className="flex shrink-0 flex-col items-end">
                   <span className="text-[14px] leading-[20px] font-black text-right text-[#1f2937]">
-                    {booking.amountLabel || money(booking.amount)}
+                    {amountText(booking)}
                   </span>
                   <span className="text-[10px] leading-[15px] font-medium text-right text-[#99a1af]">
                     {booking.package || "—"}
@@ -137,7 +144,10 @@ export default function MyBookingsPanel({ bookings = [], cancelRequests = [], on
                       { label: "Package", value: booking.package || "—" },
                       { label: "Studio", value: booking.studio || "—" },
                       { label: "Amount Paid", value: money(booking.paid) },
-                      { label: "Balance Due", value: money(balance) },
+                      {
+                        label: "Balance Due",
+                        value: Number(booking.amount) > 0 ? money(balance) : "Pending quote",
+                      },
                     ].map((row) => (
                       <span
                         key={row.label}

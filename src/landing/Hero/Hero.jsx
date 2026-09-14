@@ -7,13 +7,6 @@ import heroFamilyShoot from "./assets/hero-family-shoot.jpg";
  * Figma: Klicpic mithu / Home — Hero (1550:2026)
  * Full-bleed family-shoot photo, dark scrim, centred headline stack.
  */
-const TRUST_BADGES = [
-  { emoji: "⭐", label: "4.9 Rating" },
-  { emoji: "📸", label: "12,500+ Sessions" },
-  { emoji: "🏆", label: "Award Winning" },
-  { emoji: "🔥", label: "7 Weekend Slots Left" },
-];
-
 export default function Hero() {
   return (
     <section className="relative min-h-[680px] w-full bg-[#101828] md:min-h-[852.27px]">
@@ -48,11 +41,6 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* script eyebrow */}
-        <p className="pb-3 text-center font-script text-[24px] leading-8 font-normal whitespace-nowrap text-[rgba(255,255,255,0.65)] sm:text-[30px] sm:leading-[36px]">
-          Trusted by 12,500+ Families
-        </p>
-
         <h1 className="max-w-[1060.858px] pb-5 text-center text-[32px] leading-[40px] font-bold text-balance text-white sm:text-[40px] sm:leading-[48px] md:text-[48px] md:leading-[56px] xl:text-[56px] xl:leading-[64.4px] xl:whitespace-nowrap">
           Capture Moments. Create Memories.
           <br />
@@ -63,7 +51,7 @@ export default function Hero() {
           Premium Photography Experiences Crafted Around Your Story
         </p>
 
-        <div className="flex flex-wrap items-stretch justify-center gap-3 pb-10 sm:gap-4 sm:pb-14">
+        <div className="flex flex-wrap items-stretch justify-center gap-3 sm:gap-4">
           <Link
             to="/book"
             className="flex items-center justify-center rounded-full bg-[#f9a825] px-8 py-4 shadow-[0px_10px_7.5px_rgba(0,0,0,0.1),0px_4px_3px_rgba(0,0,0,0.1)] transition-colors hover:bg-[#e69a1f]"
@@ -80,22 +68,6 @@ export default function Hero() {
               Explore Portfolio
             </span>
           </Link>
-        </div>
-
-        <div className="flex flex-wrap items-stretch justify-center gap-2 sm:gap-3">
-          {TRUST_BADGES.map(({ emoji, label }) => (
-            <div
-              key={label}
-              className="flex shrink-0 items-center gap-2 rounded-full border-[0.701px] border-solid border-[rgba(255,255,255,0.15)] bg-[rgba(255,255,255,0.1)] px-3 py-2 sm:px-4"
-            >
-              <span className="text-center text-[16px] leading-6 whitespace-nowrap">
-                {emoji}
-              </span>
-              <span className="text-center text-[14px] leading-[20px] font-medium whitespace-nowrap text-white">
-                {label}
-              </span>
-            </div>
-          ))}
         </div>
       </div>
 

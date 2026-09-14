@@ -14,8 +14,10 @@ import venue from "./assets/locations/venue.jpg";
 export const LOCATION_OPTIONS = [
   {
     id: "studio",
+    // "Professional AC studio with 20+ backdrop sets" is gone — nothing counts
+    // backdrop sets and nobody could confirm the number or the air-con.
     name: "Klicpic Studios",
-    tagline: "Professional AC studio with 20+ backdrop sets",
+    tagline: "Shoot at one of our studios",
     image: studios,
     link: "Visit Studio Page",
     linkNote: "View full studio details & virtual tour",
@@ -25,8 +27,11 @@ export const LOCATION_OPTIONS = [
     name: "Your Venue / Home",
     tagline: "We come to your home, venue, or any location",
     image: venue,
-    note: "Tell us where to come. Our team calls ahead for a free pre-shoot location scouting call.",
-    charges: "Travel charges included up to 20 km · Extra ₹10/km beyond",
+    // The "free pre-shoot location scouting call" was a service the studio
+    // does not run, and the travel line ("included up to 20 km · Extra ₹10/km
+    // beyond") quoted a rate card nobody approved — travel is settled with the
+    // customer when the booking is confirmed, so the step no longer prices it.
+    note: "Tell us where to come and we will bring the setup to you.",
   },
 ];
 

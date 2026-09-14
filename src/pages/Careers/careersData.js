@@ -13,11 +13,13 @@ export const HERO = {
   // TRUNCATED in Figma metadata at: "We're building a world-class photography studio an"
   subtitle:
     "We're building a world-class photography studio and we want passionate people on the team.",
-  stats: [
-    { value: "4", label: "Open Roles" },
-    { value: "12", label: "Team Members" },
-    { value: "Bangalore", label: "HQ" },
-  ],
+  /**
+   * "12 Team Members" was invented — nothing in the CRM counts heads — and the
+   * hardcoded "4 Open Roles" matched the live postings only by coincidence.
+   * Both are gone; Careers.jsx counts the open roles from the live list and
+   * renders whatever else stands here after them.
+   */
+  stats: [{ value: "Bangalore", label: "HQ" }],
 };
 
 export const BENEFITS = [
@@ -113,8 +115,9 @@ export const OPEN_APPLICATION = {
   email: "careers@klicpic.in",
 };
 
-export const ANNOUNCEMENT = {
-  emoji: "⭐",
-  message: "Rated 4.9/5 by 12,500+ happy families across India",
-  activeDot: 2,
-};
+/**
+ * The page's own announcement strip is gone: "Rated 4.9/5 by 12,500+ happy
+ * families" had no source — the site has no published reviews at all — and a
+ * careers page is the last place to make a customer-facing claim. Careers now
+ * shows the site-wide strip, like every other inner page.
+ */

@@ -16,8 +16,8 @@ export default function BookingSummary() {
   // already claimed for this booking wins; otherwise the first live offer
   // stands in. With none running the strip does not render at all — a promise
   // nobody is honouring is worse than a quieter card.
-  const { offers } = useOffers([]);
-  const promo = booking.coupon || offers[0] || null;
+  const { offers } = useOffers();
+  const promo = booking.coupon || (booking.couponFailed ? null : offers[0]) || null;
 
   const rows = [
     { label: "Shoot Type", value: booking.shootType },

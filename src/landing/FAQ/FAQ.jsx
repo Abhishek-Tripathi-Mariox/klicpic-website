@@ -1,44 +1,28 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
+import { useApi } from "../../api/useApi";
+import { fetchFaqs } from "../../api/endpoints";
 
 /**
  * Figma: Klicpic mithu / Home — Everything You Need to Know (1550:3254)
  *
- * NOTE: every row is collapsed in the Figma frame, so it specifies no answer
- * copy. The answers below are drawn from facts stated elsewhere on the page
- * (48hr delivery, customizable packages, props/themes chosen later) and should
- * be replaced with the final approved copy.
+ * Every row is collapsed in the frame, so it specifies no answer copy, and the
+ * five answers written to fill it invented the facts they quoted — "500+ themes
+ * and 1,500+ props" against the CRM's 178 and 551, "30 photos delivered within
+ * 48 hours" against the Terms' 5–10 business days. The questions are records
+ * now: these are the CRM's own, the same ones /faq serves.
  */
-const FAQS = [
-  {
-    question: "How does the booking process work?",
-    answer:
-      "Pick your shoot category and studio, choose a date from the availability calendar, and confirm your package. Our team calls you within 24 hours to lock the details.",
-  },
-  {
-    question: "Can I customize my package?",
-    answer:
-      "Yes. Start from the base session and add only the extras you want — albums, framed prints, canvas wall art, reels or cinematic video. Your total updates as you build.",
-  },
-  {
-    question: "Can I select props and themes later?",
-    answer:
-      "Absolutely. You can lock your date first and pick from 500+ themes and 1,500+ props any time before the shoot day.",
-  },
-  {
-    question: "What is the rescheduling policy?",
-    answer:
-      "Reschedule free of charge up to 72 hours before your slot, subject to availability at your chosen studio.",
-  },
-  {
-    question: "How many edited photos will I receive?",
-    answer:
-      "Every base session includes 30 high-resolution edited photos, delivered within 48 hours. Additional edits can be added to your package.",
-  },
-];
+const HOME_FAQ_COUNT = 5;
 
 export default function FAQ() {
+  const { data } = useApi(fetchFaqs, null, []);
   const [openIndex, setOpenIndex] = useState(null);
+
+  const faqs = (Array.isArray(data?.faqs) ? data.faqs : []).slice(0, HOME_FAQ_COUNT);
+
+  // No published questions — no section rather than invented answers.
+  if (faqs.length === 0) return null;
 
   return (
     <section className="flex w-full flex-col items-center bg-[#fff7ed] px-4 py-16 sm:px-6 md:py-24">
@@ -53,11 +37,11 @@ export default function FAQ() {
         </div>
 
         <div className="flex w-full flex-col items-start gap-3 pt-8 md:pt-12">
-          {FAQS.map((faq, index) => {
+          {faqs.map((faq, index) => {
             const isOpen = openIndex === index;
             return (
               <div
-                key={faq.question}
+                key={faq.id || faq.question}
                 className="w-full overflow-hidden rounded-2xl border-[0.701px] border-solid border-[#f3f4f6] bg-white"
               >
                 <button
@@ -86,6 +70,16 @@ export default function FAQ() {
               </div>
             );
           })}
+        </div>
+
+        {/* The home page shows the first few; the rest live on /faq. */}
+        <div className="flex w-full justify-center pt-8">
+          <Link
+            to="/faq"
+            className="rounded-full border-[1.4px] border-solid border-[#f9a825] px-6 py-2.5 text-[14px] font-bold text-[#f9a825] transition-colors hover:bg-[#f9a825]/10"
+          >
+            See all questions →
+          </Link>
         </div>
       </div>
     </section>

@@ -93,10 +93,11 @@ export default function RefundsPanel({ data }) {
               })}
             </ol>
 
-            <div className="mt-4 grid grid-cols-1 gap-3 border-t-[0.57px] border-solid border-[#f3f4f6] pt-4 sm:grid-cols-3">
+            {/* The frame's "ETA: 2–3 business days" is gone — nothing in the
+                refund record carries a date, so it was a promise nobody made. */}
+            <div className="mt-4 grid grid-cols-1 gap-3 border-t-[0.57px] border-solid border-[#f3f4f6] pt-4 sm:grid-cols-2">
               {[
                 { label: "Refund Method", value: refund.method || "Shared by our team" },
-                { label: "ETA", value: "2–3 business days" },
                 { label: "Reason", value: refund.reason || "—" },
               ].map((row) => (
                 <span key={row.label} className="flex flex-col items-start">

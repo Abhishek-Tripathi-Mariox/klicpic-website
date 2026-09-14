@@ -63,9 +63,13 @@ export default function StepType({ onNext }) {
               Today's Offer
             </span>
           </span>
-          <span className="text-[10px] leading-[15px] font-medium whitespace-nowrap text-[#99a1af]">
-            {booking.coupon ? "Applied to this booking" : "Refreshes daily · 1 per user"}
-          </span>
+          {/* "Refreshes daily · 1 per user" described a rotation and a limit
+              that nothing implements — offers run until the team ends them. */}
+          {booking.coupon && (
+            <span className="text-[10px] leading-[15px] font-medium whitespace-nowrap text-[#99a1af]">
+              Applied to this booking
+            </span>
+          )}
         </div>
         {/* Once an offer is claimed the banner states it rather than sending
             the customer back out to pick another. */}

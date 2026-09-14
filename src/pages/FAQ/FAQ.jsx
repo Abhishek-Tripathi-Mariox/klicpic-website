@@ -38,11 +38,6 @@ export default function FAQPage() {
 
   return (
     <SiteLayout
-      announcement={{
-        emoji: "🎁",
-        message: "Refer a friend and get ₹500 off your next shoot. Ask us how!",
-        activeDot: 1,
-      }}
     >
       <PolicyHero
         badge="FAQ"

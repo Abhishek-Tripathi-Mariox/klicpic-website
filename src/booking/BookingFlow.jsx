@@ -85,8 +85,12 @@ function Flow({ screen, setScreen }) {
         });
       })
       .catch(() => {
-        // An expired or mistyped code simply does not apply — the wizard
-        // carries on rather than blocking the booking.
+        // An expired or mistyped code does not block the booking, but the
+        // customer came here for it: say so, and stop the summary offering a
+        // different promo in its place as though it were theirs.
+        if (!active) return;
+        set({ coupon: null, couponFailed: true });
+        setNotice("That offer link is no longer valid — see Offers for what's running now. Your booking can carry on.");
       });
 
     return () => {

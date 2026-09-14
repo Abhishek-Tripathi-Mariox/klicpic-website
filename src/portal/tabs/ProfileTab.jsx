@@ -48,75 +48,6 @@ const QUICK_ACTIONS = [
   { id: "activity", label: "Activity Log", icon: History },
 ];
 
-const NOTIFICATION_GROUPS = [
-  {
-    title: "WhatsApp",
-    items: [
-      {
-        id: "whatsapp",
-        label: "WhatsApp Notifications",
-        hint: "All booking updates via WhatsApp",
-        on: true,
-      },
-    ],
-  },
-  {
-    title: "Alert Types",
-    items: [
-      {
-        id: "booking",
-        label: "Booking Alerts",
-        hint: "Confirmations, reschedules, cancellations",
-        on: true,
-      },
-      {
-        id: "delivery",
-        label: "Delivery Alerts",
-        hint: "Exclusive deals, seasonal offers",
-        on: true,
-      },
-    ],
-  },
-  {
-    title: "Other Channels",
-    items: [
-      {
-        id: "email",
-        label: "Email Digest",
-        hint: "Weekly summary to your email",
-        on: false,
-      },
-      {
-        id: "sms",
-        label: "SMS Alerts",
-        hint: "Critical updates via SMS (no spam)",
-        on: false,
-      },
-    ],
-  },
-];
-
-function Toggle({ on, onChange, label }) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={on}
-      aria-label={label}
-      onClick={() => onChange(!on)}
-      className={`relative flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full p-[2px] transition-colors after:absolute after:-inset-2 ${
-        on ? "bg-[#f9a825]" : "bg-[#e5e7eb]"
-      }`}
-    >
-      <span
-        className={`size-5 rounded-full bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.2)] transition-transform ${
-          on ? "translate-x-5" : "translate-x-0"
-        }`}
-      />
-    </button>
-  );
-}
-
 function Stat({ value, label }) {
   return (
     <div className={`${CARD} flex flex-col items-center px-4 py-5`}>
@@ -151,12 +82,6 @@ export default function ProfileTab({ customer, bookings = [], onLogout }) {
   const [reload, setReload] = useState(0);
   const { data: refunds } = useApi(fetchRefunds, null, [reload]);
   const { data: activity } = useApi(fetchActivity, null, [reload]);
-  const [prefs, setPrefs] = useState(() =>
-    Object.fromEntries(
-      NOTIFICATION_GROUPS.flatMap((group) => group.items.map((item) => [item.id, item.on]))
-    )
-  );
-
   const name = customer?.name || "Klicpic customer";
   const initials =
     name
@@ -194,12 +119,11 @@ export default function ProfileTab({ customer, bookings = [], onLogout }) {
           </span>
           <span className="flex min-w-0 flex-col items-start">
             <span className="text-[18px] leading-7 font-bold break-words text-[#1f2937]">{name}</span>
+            {/* The frame's "Gold Member" tier was the same for everybody —
+                there is no loyalty programme to be a member of. */}
             <span className="flex flex-wrap items-center gap-2 pt-[2px]">
-              <span className="rounded-full bg-[#fffbeb] px-2 py-[2px] text-[11px] leading-4 font-bold text-[#d08700]">
-                🥇 Gold Member
-              </span>
               <span className="text-[12px] leading-4 text-[#99a1af]">
-                · {bookings.length} booking{bookings.length === 1 ? "" : "s"} with us
+                {bookings.length} booking{bookings.length === 1 ? "" : "s"} with us
               </span>
             </span>
           </span>
@@ -215,10 +139,11 @@ export default function ProfileTab({ customer, bookings = [], onLogout }) {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 pt-4 sm:grid-cols-4">
+      {/* Loyalty Points used to sit here as bookings × 280. There are no
+          points, so there is no tile. */}
+      <div className="grid grid-cols-3 gap-3 pt-4">
         <Stat value={bookings.length} label="Total Bookings" />
         <Stat value={completed} label="Completed" />
-        <Stat value={`${bookings.length * 280} pts`} label="Loyalty Points" />
         <Stat value={packages} label="Packages Used" />
       </div>
 
@@ -382,48 +307,47 @@ export default function ProfileTab({ customer, bookings = [], onLogout }) {
       {section === "notifications" && (
         <div className={`${CARD} p-5 sm:p-6`}>
           <h3 className="text-[18px] leading-[27px] font-bold text-[#1f2937]">
-            Notification Preferences
+            Notifications
           </h3>
           <p className="pt-1 text-[14px] leading-[20px] text-[#99a1af]">
-            Choose how you want to hear from us
+            How we keep you posted about your shoot
           </p>
 
-          {NOTIFICATION_GROUPS.map((group) => (
-            <div key={group.title} className="pt-5">
-              <p className="text-[11px] leading-4 font-bold tracking-[0.6px] text-[#99a1af] uppercase">
-                {group.title}
-              </p>
-              {group.items.map((item) => (
-                <div
-                  key={item.id}
-                  className="mt-3 flex items-center gap-3 rounded-[20px] border-[0.57px] border-solid border-[#f3f4f6] px-4 py-3"
-                >
-                  <Bell className="size-4 shrink-0 text-[#f9a825]" strokeWidth={1.666} />
-                  <span className="flex min-w-0 flex-col items-start">
-                    <span className="text-[14px] leading-[20px] font-bold text-[#1f2937]">
-                      {item.label}
-                    </span>
-                    <span className="text-[12px] leading-4 text-[#99a1af]">{item.hint}</span>
-                  </span>
-                  <span className="ml-auto shrink-0">
-                    <Toggle
-                      on={prefs[item.id]}
-                      label={item.label}
-                      onChange={(next) =>
-                        setPrefs((current) => ({ ...current, [item.id]: next }))
-                      }
-                    />
-                  </span>
-                </div>
-              ))}
-            </div>
-          ))}
+          <div className="mt-5 flex items-center gap-3 rounded-[20px] border-[0.57px] border-solid border-[#f3f4f6] px-4 py-3">
+            <Bell className="size-4 shrink-0 text-[#f9a825]" strokeWidth={1.666} />
+            <span className="flex min-w-0 flex-col items-start">
+              <span className="text-[14px] leading-[20px] font-bold text-[#1f2937]">
+                WhatsApp
+              </span>
+              <span className="text-[12px] leading-4 break-words text-[#6a7282]">
+                Quotations, payment links and shoot updates go to
+                {customer?.mobile ? ` +91 ${customer.mobile}` : " your verified number"}
+              </span>
+            </span>
+          </div>
 
-          {/* Preferences are held in this session only — the CRM has no column
-              for them yet, and pretending they were saved would be worse. */}
-          <p className="flex items-center gap-2 pt-5 text-[12px] leading-4 text-[#99a1af]">
-            <CalendarDays className="size-[13px] shrink-0" strokeWidth={1.666} />
-            Changes apply to this session. Ask the team to update them permanently.
+          {customer?.email && (
+            <div className="mt-3 flex items-center gap-3 rounded-[20px] border-[0.57px] border-solid border-[#f3f4f6] px-4 py-3">
+              <Mail className="size-4 shrink-0 text-[#f9a825]" strokeWidth={1.666} />
+              <span className="flex min-w-0 flex-col items-start">
+                <span className="text-[14px] leading-[20px] font-bold text-[#1f2937]">
+                  Email
+                </span>
+                <span className="max-w-full truncate text-[12px] leading-4 text-[#6a7282]">
+                  {customer.email}
+                </span>
+              </span>
+            </div>
+          )}
+
+          {/* The per-channel switches that used to be here were local state:
+              turning WhatsApp off changed nothing, and the messages kept
+              coming. Nothing in the CRM stores a preference, so there is no
+              switch until something can act on it. */}
+          <p className="flex items-start gap-2 pt-5 text-[12px] leading-4 text-[#99a1af]">
+            <Bell className="mt-[1px] size-[13px] shrink-0" strokeWidth={1.666} />
+            To change how we reach you — or to stop a channel — ask the team and
+            they will update your record.
           </p>
         </div>
       )}
